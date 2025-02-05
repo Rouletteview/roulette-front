@@ -1,2 +1,11 @@
 @import "tailwindcss";
 
+.hero-cards {
+    box-shadow: 0px -6px 8px 0px #00000033 inset;
+    box-shadow: 0px 4px 6px 0px #FFFFFF3D inset;
+}
+
+
+.hero-background {
+    background: linear-gradient(180.07deg, rgba(18, 20, 24, 0.95) 38.66%, rgba(18, 20, 24, 0.9) 77.63%, rgba(217, 164, 37, 0.5) 116.49%);
+}
