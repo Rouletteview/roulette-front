@@ -1,5 +1,5 @@
 import './App.css'
-import HeroSection from './assets/Sections/HeroSection'
+import HeroSection from './Sections/HeroSection'
 import Header from './components/Header'
 
 function RouletteViewApp() {
