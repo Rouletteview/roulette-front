@@ -1,6 +1,8 @@
 import './App.css'
-import HeroSection from './Sections/HeroSection'
 import Header from './components/Header'
+import HeroSection from './Sections/HeroSection'
+import SubHeroSection from './Sections/SubHeroSection'
+// import Header from './components/Header'
 
 function RouletteViewApp() {
 
@@ -8,7 +10,8 @@ function RouletteViewApp() {
   return (
     <>
       <Header />
-      <HeroSection/>
+      <HeroSection />
+      <SubHeroSection />
     </>
   )
 }
