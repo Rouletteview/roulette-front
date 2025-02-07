@@ -2,6 +2,7 @@ import laptopAndSmartphone from '../assets/images/laptop.png'
 import finantialMarketImage from '../assets/images/financial-market.png'
 import laptopVideo from '../assets/videos/charts.mp4'
 
+
 export const SubHeroSection = () => {
     return (
         <div
@@ -27,9 +28,14 @@ export const SubHeroSection = () => {
                             <img src={laptopAndSmartphone} alt="" className="relative z-30" />
 
                         </div>
-                        <div className=' lg:mt-14  max-w-[550px] text-center'>
-                            <h1 className='text-[#D9A425] text-[40px] md:text-[80px] font-medium leading-[41px] md:leading-[83px]'>Maximiza tus oportunidades de éxito en cada jugada</h1>
+                        <div className="lg:mt-14 max-w-[550px] text-center relative">
+                            <h1 className="text-[#D9A425] text-[40px] md:text-[80px] font-medium leading-[41px] md:leading-[83px] relative z-10 drop-shadow-[0_0_25px_rgba(64, 64, 64, 1)]
+      before:content-[''] before:absolute before:-left-14 before:-top-2 before:w-[177px] md:before:w-[250px] before:h-[169px] md:before:h-[272px] before:bg-white before:blur-[100px] before:opacity-25 before:rounded-full before:-z-10
+      after:content-[''] after:absolute after:right-8 after:-bottom-2 after:w-[210px] after:h-[200px] after:bg-white after:blur-[100px] after:opacity-35 after:rounded-full after:-z-10">
+                                Maximiza tus oportunidades de éxito en cada jugada
+                            </h1>
                         </div>
+
 
                     </div>
                     <div className='mt-16 text-center w-full leading-[22px] md:leading-[56px]'>
@@ -40,7 +46,7 @@ export const SubHeroSection = () => {
                 </div>
 
 
-              
+
             </div>
 
         </div >
