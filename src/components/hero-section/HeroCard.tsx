@@ -9,7 +9,7 @@ interface Props {
 const HeroCard = ({ icon, title, description }: Props) => {
     return (
         <div
-            className="hero-cards flex flex-col w-full max-w-[300px] md:max-w-[410px] h-auto min-h-[220px] md:min-h-[270px] px-3.5 pt-4 pb-11 rounded-4xl leading-[22px]"
+            className="hero-cards flex flex-col w-full  md:max-w-[410px] h-auto min-h-[220px] md:min-h-[270px] px-3.5 pt-4 pb-11 rounded-4xl leading-[22px] text-white"
             style={{ background: "linear-gradient(180deg, #404040 0%, #000000 94.4%)" }}
         >
             <div className='text-start mb-1'>

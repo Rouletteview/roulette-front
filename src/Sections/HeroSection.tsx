@@ -6,7 +6,7 @@ import desktopComputer from "../assets/icon/desktop-computer.svg"
 
 export const HeroSection = () => {
   return (
-    <div
+    <section
       className="w-full bg-center bg-cover flex items-center justify-center text-white"
       style={{ backgroundImage: "url('/background/close-up-roulette-wheel-1.png')" }}
     >
@@ -45,7 +45,7 @@ export const HeroSection = () => {
           </section>
         </div>
       </div>
-    </div>
+    </section>
 
 
 

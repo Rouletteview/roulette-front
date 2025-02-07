@@ -6,10 +6,10 @@ import laptopVideo from '../assets/videos/charts.mp4'
 export const SubHeroSection = () => {
     return (
         <div
-            className="h-[922px] md:h-[1310px] bg-center w-full flex items-center justify-center text-white"
+            className="h-full bg-center w-full flex items-center justify-center text-white"
             style={{ backgroundImage: "url('/background/business-stock.gif')", backgroundSize: "cover" }}
         >
-            <div className="w-full h-full bg-[#121418F2]" >
+            <div className="w-full  bg-[#121418F2]" >
                 <div className="mt-28 md:mt-20 flex flex-col justify-center items-center text-center font-medium leading-[22px] md:leading-[48px] px-4">
                     <section className="max-w-[881px] flex flex-col gap-y-7">
                         <h1 className="text-2xl md:text-[45px] mx-3 md:mx-28 font-medium">Sistema de <span className="text-[#D9A425] font-[800]">Gráficos</span>  en vivo</h1>
