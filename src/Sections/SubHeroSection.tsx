@@ -6,8 +6,8 @@ import laptopVideo from '../assets/videos/charts.mp4'
 export const SubHeroSection = () => {
     return (
         <div
-            className="h-full bg-center w-full flex items-center justify-center text-white"
-            style={{ backgroundImage: "url('/background/business-stock.gif')", backgroundSize: "cover" }}
+            className="h-full bg-cover  flex  items-center justify-center text-white"
+            style={{ backgroundImage: "url('/background/business-stock.gif')" }}
         >
             <div className="w-full  bg-[#121418F2]" >
                 <div className="mt-28 md:mt-20 flex flex-col justify-center items-center text-center font-medium leading-[22px] md:leading-[48px] px-4">
