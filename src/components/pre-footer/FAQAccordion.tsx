@@ -44,7 +44,7 @@ const FAQAccordion = () => {
                         </span>
                     </button>
 
-                    {/* Respuesta con animación */}
+                 
                     <div
                         className={clsx(
                             "overflow-hidden transition-all duration-300",
