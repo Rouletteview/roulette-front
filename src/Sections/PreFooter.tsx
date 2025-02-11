@@ -3,6 +3,7 @@ import chartsIcon from "../assets/icon/charts-icon.svg"
 import seo from "../assets/icon/seo.svg"
 import chartIcon2 from "../assets/icon/chart-icon2.svg"
 import PriceCard from "../components/pre-footer/PriceCard"
+import QASection from "./QASection"
 
 
 
@@ -91,7 +92,7 @@ const PreFooter = () => {
                     </div>
                 </section>
 
-                <section className="mt-10 text-center text-white">
+                <section className="mt-10 md:mt-24 text-center text-white">
                     <h2 className="text-[26px] md:text-[50px] font-medium">Prueba nuestra plataforma </h2>
                     <h1 className="uppercase text-[#D9A425] text-[50px] md:text-7xl font-extrabold">Gratis</h1>
                     <h3 className="text-lg md:text-3xl">Por 7 días te <span className="text-[#D9A425]">regalamos acceso </span> para experimentar nuestros análisis en vivo</h3>
@@ -100,7 +101,7 @@ const PreFooter = () => {
                     </div>
 
                 </section>
-
+                <QASection />
             </div>
         </section>
     )
