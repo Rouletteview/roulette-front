@@ -6,7 +6,7 @@ import laptopVideo from '../assets/videos/charts.mp4'
 export const SubHeroSection = () => {
     return (
         <div
-            className="h-full bg-cover  flex  items-center justify-center text-white"
+            className="h-full flex  bg-center bg-cover   items-center justify-center text-white"
             style={{ backgroundImage: "url('/background/business-stock.gif')" }}
         >
             <div className="w-full  bg-[#121418F2]" >
@@ -39,7 +39,7 @@ export const SubHeroSection = () => {
 
                     </div>
                     <div className='mt-16 text-center w-full leading-[22px] md:leading-[56px]'>
-                        <p className='font-medium text-base md:text-[45px]'>Nuestra plataforma es ideal para inversores que buscan hacer <span className='text-[#D9A425] font-[800]'>trading</span> de forma profesional y <span className='text-[#D9A425] font-[800]'>basada en datos</span></p>
+                        <p className='font-medium text-base md:text-[45px]  md:mx-36'>Nuestra plataforma es ideal para inversores que buscan hacer <span className='text-[#D9A425] font-[800]'>trading</span> de forma profesional y <span className='text-[#D9A425] font-[800]'>basada en datos</span></p>
                     </div>
 
 
