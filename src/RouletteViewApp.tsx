@@ -1,9 +1,10 @@
 import './App.css'
+import Footer from './components/Footer'
 import Header from './components/Header'
 import HeroSection from './Sections/HeroSection'
 import PreFooter from './Sections/PreFooter'
 import SubHeroSection from './Sections/SubHeroSection'
-// import Header from './components/Header'
+
 
 function RouletteViewApp() {
 
@@ -14,6 +15,7 @@ function RouletteViewApp() {
       <HeroSection />
       <SubHeroSection />
       <PreFooter/>
+      <Footer/>
     </>
   )
 }
