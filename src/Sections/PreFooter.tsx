@@ -10,10 +10,10 @@ import QASection from "./QASection"
 const PreFooter = () => {
     return (
         <section
-            className="w-full h-full bg-cover "
+            className="w-full   bg-cover "
             style={{ backgroundImage: "url('/background/business-background.png')" }}
         >
-            <div className="bg-[#121418F2] ">
+            <div className="bg-[#121418F2]  ">
 
 
 
