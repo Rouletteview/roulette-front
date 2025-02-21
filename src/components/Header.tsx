@@ -10,7 +10,7 @@ export const Header = () => {
 
             <div className="flex items-center gap-x-3.5 md:gap-x-7 text-white text-[12px] md:text-lg font-semibold">
                 <a href="/iniciar-sesion" className="border border-[#D9A425] hover:border-[#B3831D] transition-all px-4 py-2 rounded-xl text-center">Iniciar sesión</a>
-                <a href="/registrar" className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center">Registrarse</a>
+                <a href="/registrarse" className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center">Registrarse</a>
             </div>
         </nav>
     </header>
