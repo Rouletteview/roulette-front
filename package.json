@@ -14,6 +14,7 @@
     "@hookform/resolvers": "^4.1.0",
     "@tailwindcss/vite": "^4.0.3",
     "clsx": "^2.1.1",
+    "flatpickr": "^4.6.13",
     "graphql": "^16.10.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
