@@ -1,6 +1,14 @@
+
+import { ReactNode } from "react";
 import Logo from "../assets/logo/logo2.svg";
 
-export const Header = () => {
+
+type Props = {
+    children: ReactNode
+}
+
+
+export const Header = ({children}: Props) => {
     return (
         <header className="py-4 px-5 md:px-[98px] absolute top-0 left-0 w-full z-50">
         <nav className="flex justify-between items-center mt-6">
@@ -9,8 +17,7 @@ export const Header = () => {
             </a>
 
             <div className="flex items-center gap-x-3.5 md:gap-x-7 text-white text-[12px] md:text-lg font-semibold">
-                <a href="/iniciar-sesion" className="border border-[#D9A425] hover:border-[#B3831D] transition-all px-4 py-2 rounded-xl text-center">Iniciar sesión</a>
-                <a href="/registrarse" className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center">Registrarse</a>
+                {children}
             </div>
         </nav>
     </header>
