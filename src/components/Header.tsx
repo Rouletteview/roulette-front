@@ -4,7 +4,7 @@ import Logo from "../assets/logo/logo2.svg";
 
 
 type Props = {
-    children: ReactNode
+    children?: ReactNode
 }
 
 
