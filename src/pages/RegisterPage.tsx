@@ -7,10 +7,10 @@ const RegisterPage = () => {
   return (
     <>
       <Header>
-        <a href="/iniciar-sesion" className="border border-[#D9A425] hover:border-[#B3831D] transition-all px-4 py-2 rounded-xl text-center">Iniciar sesión</a>
+        <a href="/iniciar-sesion" className="border border-[#D9A425] hover:border-[#B3831D] transition-all px-4 py-2 rounded-xl text-center hidden md:block">Iniciar sesión</a>
         <a
           href="/"
-          className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-white hidden md:block"
+          className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-white "
         >
           Ir al inicio
         </a>
