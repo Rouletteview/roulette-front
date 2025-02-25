@@ -7,12 +7,14 @@ interface InputProps {
     name: string;
     type?: string;
     placeholder?: string;
-    register: UseFormRegisterReturn;
+    register?: UseFormRegisterReturn;
     error?: string;
+    icon?: string;
+    className?: string;
 }
 
 
-const Input = ({ type = 'text', placeholder, register, error }: InputProps) => {
+const Input = ({ type = 'text', placeholder, register, error, icon, className }: InputProps) => {
 
     useEffect(() => {
         const inputElement = document.getElementById("date-input") as HTMLInputElement;
@@ -34,14 +36,28 @@ const Input = ({ type = 'text', placeholder, register, error }: InputProps) => {
     }, []);
 
     return (
-        <div className="flex flex-col space-y-1 max-w-[413px]">
-            <input
-                id={type === 'date' ? 'date-input' : 'text-input'}
-                placeholder={placeholder}
-                {...register}
-                className={`bg-[#404040] py-3 px-4 w-ful   rounded-[10px] text-white text-lg placeholder-white ${error ? "border border-red-500" : ""} focus:border-white focus:ring-white disabled:pointer-events-none`}
-            />
+        <div className="flex flex-col space-y-1 ">
+            <div className="relative">
+                <input
+                    id={type === 'date' ? 'date-input' : 'text-input'}
+                    placeholder={placeholder}
+                    {...register}
+                    className={`bg-[#404040] py-3 px-4 w-full rounded-[10px] text-white text-lg placeholder-white ${error ? "border border-red-500" : ""
+                        } focus:border-white focus:ring-white disabled:pointer-events-none ${icon ? "pr-10" : ""
+                        } ${className}`}
+                />
+                <div>
+                    {icon && (
+                        <span className="absolute inset-y-0 right-4 flex items-center text-white">
+                            <img src={icon} alt="" />
+                        </span>
+                    )}
+                </div>
+            </div>
+
             {error && <p className="text-red-500 text-sm">{error}</p>}
+
+
         </div>
     )
 }

@@ -7,19 +7,46 @@ const RegisterPage = () => {
   return (
     <>
       <Header>
-        <a href="/" className="border bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center">Ir al inicio</a>
+        <a href="/iniciar-sesion" className="border border-[#D9A425] hover:border-[#B3831D] transition-all px-4 py-2 rounded-xl text-center">Iniciar sesión</a>
+        <a
+          href="/"
+          className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-white hidden md:block"
+        >
+          Ir al inicio
+        </a>
       </Header>
-      <main className="flex flex-col justify-center items-center h-screen mx-6 mt-27">
-        <div className="text-center my-8">
-          <h1 className="text-lg leading-6 font-bold"><span className="text-[#D9A425] font-medium">¡Únete a nuestra comunidad de jugadores inteligentes!</span> Crea tu cuenta ahora para acceder a las herramientas más avanzadas de análisis de la ruleta</h1>
+
+      <section
+        className="w-full  bg-center bg-cover flex items-center justify-center text-white relative"
+        style={{ backgroundImage: "url('/background/close-up-roulette-wheel-1.png')" }}
+      >
+        <div className="w-full min-h-screen grid lg:grid-cols-3 items-center px-6 pt-32 hero-background ">
+          
+          <div className="lg:mx-20  col-span-2">
+            <div className="text-center my-8">
+              <h1 className="text-lg md:text-[32px] text-white leading-6 md:leading-12 font-bold mx-8">
+                <span className="text-[#D9A425] font-medium">
+                  ¡Únete a nuestra comunidad de jugadores inteligentes!
+                </span>{" "}
+                Crea tu cuenta ahora para acceder a las herramientas más avanzadas de análisis de la
+                ruleta.
+              </h1>
+            </div>
+
+            <div className="w-full">
+              <RegisterForm />
+            </div>
+          </div>
+
+          <div className="absolute bottom-0 right-0 hidden lg:block">
+            <img
+              src={img}
+              alt="Ilustración"
+              className="w-[250px] md:w-[350px] lg:w-[450px] xl:w-[500px] h-auto absolute bottom-0 right-0 lg:relative"
+            />
+          </div>
         </div>
-        <div className="w-full">
-          <RegisterForm />
-        </div>
-        <div className="absolute bottom-0 right-0 ">
-          <img src={img} alt="" className="w-[565px] h-auto hidden md:block" />
-        </div>
-      </main>
+      </section>
     </>
   )
 }
