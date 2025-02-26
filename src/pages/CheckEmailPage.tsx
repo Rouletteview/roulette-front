@@ -15,14 +15,14 @@ const CheckEmailPage = () => {
 
                     <div className="flex flex-col gap-y-[92px] justify-center items-center lg:mx-20  col-span-2 text-center">
                         <div className=" my-8">
-                            <h1 className="text-lg md:text-[50px] text-white leading-6 md:leading-14 font-bold mx-8 ">
+                            <h1 className="text-lg md:text-[50px] text-white leading-8 md:leading-14 font-bold lg:mx-8 ">
                                 <span className="text-[#D9A425]">¡Te hemos enviado un link a tu correo! </span>Accede a nuestra plataforma dándole click al link del correo, esto nos ayuda a verificar que tu correo es correcto
                             </h1>
                         </div>
 
-                        <div className="flex flex-col text-3xl gap-y-4">
-                            <span>¿No te llego el correo?</span>
-                            <a href="" className="text-[#D9A425] underline">Volver a enviar link a mi correo</a>
+                        <div className="flex flex-col lg:text-3xl gap-y-4">
+                            <span className="text-xl">¿No te llego el correo?</span>
+                            <a href="" className="text-[#D9A425] text-2xl underline">Volver a enviar link a mi correo</a>
                         </div>
 
                     </div>
