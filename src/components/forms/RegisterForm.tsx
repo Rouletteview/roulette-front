@@ -133,7 +133,7 @@ const RegisterForm = () => {
                 <button
                     type="submit"
                     disabled={!isChecked}
-                    className="block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-full md:w-[512px] text-lg font-bold rounded-[10px] py-2 mt-5 mb-24 disabled:bg-[#B2B2B2]"
+                    className="block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-full md:w-[512px] text-lg font-bold rounded-[10px] py-2 mt-5 mb-24 disabled:bg-[#B2B2B2] "
                 >
                     Registrarse
                 </button>
