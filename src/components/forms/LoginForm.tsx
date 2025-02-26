@@ -7,7 +7,7 @@ import Input from "./Input";
 
 const LoginForm = () => {
 
-    const { register, handleSubmit, formState: { errors } } = useForm<loginFormData>({
+    const { register, handleSubmit, formState: { errors, isValid } } = useForm<loginFormData>({
         resolver: zodResolver(loginSchema),
     });
 
@@ -16,7 +16,7 @@ const LoginForm = () => {
 
     const onSubmit = async (data: loginFormData) => {
         try {
-            
+
             const result = await Login({
                 variables: {
                     Email: data.email,
@@ -33,24 +33,40 @@ const LoginForm = () => {
     return (
 
         <form onSubmit={handleSubmit(onSubmit)}>
-            <Input
-                placeholder="Correo eléctronico"
-                name="email"
-                type="email"
-                register={register("email")}
-                error={errors.email?.message}
-            />
-            <Input
-                placeholder="Contraseña"
-                name="password"
-                type="password"
-                register={register("password")}
-                error={errors.password?.message}
-            />
+            <div className="flex flex-col ">
+                <div className="flex flex-col ">
+                    <Input
+                        placeholder="Correo eléctronico"
+                        name="email"
+                        type="email"
+                        className="mb-7"
+                        register={register("email")}
+                        error={errors.email?.message}
+                    />
+                    <Input
+                        placeholder="Contraseña"
+                        name="password"
+                        type="password"
+                        register={register("password")}
+                        error={errors.password?.message}
+                    />
+                    <a href="" className="my-4 text-right underline">¿Olvidaste tu contraseña?</a>
+                </div>
 
-            <button type="submit" className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600">
-                Iniciar sesión
-            </button>
+
+                <button
+                    type="submit"
+                    disabled={!isValid}
+                    className='block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-full md:w-[512px] text-lg font-bold rounded-[10px] py-2 mt-5 mb-3 disabled:bg-[#B2B2B2]'>
+                    Iniciar sesión
+                </button>
+                <div className="flex justify-center gap-x-2.5">
+                    <span>¿No tienes cuenta?</span>
+                    <a href="/registrarse" className="text-[#D9A425] underline">Crear cuenta</a>
+                </div>
+
+            </div>
+
 
         </form>
     )
