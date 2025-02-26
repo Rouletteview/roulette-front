@@ -7,7 +7,6 @@ const LoginPage = () => {
   return (
     <>
       <Header>
-        <a href="/iniciar-sesion" className="border border-[#D9A425] hover:border-[#B3831D] transition-all px-4 py-2 rounded-xl text-center hidden md:block">Iniciar sesión</a>
         <a
           href="/"
           className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-white "
@@ -19,9 +18,9 @@ const LoginPage = () => {
         className="w-full  bg-center bg-cover flex items-center justify-center text-white relative"
         style={{ backgroundImage: "url('/background/close-up-roulette-wheel-1.png')" }}
       >
-        <div className="w-full min-h-screen grid lg:grid-cols-3 items-center px-6 pt-11 hero-background ">
+        <div className="w-full min-h-screen grid lg:grid-cols-3 justify-center items-center px-6 pt-11 hero-background ">
           
-          <div className="lg:mx-20  col-span-2">
+          <div className="   col-span-2 lg:px-28  xl:px-48">
             <div className="text-center my-8">
               <h1 className="text-[28px] md:text-[32px] text-white leading-8 md:leading-12 font-medium">
               Inicia sesión para acceder a los datos que necesitas para ganar
