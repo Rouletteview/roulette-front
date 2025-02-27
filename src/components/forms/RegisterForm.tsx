@@ -8,8 +8,11 @@ import arrowIcon from "../../assets/icon/arrow-down-white.svg"
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
+import eyeOff from '../../assets/icon/eye-off.svg'
+
 
 const RegisterForm = () => {
+    const [showPassword, setShowPassword] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const navigate = useNavigate();
     const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
@@ -105,13 +108,27 @@ const RegisterForm = () => {
                     register={register("email")}
                     error={errors.email?.message}
                 />
-                <Input
-                    placeholder="Contraseña"
-                    type="password"
-                    name="password"
-                    register={register("password")}
-                    error={errors.password?.message}
-                />
+                <div className="relative">
+                    <Input
+                        placeholder="Contraseña"
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        register={register("password")}
+                        error={errors.password?.message}
+                    />
+                    <button
+                        type="button"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                        onClick={() => setShowPassword(!showPassword)}
+                    >
+                        {showPassword ? (
+                            <img src={eyeOff} alt="" />
+                        ) : (
+
+                            <img src={eyeOff} alt="" />
+                        )}
+                    </button>
+                </div>
             </div>
 
             <div className="mt-5 md:mt-11 flex flex-col items-center justify-center">

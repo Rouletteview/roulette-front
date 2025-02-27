@@ -40,6 +40,7 @@ const Input = ({ type = 'text', placeholder, register, error, icon, className }:
             <div className="relative">
                 <input
                     id={type === 'date' ? 'date-input' : 'text-input'}
+                    type={type}
                     placeholder={placeholder}
                     {...register}
                     className={`bg-[#404040] py-3 px-4 w-full rounded-[10px] text-white text-lg placeholder-white ${error ? "border border-red-500" : ""
