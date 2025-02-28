@@ -3,11 +3,15 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import RouletteViewApp from './RouletteViewApp.tsx'
 import { BrowserRouter } from "react-router";
+import { ApolloProvider } from '@apollo/client';
+import client from './graphql/client.ts'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
-    <RouletteViewApp/>
-    </BrowserRouter>
+    <ApolloProvider client={client}>
+      <BrowserRouter>
+        <RouletteViewApp />
+      </BrowserRouter>
+    </ApolloProvider>
   </StrictMode>
 )
