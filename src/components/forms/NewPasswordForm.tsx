@@ -2,19 +2,67 @@ import { useState } from "react";
 import Input from "./Input"
 
 import eyeOff from '../../assets/icon/eye-off.svg'
+import { useResetPassword } from "../../hooks/useResetPassword";
+import { useForm } from "react-hook-form";
+import { newPasswordFormData, newPasswordSchema } from '../../schemas/newPasswordSchema';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate, useSearchParams } from "react-router";
 
 
 const NewPasswordForm = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const token = searchParams.get("token");
+
+    const { register, handleSubmit, formState: { errors } } = useForm<newPasswordFormData>({
+        resolver: zodResolver(newPasswordSchema),
+    });
+
+
+
+
+    const { ResetPassword } = useResetPassword();
+
+    const onSubmit = async (data: newPasswordFormData) => {
+        if (!token) {
+            setErrorMessage("Token inválido o expirado.");
+            return;
+        }
+
+        try {
+            const result = await ResetPassword({
+                variables: {
+                    input: {
+                        NewPassword: data.password,
+                        ValidationToken: token,
+                    },
+                },
+            });
+            navigate('/iniciar-sesion');
+            console.log(result);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+            console.error("Error al cambiar contraseña:", error);
+
+            if (error.graphQLErrors?.length) {
+                setErrorMessage(error.graphQLErrors[0].message);
+            } else {
+                setErrorMessage("Error desconocido al cambiar contraseña.");
+            }
+        }
+    };
+
 
     return (
-        <form >
+        <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col ">
                 <div className="flex flex-col  gap-y-7">
                     <div className="relative">
                         <Input placeholder="Contraseña" type={showPassword ? "text" : "password"} name="password"
-                        // register={register("password")} 
-                        // error={errors.password?.message} 
+                            register={register("password")}
+                            error={errors.password?.message}
                         />
 
                         <button
@@ -33,8 +81,8 @@ const NewPasswordForm = () => {
 
                     <div className="relative">
                         <Input placeholder="Confirmar contraseña" type={showPassword ? "text" : "password"} name="confirm-password"
-                        // register={register("password")} 
-                        // error={errors.password?.message} 
+                            register={register("confirmPassword")}
+                            error={errors.password?.message}
                         />
 
                         <button
@@ -53,6 +101,10 @@ const NewPasswordForm = () => {
 
 
                 </div>
+
+                {errorMessage && (
+                    <p className="text-red-500 text-center mt-2">{errorMessage}</p>
+                )}
 
 
                 <button
