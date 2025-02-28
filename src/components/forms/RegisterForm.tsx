@@ -55,67 +55,29 @@ const RegisterForm = () => {
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="w-full  px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Input
-                    placeholder="Nombre completo"
-                    name="fullName"
-                    register={register("fullName")}
-                    error={errors.fullName?.message}
-                />
-                <Input
-                    placeholder="Fecha de nacimiento"
-                    name="birthDate"
-                    type="date"
-                    register={register("birthDate")}
-                    error={errors.birthDate?.message}
-                />
-
+                <Input placeholder="Nombre completo" name="fullName" register={register("fullName")} error={errors.fullName?.message} />
+                <Input placeholder="Fecha de nacimiento" name="birthDate" type="date" register={register("birthDate")} error={errors.birthDate?.message} icon={arrowIcon} />
 
                 <div className="flex gap-2 w-full">
                     <div className=" max-w-[95px]"  >
-                        <Input
-                            placeholder="+00"
-                            name="countryCode"
+                        <Input placeholder="+00" name="countryCode"
                             // register={register("countryCode")}
                             // error={errors.countryCode?.message}
-
                             icon={arrowIcon}
                         />
                     </div>
+
                     <div className="w-full">
-                        <Input
-                            placeholder="Teléfono"
-                            name="phone"
-                            register={register("phone")}
-                            error={errors.phone?.message}
-
-                        />
+                        <Input placeholder="Teléfono" name="phone" register={register("phone")} error={errors.phone?.message} />
                     </div>
-
-
                 </div>
 
+                <Input placeholder="País" name="country" register={register("country")} error={errors.country?.message} icon={arrowIcon} />
+                <Input placeholder="Correo electrónico" name="email" register={register("email")} error={errors.email?.message} />
 
-                <Input
-                    placeholder="País"
-                    name="country"
-                    register={register("country")}
-                    error={errors.country?.message}
-                    icon={arrowIcon}
-                />
-                <Input
-                    placeholder="Correo electrónico"
-                    name="email"
-                    register={register("email")}
-                    error={errors.email?.message}
-                />
                 <div className="relative">
-                    <Input
-                        placeholder="Contraseña"
-                        type={showPassword ? "text" : "password"}
-                        name="password"
-                        register={register("password")}
-                        error={errors.password?.message}
-                    />
+                    <Input placeholder="Contraseña" type={showPassword ? "text" : "password"} name="password" register={register("password")} error={errors.password?.message} />
+
                     <button
                         type="button"
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
