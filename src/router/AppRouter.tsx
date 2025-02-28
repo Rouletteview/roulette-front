@@ -18,7 +18,7 @@ const AppRouter = () => {
 
       <Route path="/confirmacion-correo" element={<CheckEmailPage/>} />
       <Route path="/recuperar-contraseña" element={<ResetPassword/>}/>
-      <Route path="/nueva-contraseña" element={<NewPasswordPage/>}/>
+      <Route path="/resetPassword?token=" element={<NewPasswordPage/>}/>
 
 
    </Routes>
