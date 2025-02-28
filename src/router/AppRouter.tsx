@@ -4,6 +4,7 @@ import RegisterPage from "../pages/RegisterPage"
 import LoginPage from "../pages/LoginPage"
 import CheckEmailPage from "../pages/CheckEmailPage"
 import ResetPassword from "../pages/ResetPassword"
+import NewPasswordPage from "../pages/NewPasswordPage"
 
 
 
@@ -17,6 +18,7 @@ const AppRouter = () => {
 
       <Route path="/confirmacion-correo" element={<CheckEmailPage/>} />
       <Route path="/recuperar-contraseña" element={<ResetPassword/>}/>
+      <Route path="/nueva-contraseña" element={<NewPasswordPage/>}/>
 
 
    </Routes>
