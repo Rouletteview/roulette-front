@@ -3,9 +3,18 @@ import { loginFormData, loginSchema } from "../../schemas/loginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLogin } from "../../hooks/useLogin";
 import Input from "./Input";
+import { useState } from "react";
+
+
+import eyeOff from '../../assets/icon/eye-off.svg'
+import { useNavigate } from "react-router";
 
 
 const LoginForm = () => {
+    const [showPassword, setShowPassword] = useState(false);
+    const [errorMessage, setErrorMessage] = useState(""); 
+    const navigate = useNavigate();
+
 
     const { register, handleSubmit, formState: { errors, isValid } } = useForm<loginFormData>({
         resolver: zodResolver(loginSchema),
@@ -15,6 +24,7 @@ const LoginForm = () => {
 
 
     const onSubmit = async (data: loginFormData) => {
+        setErrorMessage("");
         try {
 
             const result = await Login({
@@ -23,9 +33,17 @@ const LoginForm = () => {
                     Password: data.password
                 },
             });
+            navigate('/home')
             console.log("Usuario logeado:", result);
-        } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
             console.error("Error al iniciar sesión:", error);
+
+            if (error.graphQLErrors?.length) {
+                setErrorMessage(error.graphQLErrors[0].message);  
+            } else {
+                setErrorMessage("Error desconocido al iniciar sesión.");
+            }
         }
     };
 
@@ -43,16 +61,27 @@ const LoginForm = () => {
                         register={register("email")}
                         error={errors.email?.message}
                     />
-                    <Input
-                        placeholder="Contraseña"
-                        name="password"
-                        type="password"
-                        register={register("password")}
-                        error={errors.password?.message}
-                    />
+                    <div className="relative">
+                        <Input placeholder="Contraseña" type={showPassword ? "text" : "password"} name="password" register={register("password")} error={errors.password?.message} />
+
+                        <button
+                            type="button"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? (
+                                <img src={eyeOff} alt="" />
+                            ) : (
+
+                                <img src={eyeOff} alt="" />
+                            )}
+                        </button>
+                    </div>
                     <a href="/recuperar-contraseña" className="my-4 text-right underline lg:text-xl">¿Olvidaste tu contraseña?</a>
                 </div>
-
+                {errorMessage && (
+                    <p className="text-red-500 text-center mt-2">{errorMessage}</p>
+                )}
 
                 <button
                     type="submit"
