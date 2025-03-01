@@ -1,16 +1,16 @@
 import z from 'zod'
 
 export const newPasswordSchema = z.object({
-    password: z.string(),
-    confirmPassword: z.string(),
-}).refine(
-    (values) => {
-        return values.password === values.confirmPassword;
-    },
-    {
-        message: "¡Las contraseñas deben coincidir!",
-    }
-);
+    NewPassword: z
+        .string()
+        .min(8, "La contraseña debe tener al menos 8 caracteres"),
+
+
+    ConfirmPassword: z.string(),
+}).refine((data) => data.NewPassword === data.ConfirmPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["ConfirmPassword"], 
+});
 
 
 export type newPasswordFormData = z.infer<typeof newPasswordSchema>;

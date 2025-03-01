@@ -23,7 +23,7 @@ const NewPasswordForm = () => {
 
 
 
-    const { ResetPassword } = useResetPassword();
+    const { ResetPassword, loading } = useResetPassword();
 
     const onSubmit = async (data: newPasswordFormData) => {
         if (!token) {
@@ -34,10 +34,8 @@ const NewPasswordForm = () => {
         try {
             const result = await ResetPassword({
                 variables: {
-                    input: {
-                        NewPassword: data.password,
-                        ValidationToken: token,
-                    },
+                    newPassword: data.NewPassword,
+                    validationToken: token,
                 },
             });
             navigate('/iniciar-sesion');
@@ -61,8 +59,8 @@ const NewPasswordForm = () => {
                 <div className="flex flex-col  gap-y-7">
                     <div className="relative">
                         <Input placeholder="Contraseña" type={showPassword ? "text" : "password"} name="password"
-                            register={register("password")}
-                            error={errors.password?.message}
+                            register={register("NewPassword")}
+                            error={errors.NewPassword?.message}
                         />
 
                         <button
@@ -81,8 +79,8 @@ const NewPasswordForm = () => {
 
                     <div className="relative">
                         <Input placeholder="Confirmar contraseña" type={showPassword ? "text" : "password"} name="confirm-password"
-                            register={register("confirmPassword")}
-                            error={errors.password?.message}
+                            register={register("ConfirmPassword")}
+                            error={errors.ConfirmPassword?.message}
                         />
 
                         <button
@@ -109,9 +107,9 @@ const NewPasswordForm = () => {
 
                 <button
                     type="submit"
-                    // disabled={!isValid}
+                    disabled={loading}
                     className='block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-full  text-lg font-bold rounded-[10px] py-2 mt-5 mb-3 disabled:bg-[#B2B2B2]'>
-                    Cambiar contraseña
+                      {loading ? "Cargando..." : "Restablecer Contraseña"}
                 </button>
 
 
