@@ -19,7 +19,7 @@ const RegisterForm = () => {
         resolver: zodResolver(registerSchema),
     });
 
-    const { registerUser } = useRegister();
+    const { registerUser, loading } = useRegister();
 
 
     const onSubmit = async (data: RegisterFormData) => {
@@ -111,10 +111,10 @@ const RegisterForm = () => {
 
                 <button
                     type="submit"
-                    disabled={!isChecked}
+                    disabled={!isChecked || loading}
                     className="block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-full md:w-[512px] text-lg font-bold rounded-[10px] py-2 mt-5 mb-24 disabled:bg-[#B2B2B2] "
                 >
-                    Registrarse
+                    {loading ? "Cargando..." : "Registrarse"}
                 </button>
             </div>
 
