@@ -10,18 +10,18 @@ import NewPasswordPage from "../pages/NewPasswordPage"
 
 const AppRouter = () => {
   return (
-   <Routes>
+    <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/registrarse" element={<RegisterPage />} />
       <Route path="/iniciar-sesion" element={<LoginPage />} />
 
 
-      <Route path="/confirmacion-correo" element={<CheckEmailPage/>} />
-      <Route path="/recuperar-contraseña" element={<ResetPassword/>}/>
-      <Route path="/resetPassword?token=" element={<NewPasswordPage/>}/>
+      <Route path="/confirmacion-correo" element={<CheckEmailPage />} />
+      <Route path="/recuperar-contraseña" element={<ResetPassword />} />
+      <Route path="/resetPassword" element={<NewPasswordPage />} />
 
 
-   </Routes>
+    </Routes>
   )
 }
 
