@@ -27,6 +27,8 @@ const RegisterForm = () => {
 
             const [name, ...lastnameArray] = data.fullName.trim().split(" ");
             const lastname = lastnameArray.join(" ") || "N/A";
+            const phoneNumber = data.countryCode + ' ' + data.phone
+            console.log(phoneNumber)
 
 
             const result = await registerUser({
@@ -37,7 +39,7 @@ const RegisterForm = () => {
                     Email: data.email,
                     Country: data.country,
                     BirthDate: new Date(data.birthDate).toISOString(),
-                    PhoneNumber: data.phone,
+                    PhoneNumber: phoneNumber,
                 },
             });
             console.log("Usuario registrado:", result);
@@ -61,8 +63,8 @@ const RegisterForm = () => {
                 <div className="flex gap-2 w-full">
                     <div className=" max-w-[95px]"  >
                         <Input placeholder="+00" name="countryCode"
-                            // register={register("countryCode")}
-                            // error={errors.countryCode?.message}
+                            register={register("countryCode")}
+                            error={errors.countryCode?.message}
                             icon={arrowIcon}
                         />
                     </div>
