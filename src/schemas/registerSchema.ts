@@ -9,11 +9,12 @@ export const registerSchema = z.object({
     birthDate: z
         .string()
         .regex(/^\d{4}-\d{2}-\d{2}$/, "Formato inválido, use dd/mm/aa"),
-
     phone: z
         .string()
-        .regex(/^\+\d{1,4}\s?\d{6,15}$/, "Número de teléfono inválido"),
-
+        .regex(/^\d{6,15}$/, "Número de teléfono inválido"),
+    countryCode: z
+        .string()
+        .regex(/^\+\d{1,4}$/, "Prefijo telefónico inválido"),
     country: z
         .string()
         .min(1, "Debe seleccionar un país"),
