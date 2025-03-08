@@ -14,6 +14,7 @@ import eyeOff from '../../assets/icon/eye-off.svg'
 const RegisterForm = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
     const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
         resolver: zodResolver(registerSchema),
@@ -31,7 +32,7 @@ const RegisterForm = () => {
             console.log(phoneNumber)
 
 
-            const result = await registerUser({
+            await registerUser({
                 variables: {
                     FirstName: name,
                     LastName: lastname,
@@ -42,12 +43,16 @@ const RegisterForm = () => {
                     PhoneNumber: phoneNumber,
                 },
             });
-            console.log("Usuario registrado:", result);
             navigate("/confirmacion-correo");
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
 
-        } catch (error) {
-            console.error("Error al registrar:", error);
+            if (error.graphQLErrors?.length) {
+                setErrorMessage(error.graphQLErrors[0].message);
+            } else {
+                setErrorMessage("Lo sentimos ha ocurrido un error. Revise los campos e intente más tarde");
+            }
         }
     };
 
@@ -61,11 +66,11 @@ const RegisterForm = () => {
                 <Input placeholder="Fecha de nacimiento" name="birthDate" type="date" register={register("birthDate")} error={errors.birthDate?.message} icon={arrowIcon} />
 
                 <div className="flex gap-2 w-full">
-                    <div className=" max-w-[95px]"  >
+                    <div className=" max-w-[75px]"  >
                         <Input placeholder="+00" name="countryCode"
                             register={register("countryCode")}
                             error={errors.countryCode?.message}
-                            icon={arrowIcon}
+                            className="text-center"
                         />
                     </div>
 
@@ -74,7 +79,7 @@ const RegisterForm = () => {
                     </div>
                 </div>
 
-                <Input placeholder="País" name="country" register={register("country")} error={errors.country?.message} icon={arrowIcon} />
+                <Input placeholder="País" name="country" register={register("country")} error={errors.country?.message} />
                 <Input placeholder="Correo electrónico" name="email" register={register("email")} error={errors.email?.message} />
 
                 <div className="relative">
@@ -109,7 +114,9 @@ const RegisterForm = () => {
                     />
                 </div>
 
-
+                {errorMessage && (
+                    <p className="text-red-500 text-center mt-2">{errorMessage}</p>
+                )}
 
                 <button
                     type="submit"

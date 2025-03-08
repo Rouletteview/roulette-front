@@ -12,7 +12,7 @@ import { useNavigate } from "react-router";
 
 const LoginForm = () => {
     const [showPassword, setShowPassword] = useState(false);
-    const [errorMessage, setErrorMessage] = useState(""); 
+    const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
 
 
@@ -35,14 +35,14 @@ const LoginForm = () => {
             });
             navigate('/home')
             console.log("Usuario logeado:", result);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error("Error al iniciar sesión:", error);
 
             if (error.graphQLErrors?.length) {
-                setErrorMessage(error.graphQLErrors[0].message);  
+                setErrorMessage(error.graphQLErrors[0].message);
             } else {
-                setErrorMessage("Error desconocido al iniciar sesión.");
+                setErrorMessage("Lo sentimos ha ocurrido un error. Revise los campos e intente más tarde");
             }
         }
     };
@@ -87,7 +87,7 @@ const LoginForm = () => {
                     type="submit"
                     disabled={!isValid || loading}
                     className='block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-full  text-lg font-bold rounded-[10px] py-2 mt-5 mb-3 disabled:bg-[#B2B2B2]'>
-                     {loading ? "Cargando..." : "Iniciar sesión"}
+                    {loading ? "Cargando..." : "Iniciar sesión"}
                 </button>
                 <div className="flex justify-center gap-x-2.5 lg:text-xl">
                     <span>¿No tienes cuenta?</span>
