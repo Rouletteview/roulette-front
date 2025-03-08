@@ -47,7 +47,7 @@ const NewPasswordForm = () => {
             if (error.graphQLErrors?.length) {
                 setErrorMessage(error.graphQLErrors[0].message);
             } else {
-                setErrorMessage("Error desconocido al cambiar contraseña.");
+                setErrorMessage("Lo sentimos ha ocurrido un error. Revise los campos e intente más tarde");
             }
         }
     };
