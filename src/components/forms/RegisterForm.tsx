@@ -29,7 +29,7 @@ const RegisterForm = () => {
             const [name, ...lastnameArray] = data.fullName.trim().split(" ");
             const lastname = lastnameArray.join(" ") || "N/A";
             const phoneNumber = data.countryCode + ' ' + data.phone
-            console.log(phoneNumber)
+
 
 
             await registerUser({
