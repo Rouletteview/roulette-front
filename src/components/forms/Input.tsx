@@ -28,7 +28,7 @@ const Input = ({ type = 'text', placeholder, register, error, icon, className }:
             ).toISOString();
 
             flatpickr(inputElement, {
-                dateFormat: "Y-m-d",
+                dateFormat: "d-m-Y",
                 maxDate: eighteenYearsAgo,
                 disableMobile: true,
             });

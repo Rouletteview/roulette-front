@@ -8,7 +8,7 @@ export const registerSchema = z.object({
 
     birthDate: z
         .string()
-        .regex(/^\d{4}-\d{2}-\d{2}$/, "Formato inválido, use dd/mm/aa"),
+        .regex(/^\d{2}-\d{2}-\d{4}$/, "Formato inválido, use dd/mm/aa"),
     phone: z
         .string()
         .regex(/^\d{6,15}$/, "Número de teléfono inválido"),
