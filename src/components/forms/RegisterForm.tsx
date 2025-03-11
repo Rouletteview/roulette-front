@@ -11,6 +11,9 @@ import { useNavigate } from "react-router";
 import eyeOff from '../../assets/icon/eye-off.svg'
 
 
+
+
+
 const RegisterForm = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
@@ -23,31 +26,41 @@ const RegisterForm = () => {
     const { registerUser, loading } = useRegister();
 
 
+
+
+
+
     const onSubmit = async (data: RegisterFormData) => {
         try {
 
             const [name, ...lastnameArray] = data.fullName.trim().split(" ");
             const lastname = lastnameArray.join(" ") || "N/A";
-            const phoneNumber = data.countryCode + ' ' + data.phone
+            const phoneNumber = data.countryCode + data.phone
+
+            console.log(typeof  data.birthDate)
 
 
 
-            await registerUser({
+            const response = await registerUser({
                 variables: {
-                    FirstName: name,
-                    LastName: lastname,
-                    Password: data.password,
-                    Email: data.email,
-                    Country: data.country,
-                    BirthDate: new Date(data.birthDate).toISOString(),
-                    PhoneNumber: phoneNumber,
+                  FirstName: name,
+                  LastName: lastname,
+                  Password: data.password,
+                  Email: data.email,
+                  Country: data.country,
+                  BirthDate: new Date(data.birthDate).toISOString(),
+                  PhoneNumber: phoneNumber,
                 },
-            });
-            navigate("/confirmacion-correo");
+              });
+              
+              if (response.errors) {
+                console.log(response.errors);  
+              }
+            navigate("/confirmar-correo");
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
-
+            console.log(error)
             if (error.graphQLErrors?.length) {
                 setErrorMessage(error.graphQLErrors[0].message);
             } else {
@@ -55,6 +68,8 @@ const RegisterForm = () => {
             }
         }
     };
+
+
 
 
 

@@ -16,7 +16,7 @@ const AppRouter = () => {
       <Route path="/iniciar-sesion" element={<LoginPage />} />
 
 
-      <Route path="/activateUser" element={<CheckEmailPage />} />
+      <Route path="/confirmar-correo" element={<CheckEmailPage />} />
       <Route path="/recuperar-contraseña" element={<ResetPassword />} />
       <Route path="/resetPassword" element={<NewPasswordPage />} />
 
