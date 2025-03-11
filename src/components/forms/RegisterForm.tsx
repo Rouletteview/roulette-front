@@ -56,7 +56,7 @@ const RegisterForm = () => {
               if (response.errors) {
                 console.log(response.errors);  
               }
-            navigate("/activateUser");
+            navigate("/confirmar-correo");
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
