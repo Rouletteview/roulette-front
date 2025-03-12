@@ -37,10 +37,12 @@ const LoginForm = () => {
             console.log("Usuario logeado:", result);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
-            console.error("Error al iniciar sesión:", error);
 
             if (error.graphQLErrors?.length) {
-                setErrorMessage(error.graphQLErrors[0].message);
+                if (error.graphQLErrors[0].code === 'BAD_REQUEST') {
+                    setErrorMessage('El correo electrónico o la contraseña ingresados son incorrectos');
+                }
+
             } else {
                 setErrorMessage("Lo sentimos ha ocurrido un error. Revise los campos e intente más tarde");
             }

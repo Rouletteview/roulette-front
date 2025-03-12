@@ -42,7 +42,7 @@ const NewPasswordForm = () => {
             console.log(result);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
-            console.error("Error al cambiar contraseña:", error);
+
 
             if (error.graphQLErrors?.length) {
                 setErrorMessage(error.graphQLErrors[0].message);
@@ -109,7 +109,7 @@ const NewPasswordForm = () => {
                     type="submit"
                     disabled={loading}
                     className='block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-full  text-lg font-bold rounded-[10px] py-2 mt-5 mb-3 disabled:bg-[#B2B2B2]'>
-                      {loading ? "Cargando..." : "Restablecer Contraseña"}
+                    {loading ? "Cargando..." : "Restablecer Contraseña"}
                 </button>
 
 
