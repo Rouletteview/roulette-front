@@ -32,19 +32,21 @@ const RecoveryForm = () => {
       console.log("Usuario logeado:", result);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-    
-
-      if (error.graphQLErrors?.length) {
-        if (error.graphQLErrors[0].code === 'NOT_FOUND') {
+      if (error.graphQLErrors?.length > 0) {
+        const graphQLError = error.graphQLErrors[0];
+        if (graphQLError.code === "NOT_FOUND") {
           setErrorMessage('No existe una cuenta asociada a este correo electrónico.');
-
+        } else {
+            setErrorMessage(`Error: ${graphQLError.message}`);
         }
-
+    } else if (error.networkError) {
+        setErrorMessage("Error de red. Por favor, verifica tu conexión.");
     } else {
-        setErrorMessage("Lo sentimos ha ocurrido un error. Revise los campos e intente más tarde");
+        setErrorMessage("Ocurrió un error inesperado. Por favor, intenta nuevamente.");
     }
+
     }
-  };
+  }
 
 
   return (
