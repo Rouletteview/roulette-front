@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 
 import eyeOff from '../../assets/icon/eye-off.svg'
+import LoadingOverlay from "../LoadingOverlay";
 
 
 
@@ -25,6 +26,8 @@ const RegisterForm = () => {
 
     const { registerUser, loading } = useRegister();
 
+
+    if (loading) return <LoadingOverlay />;
 
 
 

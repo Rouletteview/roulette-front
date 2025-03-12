@@ -3,6 +3,7 @@ import Input from "./Input"
 import { useSendResetPassword } from "../../hooks/useSendResetPasswordEmail";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import LoadingOverlay from "../LoadingOverlay";
 
 interface FormInput {
   email: string;
@@ -16,20 +17,22 @@ const RecoveryForm = () => {
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormInput>();
 
-  const { SendResetPasswordEmail } = useSendResetPassword()
+  const { SendResetPasswordEmail, loading } = useSendResetPassword();
+
+  if (loading) return <LoadingOverlay/>
 
   const onSubmit = async (data: FormInput) => {
     setErrorMessage("");
     try {
 
-      const result = await SendResetPasswordEmail({
+       await SendResetPasswordEmail({
         variables: {
           email: data.email,
         },
       });
 
-      navigate('/')
-      console.log("Usuario logeado:", result);
+      navigate("/correo-enviado");
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.graphQLErrors?.length > 0) {
@@ -50,6 +53,7 @@ const RecoveryForm = () => {
 
 
   return (
+    
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-col ">
         <div className="flex flex-col ">

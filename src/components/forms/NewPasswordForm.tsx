@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { newPasswordFormData, newPasswordSchema } from '../../schemas/newPasswordSchema';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, useSearchParams } from "react-router";
+import LoadingOverlay from "../LoadingOverlay";
 
 
 const NewPasswordForm = () => {
@@ -24,6 +25,9 @@ const NewPasswordForm = () => {
 
 
     const { ResetPassword, loading } = useResetPassword();
+
+
+    if (loading) return <LoadingOverlay />;
 
     const onSubmit = async (data: newPasswordFormData) => {
         if (!token) {
