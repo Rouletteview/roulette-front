@@ -17,6 +17,7 @@ const AppRouter = () => {
       <Route path="/recuperar-password" element={<ResetPassword />} />
       <Route path="/correo-enviado" element={<CheckEmailPasswordPage />} />
       <Route path="/resetPassword" element={<NewPasswordPage />} />
+    
     </Routes>
   );
 };

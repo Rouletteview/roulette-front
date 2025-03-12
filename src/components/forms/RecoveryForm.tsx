@@ -19,13 +19,13 @@ const RecoveryForm = () => {
 
   const { SendResetPasswordEmail, loading } = useSendResetPassword();
 
-  if (loading) return <LoadingOverlay/>
+  if (loading) return <LoadingOverlay />
 
   const onSubmit = async (data: FormInput) => {
     setErrorMessage("");
     try {
 
-       await SendResetPasswordEmail({
+      await SendResetPasswordEmail({
         variables: {
           email: data.email,
         },
@@ -40,20 +40,20 @@ const RecoveryForm = () => {
         if (graphQLError.code === "NOT_FOUND") {
           setErrorMessage('No existe una cuenta asociada a este correo electrónico.');
         } else {
-            setErrorMessage(`Error: ${graphQLError.message}`);
+          setErrorMessage(`Error: ${graphQLError.message}`);
         }
-    } else if (error.networkError) {
+      } else if (error.networkError) {
         setErrorMessage("Error de red. Por favor, verifica tu conexión.");
-    } else {
+      } else {
         setErrorMessage("Ocurrió un error inesperado. Por favor, intenta nuevamente.");
-    }
+      }
 
     }
   }
 
 
   return (
-    
+
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-col ">
         <div className="flex flex-col ">

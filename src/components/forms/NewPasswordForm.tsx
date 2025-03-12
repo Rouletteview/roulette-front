@@ -42,7 +42,7 @@ const NewPasswordForm = () => {
                     validationToken: token,
                 },
             });
-            navigate('/iniciar-sesion');
+            navigate("/iniciar-sesion", { state: { message: "Contraseña cambiada con éxito", ok: true } });
             console.log(result);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
@@ -50,7 +50,7 @@ const NewPasswordForm = () => {
             if (error.graphQLErrors?.length > 0) {
                 const graphQLError = error.graphQLErrors[0];
                 if (error.graphQLErrors?.length) {
-                        setErrorMessage(error.graphQLErrors[0].message);
+                    setErrorMessage(error.graphQLErrors[0].message);
                 } else {
                     setErrorMessage(`Error: ${graphQLError.message}`);
                 }
@@ -59,8 +59,8 @@ const NewPasswordForm = () => {
             } else {
                 setErrorMessage("Ocurrió un error inesperado. Por favor, intenta nuevamente.");
             }
-        
-          
+
+
         }
     };
 
