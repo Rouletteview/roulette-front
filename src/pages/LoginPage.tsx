@@ -3,6 +3,7 @@ import Header from "../components/Header"
 import img from "../assets/images/phone-auth.png"
 import { useLocation } from "react-router";
 import Popup from "../components/PopUp";
+import { useState } from "react";
 
 
 const LoginPage = () => {
@@ -10,10 +11,12 @@ const LoginPage = () => {
   const message = location.state?.message;
   const ok = location.state?.ok;
 
+  const [showPopup, setShowPopup] = useState(ok || false);
 
-  if (ok) {
-    return <Popup message={message || "Mensaje no disponible"} onClose={() => {}} />;
-  }
+  const closePopup = () => {
+    setShowPopup(false);
+  };
+
 
   return (
     <>
@@ -56,6 +59,7 @@ const LoginPage = () => {
 
           </div>
         </div>
+        {showPopup && <Popup message={message || "Mensaje no disponible"} onClose={closePopup} />}
       </section>
     </>
 

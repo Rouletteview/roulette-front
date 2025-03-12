@@ -1,9 +1,22 @@
 import RegisterForm from "../components/forms/RegisterForm"
 import Header from "../components/Header"
 import img from "../assets/images/phone-auth.png"
+import { useLocation } from "react-router";
+import { useState } from "react";
+import Popup from "../components/PopUp";
 
 
 const RegisterPage = () => {
+
+  const location = useLocation();
+  const message = location.state?.message;
+  const ok = location.state?.ok;
+
+  const [showPopup, setShowPopup] = useState(ok || false);
+
+  const closePopup = () => {
+    setShowPopup(false);
+  };
   return (
     <>
       <Header>
@@ -50,6 +63,7 @@ const RegisterPage = () => {
             </div>
           </div>
         </div>
+        {showPopup && <Popup message={message || "Mensaje no disponible"} onClose={closePopup} />}
       </section>
     </>
   )
