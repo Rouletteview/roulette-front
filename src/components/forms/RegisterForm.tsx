@@ -53,7 +53,7 @@ const RegisterForm = () => {
             });
 
             console.log("Usuario registrado exitosamente:", response.data);
-            navigate("/confirmar-correo");
+            navigate("/confirmar-correo", { state: { message: "Email confirmado con éxito", ok: true } });
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {

@@ -9,9 +9,9 @@ const Popup: React.FC<PopupProps> = ({ message, onClose }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
-    }, 5000); // El popup se cierra después de 5 segundos
+    }, 5000); 
 
-    return () => clearTimeout(timer); // Limpiar el timer al desmontar el componente
+    return () => clearTimeout(timer); 
   }, [onClose]);
 
   return (
