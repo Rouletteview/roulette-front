@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { newPasswordFormData, newPasswordSchema } from '../../schemas/newPasswordSchema';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, useSearchParams } from "react-router";
+import LoadingOverlay from "../LoadingOverlay";
 
 
 const NewPasswordForm = () => {
@@ -25,6 +26,9 @@ const NewPasswordForm = () => {
 
     const { ResetPassword, loading } = useResetPassword();
 
+
+    if (loading) return <LoadingOverlay />;
+
     const onSubmit = async (data: newPasswordFormData) => {
         if (!token) {
             setErrorMessage("Token inválido o expirado.");
@@ -38,7 +42,7 @@ const NewPasswordForm = () => {
                     validationToken: token,
                 },
             });
-            navigate('/iniciar-sesion');
+            navigate("/iniciar-sesion", { state: { message: "Contraseña cambiada con éxito", ok: true } });
             console.log(result);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
@@ -46,7 +50,7 @@ const NewPasswordForm = () => {
             if (error.graphQLErrors?.length > 0) {
                 const graphQLError = error.graphQLErrors[0];
                 if (error.graphQLErrors?.length) {
-                        setErrorMessage(error.graphQLErrors[0].message);
+                    setErrorMessage(error.graphQLErrors[0].message);
                 } else {
                     setErrorMessage(`Error: ${graphQLError.message}`);
                 }
@@ -55,8 +59,8 @@ const NewPasswordForm = () => {
             } else {
                 setErrorMessage("Ocurrió un error inesperado. Por favor, intenta nuevamente.");
             }
-        
-          
+
+
         }
     };
 

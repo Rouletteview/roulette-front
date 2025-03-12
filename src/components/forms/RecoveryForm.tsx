@@ -3,6 +3,7 @@ import Input from "./Input"
 import { useSendResetPassword } from "../../hooks/useSendResetPasswordEmail";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import LoadingOverlay from "../LoadingOverlay";
 
 interface FormInput {
   email: string;
@@ -16,20 +17,22 @@ const RecoveryForm = () => {
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormInput>();
 
-  const { SendResetPasswordEmail } = useSendResetPassword()
+  const { SendResetPasswordEmail, loading } = useSendResetPassword();
+
+  if (loading) return <LoadingOverlay />
 
   const onSubmit = async (data: FormInput) => {
     setErrorMessage("");
     try {
 
-      const result = await SendResetPasswordEmail({
+      await SendResetPasswordEmail({
         variables: {
           email: data.email,
         },
       });
 
-      navigate('/')
-      console.log("Usuario logeado:", result);
+      navigate("/correo-enviado");
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.graphQLErrors?.length > 0) {
@@ -37,19 +40,20 @@ const RecoveryForm = () => {
         if (graphQLError.code === "NOT_FOUND") {
           setErrorMessage('No existe una cuenta asociada a este correo electrónico.');
         } else {
-            setErrorMessage(`Error: ${graphQLError.message}`);
+          setErrorMessage(`Error: ${graphQLError.message}`);
         }
-    } else if (error.networkError) {
+      } else if (error.networkError) {
         setErrorMessage("Error de red. Por favor, verifica tu conexión.");
-    } else {
+      } else {
         setErrorMessage("Ocurrió un error inesperado. Por favor, intenta nuevamente.");
-    }
+      }
 
     }
   }
 
 
   return (
+
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-col ">
         <div className="flex flex-col ">

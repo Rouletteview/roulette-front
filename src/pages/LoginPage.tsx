@@ -1,9 +1,20 @@
 import LoginForm from "../components/forms/LoginForm"
 import Header from "../components/Header"
 import img from "../assets/images/phone-auth.png"
+import { useLocation } from "react-router";
+import Popup from "../components/PopUp";
 
 
 const LoginPage = () => {
+  const location = useLocation();
+  const message = location.state?.message;
+  const ok = location.state?.ok;
+
+
+  if (ok) {
+    return <Popup message={message || "Mensaje no disponible"} onClose={() => {}} />;
+  }
+
   return (
     <>
       <Header>

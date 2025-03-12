@@ -8,6 +8,7 @@ import { useState } from "react";
 
 import eyeOff from '../../assets/icon/eye-off.svg'
 import { useNavigate } from "react-router";
+import LoadingOverlay from "../LoadingOverlay";
 
 
 const LoginForm = () => {
@@ -16,25 +17,26 @@ const LoginForm = () => {
     const navigate = useNavigate();
 
 
-    const { register, handleSubmit, formState: { errors, isValid } } = useForm<loginFormData>({
+    const { register, handleSubmit, formState: { errors } } = useForm<loginFormData>({
         resolver: zodResolver(loginSchema),
     });
 
     const { Login, loading } = useLogin();
+
+    if (loading) return <LoadingOverlay />;
 
 
     const onSubmit = async (data: loginFormData) => {
         setErrorMessage("");
         try {
 
-            const result = await Login({
+            await Login({
                 variables: {
                     Email: data.email,
                     Password: data.password
                 },
             });
             navigate('/home')
-            console.log("Usuario logeado:", result);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             if (error.graphQLErrors?.length > 0) {
@@ -49,8 +51,8 @@ const LoginForm = () => {
             } else {
                 setErrorMessage("Ocurrió un error inesperado. Por favor, intenta nuevamente.");
             }
-        
-           
+
+
         }
     };
 
@@ -84,7 +86,7 @@ const LoginForm = () => {
                             )}
                         </button>
                     </div>
-                    <a href="/recuperar-contraseña" className="my-4 text-right underline lg:text-xl">¿Olvidaste tu contraseña?</a>
+                    <a href="/recuperar-password" className="my-4 text-right underline lg:text-xl">¿Olvidaste tu contraseña?</a>
                 </div>
                 {errorMessage && (
                     <p className="text-red-500 text-center mt-2">{errorMessage}</p>
@@ -92,7 +94,6 @@ const LoginForm = () => {
 
                 <button
                     type="submit"
-                    disabled={!isValid || loading}
                     className='block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-full  text-lg font-bold rounded-[10px] py-2 mt-5 mb-3 disabled:bg-[#B2B2B2]'>
                     {loading ? "Cargando..." : "Iniciar sesión"}
                 </button>
