@@ -1,6 +1,8 @@
 import Header from "../components/Header"
 import img from "../assets/images/phone-auth.png"
 import RecoveryForm from "../components/forms/RecoveryForm"
+import { Outlet } from "react-router"
+
 
 
 const ResetPassword = () => {
@@ -45,6 +47,7 @@ const ResetPassword = () => {
             </div>
         </div>
       </div>
+      <Outlet />
     </section>
   </>
   )
