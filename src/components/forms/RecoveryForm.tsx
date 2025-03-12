@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import Input from "./Input"
 import { useSendResetPassword } from "../../hooks/useSendResetPasswordEmail";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 interface FormInput {
   email: string;
@@ -11,6 +12,7 @@ interface FormInput {
 const RecoveryForm = () => {
 
   const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormInput>();
 
@@ -26,17 +28,21 @@ const RecoveryForm = () => {
         },
       });
 
-      // navigate('/home')
+      navigate('/')
       console.log("Usuario logeado:", result);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error("Error al iniciar sesión:", error);
+    
 
       if (error.graphQLErrors?.length) {
-        setErrorMessage(error.graphQLErrors[0].message);
-      } else {
+        if (error.graphQLErrors[0].code === 'NOT_FOUND') {
+          setErrorMessage('No existe una cuenta asociada a este correo electrónico.');
+
+        }
+
+    } else {
         setErrorMessage("Lo sentimos ha ocurrido un error. Revise los campos e intente más tarde");
-      }
+    }
     }
   };
 
