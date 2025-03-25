@@ -58,6 +58,16 @@ const PreFooter = () => {
 
 
                 <section className="flex flex-col gap-y-3 md:gap-y-14 text-center mt-8 sm:mt-12 lg:mt-16 mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl xl:max-w-7xl 2xl:max-w-8xl text-white">
+                <section className="mt-10  md:mt-24 text-center text-white">
+                        <h2 className="text-[26px] md:text-[50px] font-medium">Prueba nuestra plataforma </h2>
+                        <h1 className="uppercase text-[#D9A425] text-[50px] md:text-7xl font-extrabold">Gratis</h1>
+                        <h3 className="text-lg md:text-3xl">Por 7 días te <span className="text-[#D9A425]">regalamos acceso </span> para experimentar nuestros análisis en vivo</h3>
+                        <div className="mt-3 w-full  px-8 place-items-center">
+                            <a href="" className="block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-auto md:w-[280px] text-lg font-bold rounded-[10px] p-3 mt-5">Prueba gratuita</a>
+                        </div>
+
+                    </section>
+                 
                     <div className="w-full">
                         <h1 className="text-3xl xs:text-[32px] sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-tight">
                             Nuestros planes
@@ -67,6 +77,8 @@ const PreFooter = () => {
                             <span className="text-[#D9A425]">tus necesidades</span>
                         </h2>
                     </div>
+
+                  
 
                     <div className="grid grid-cols-1 md:grid-cols-2 justify-items-center lg:px-24 gap-8 sm:gap-10 md:gap-x-8 lg:gap-x-12 xl:gap-x-14 w-full mt-8 sm:mt-10 md:mt-12 lg:mt-16">
                         <PriceCard
@@ -92,15 +104,7 @@ const PreFooter = () => {
                     </div>
                 </section>
 
-                <section className="mt-10 md:mt-24 text-center text-white">
-                    <h2 className="text-[26px] md:text-[50px] font-medium">Prueba nuestra plataforma </h2>
-                    <h1 className="uppercase text-[#D9A425] text-[50px] md:text-7xl font-extrabold">Gratis</h1>
-                    <h3 className="text-lg md:text-3xl">Por 7 días te <span className="text-[#D9A425]">regalamos acceso </span> para experimentar nuestros análisis en vivo</h3>
-                    <div className="mt-3 w-full  px-8 place-items-center">
-                        <a href="" className="block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-auto md:w-[280px] text-lg font-bold rounded-[10px] p-3 mt-5">Prueba gratuita</a>
-                    </div>
 
-                </section>
                 <QASection />
             </div>
         </section>
