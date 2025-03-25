@@ -1,9 +1,23 @@
 import NewPasswordForm from "../components/forms/NewPasswordForm"
 import Header from "../components/Header"
 import img from "../assets/images/phone-auth.png"
+import { useNavigate, useSearchParams } from "react-router";
+import { useEffect } from "react";
 
 
 const NewPasswordPage = () => {
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
+  useEffect(() => {
+
+
+    if (!token) {
+      navigate('/');
+    }
+  }, [token, navigate]);
+
+
   return (
     <>
       <Header>
@@ -28,7 +42,7 @@ const NewPasswordPage = () => {
             </div>
 
             <div className="w-full">
-              <NewPasswordForm />
+              <NewPasswordForm token={token ?? ""} />
             </div>
           </div>
 

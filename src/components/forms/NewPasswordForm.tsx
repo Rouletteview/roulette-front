@@ -6,16 +6,18 @@ import { useResetPassword } from "../../hooks/useResetPassword";
 import { useForm } from "react-hook-form";
 import { newPasswordFormData, newPasswordSchema } from '../../schemas/newPasswordSchema';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate, useSearchParams } from "react-router";
+import { useNavigate } from "react-router";
 import LoadingOverlay from "../LoadingOverlay";
 
+interface Props {
+    token: string;
+}
 
-const NewPasswordForm = () => {
+const NewPasswordForm = ({ token }: Props) => {
     const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    const token = searchParams.get("token");
+
 
     const { register, handleSubmit, formState: { errors } } = useForm<newPasswordFormData>({
         resolver: zodResolver(newPasswordSchema),

@@ -30,12 +30,15 @@ const LoginForm = () => {
         setErrorMessage("");
         try {
 
-            await Login({
+           const resp = await Login({
                 variables: {
                     Email: data.email,
                     Password: data.password
                 },
             });
+
+            const token = resp.data.Login.Token;
+            localStorage.setItem('token', token)
             navigate('/home')
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
