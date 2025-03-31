@@ -34,6 +34,8 @@ const RegisterForm = () => {
 
     const onSubmit = async (data: RegisterFormData) => {
         try {
+            const birthDate = new Date(data.birthDate);
+            if (isNaN(birthDate.getTime())) throw new Error("Fecha inválida");
             const [name, ...lastnameArray] = data.fullName.trim().split(" ");
             const lastname = lastnameArray.join(" ") || "N/A";
             const phoneNumber = data.countryCode + data.phone;
@@ -47,7 +49,7 @@ const RegisterForm = () => {
                     Password: data.password,
                     Email: data.email,
                     Country: data.country,
-                    BirthDate: new Date(data.birthDate).toISOString(),
+                    BirthDate: birthDate.toISOString(),
                     PhoneNumber: phoneNumber,
                 },
             });
@@ -67,6 +69,7 @@ const RegisterForm = () => {
             } else if (error.networkError) {
                 setErrorMessage("Error de red. Por favor, verifica tu conexión.");
             } else {
+                console.log(error)
                 setErrorMessage("Ocurrió un error inesperado. Por favor, intenta nuevamente.");
             }
         }

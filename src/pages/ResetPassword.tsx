@@ -27,7 +27,7 @@ const ResetPassword = () => {
             <h1 className="text-[28px] md:text-[38px] text-white leading-8 md:leading-12 font-medium">
             ¿Olvidaste tu contraseña?
             </h1>
-            <h3 className="text-[18px] md:text-[24px] leading-[22px] md:leading-10 font-medium">No te preocupes, te enviaremos un link al  correo asociado a tu cuenta para acceder</h3>
+            <h3 className="text-[18px] md:text-[24px] leading-[22px] md:leading-10 font-medium">No te preocupes, te enviaremos un link al correo asociado a tu cuenta para acceder</h3>
           </div>
 
           <div className="w-full">
