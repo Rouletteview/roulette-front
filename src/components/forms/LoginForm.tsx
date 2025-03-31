@@ -30,7 +30,7 @@ const LoginForm = () => {
         setErrorMessage("");
         try {
 
-           const resp = await Login({
+            const resp = await Login({
                 variables: {
                     Email: data.email,
                     Password: data.password
@@ -39,6 +39,9 @@ const LoginForm = () => {
 
             const token = resp.data.Login.Token;
             localStorage.setItem('token', token)
+
+            console.log("✅ Token guardado en localStorage:", token);
+            console.log("🚀 Redirigiendo a /home...");
             navigate('/home')
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
