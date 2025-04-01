@@ -34,14 +34,16 @@ const RegisterForm = () => {
 
     const onSubmit = async (data: RegisterFormData) => {
         try {
-            const birthDate = new Date(data.birthDate);
+   
+            const [day, month, year] = data.birthDate.split("-");
+            const birthDate = new Date(`${year}-${month}-${day}`);
+    
             if (isNaN(birthDate.getTime())) throw new Error("Fecha inválida");
+    
             const [name, ...lastnameArray] = data.fullName.trim().split(" ");
             const lastname = lastnameArray.join(" ") || "N/A";
             const phoneNumber = data.countryCode + data.phone;
-
-
-
+    
             const response = await registerUser({
                 variables: {
                     FirstName: name,
@@ -49,38 +51,39 @@ const RegisterForm = () => {
                     Password: data.password,
                     Email: data.email,
                     Country: data.country,
-                    BirthDate: birthDate.toISOString(),
+                    BirthDate: birthDate.toISOString(), 
                     PhoneNumber: phoneNumber,
                 },
             });
-
+    
             console.log("Usuario registrado exitosamente:", response.data);
             navigate("/confirmar-correo", { state: { message: "Email confirmado con éxito", ok: true } });
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             if (error.graphQLErrors?.length > 0) {
                 const graphQLError = error.graphQLErrors[0];
                 if (graphQLError.code === "ALREADY_EXIST") {
-                    setErrorMessage('Ya existe una cuenta registrada con este usuario');
+                    setErrorMessage("Ya existe una cuenta registrada con este usuario");
                 } else {
                     setErrorMessage(`Error: ${graphQLError.message}`);
                 }
             } else if (error.networkError) {
                 setErrorMessage("Error de red. Por favor, verifica tu conexión.");
             } else {
-                console.log(error)
+                console.log(error);
                 setErrorMessage("Ocurrió un error inesperado. Por favor, intenta nuevamente.");
             }
         }
     };
+    
 
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="w-full  px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Input placeholder="Nombre completo" name="fullName" register={register("fullName")} error={errors.fullName?.message} />
-                <Input placeholder="Fecha de nacimiento" name="birthDate" type="date" register={register("birthDate")} error={errors.birthDate?.message} icon={arrowIcon} />
+            <Input placeholder="Fecha de nacimiento" name="birthDate" type="date" register={register("birthDate")} error={errors.birthDate?.message} icon={arrowIcon} />
 
                 <div className="flex gap-2 w-full">
                     <div className=" max-w-[75px]"  >
