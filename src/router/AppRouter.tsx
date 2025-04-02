@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes, } from "react-router";
+import { Navigate, Route, Routes, useNavigate, } from "react-router";
 import LandingPage from "../pages/LandingPage";
 import RegisterPage from "../pages/RegisterPage";
 import LoginPage from "../pages/LoginPage";
@@ -8,20 +8,20 @@ import NewPasswordPage from "../pages/NewPasswordPage";
 import CheckEmailPasswordPage from "../pages/CheckEmailPasswordPage";
 import HomePage from "../pages/HomePage";
 import NotFound from "../pages/NotFound";
-// import { useEffect } from "react";
+import { useEffect } from "react";
 import { useAuthStore } from "../stores/authStore";
 
 const ActivateUserRedirect = () => {
-  // const params = new URLSearchParams(location.search);
-  // const token = params.get("token");
-  // const navigate = useNavigate();
-  // useEffect(() => {
-  //   if (token) {
-  //     navigate("/iniciar-sesion", {
-  //       state: { message: "Email confirmado con éxito", ok: true },
-  //     });
-  //   }
-  // }, [token, navigate]);
+  const params = new URLSearchParams(location.search);
+  const token = params.get("token");
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (token) {
+      navigate("/iniciar-sesion", {
+        state: { message: "Email confirmado con éxito", ok: true },
+      });
+    }
+  }, [token, navigate]);
 
   return null;
 };
@@ -33,7 +33,10 @@ const AppRouter = () => {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/registrarse" element={<RegisterPage />} />
-      <Route path="/iniciar-sesion" element={<LoginPage />} />
+
+      <Route
+        path="/iniciar-sesion"
+        element={!isAuthenticated ? <LoginPage /> : <Navigate to='/home' />} />
       {/* página de mensaje para ir a confirmar correo */}
       <Route path="/confirmar-correo" element={<CheckEmailPage />} />
       <Route path="/recuperar-password" element={<ResetPassword />} />
