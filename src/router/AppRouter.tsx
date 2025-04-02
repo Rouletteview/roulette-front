@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes, useNavigate } from "react-router";
+import { Navigate, Route, Routes, } from "react-router";
 import LandingPage from "../pages/LandingPage";
 import RegisterPage from "../pages/RegisterPage";
 import LoginPage from "../pages/LoginPage";
@@ -8,29 +8,26 @@ import NewPasswordPage from "../pages/NewPasswordPage";
 import CheckEmailPasswordPage from "../pages/CheckEmailPasswordPage";
 import HomePage from "../pages/HomePage";
 import NotFound from "../pages/NotFound";
-import { useEffect } from "react";
+// import { useEffect } from "react";
+import { useAuthStore } from "../stores/authStore";
 
 const ActivateUserRedirect = () => {
-  const params = new URLSearchParams(location.search);
-  const token = params.get("token");
-  const navigate = useNavigate();
-  console.log(token)
-
-  useEffect(() => {
-    if (token) {
-      navigate("/iniciar-sesion", {
-        state: { message: "Email confirmado con éxito", ok: true },
-      });
-    }
-  }, [token, navigate]);
+  // const params = new URLSearchParams(location.search);
+  // const token = params.get("token");
+  // const navigate = useNavigate();
+  // useEffect(() => {
+  //   if (token) {
+  //     navigate("/iniciar-sesion", {
+  //       state: { message: "Email confirmado con éxito", ok: true },
+  //     });
+  //   }
+  // }, [token, navigate]);
 
   return null;
 };
 
 const AppRouter = () => {
-  const isAuthenticated = Boolean(localStorage.getItem('token'));
-  console.log('isAuthenticated: ', isAuthenticated);
-  
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
     <Routes>
@@ -44,7 +41,7 @@ const AppRouter = () => {
       <Route path="/resetPassword" element={<NewPasswordPage />} />
 
       <Route path="/activateUser" element={<ActivateUserRedirect />} />
-      
+
       <Route
         path="/home"
         element={isAuthenticated ? <HomePage /> : <Navigate to="/iniciar-sesion" />}

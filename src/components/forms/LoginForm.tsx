@@ -9,11 +9,13 @@ import { useState } from "react";
 import eyeOff from '../../assets/icon/eye-off.svg'
 import { useNavigate } from "react-router";
 import LoadingOverlay from "../LoadingOverlay";
+import { useAuthStore } from "../../stores/authStore";
 
 
 const LoginForm = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const login = useAuthStore((state) => state.login);
     const navigate = useNavigate();
 
 
@@ -24,6 +26,7 @@ const LoginForm = () => {
     const { Login, loading } = useLogin();
 
     if (loading) return <LoadingOverlay />;
+
 
 
     const onSubmit = async (data: loginFormData) => {
@@ -38,10 +41,7 @@ const LoginForm = () => {
             });
 
             const token = resp.data.Login.Token;
-            localStorage.setItem('token', token)
-
-            console.log("✅ Token guardado en localStorage:", token);
-            console.log("🚀 Redirigiendo a /home...");
+            login(token);
             navigate('/home')
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
