@@ -30,7 +30,8 @@ const AppRouter = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
-    <Routes>
+  
+ <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/registrarse" element={<RegisterPage />} />
 
@@ -53,6 +54,8 @@ const AppRouter = () => {
       <Route path="/*" element={<NotFound />} />
 
     </Routes>
+   
+   
   );
 };
 

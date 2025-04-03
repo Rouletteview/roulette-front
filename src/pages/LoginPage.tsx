@@ -1,7 +1,7 @@
 import LoginForm from "../components/forms/LoginForm"
 import Header from "../components/Header"
 import img from "../assets/images/phone-auth.png"
-import { useLocation } from "react-router";
+import { Link, useLocation } from "react-router";
 import Popup from "../components/PopUp";
 import { useState } from "react";
 
@@ -21,12 +21,12 @@ const LoginPage = () => {
   return (
     <>
       <Header>
-        <a
-          href="/"
+        <Link
+          to="/"
           className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-white "
         >
           Ir al inicio
-        </a>
+        </Link>
       </Header>
       <section
         className="w-full  bg-center bg-cover flex items-center justify-center text-white relative"
