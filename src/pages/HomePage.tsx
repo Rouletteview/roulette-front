@@ -2,6 +2,7 @@ import Header from "../components/Header"
 import HeroSection from '../Sections/HeroSection'
 import NavBar from '../components/NavBar';
 import ChartSection from "../Sections/ChartSection";
+import WelcomeModal from "../components/WelcomeModal";
 
 const HomePage = () => {
 
@@ -9,6 +10,8 @@ const HomePage = () => {
 
   return (
     <>
+      <WelcomeModal />
+
       <Header>
         <NavBar />
       </Header>
@@ -38,8 +41,8 @@ const HomePage = () => {
         </div>
       </HeroSection>
 
-      
-     <ChartSection/>
+
+      <ChartSection />
     </>
 
   )

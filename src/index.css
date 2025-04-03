@@ -17,3 +17,12 @@ box-shadow: 0px 4px 6px 0px #00000040 inset;
 }
 
 
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hidden {
+  -ms-overflow-style: none; 
+  scrollbar-width: none;  
+}
+

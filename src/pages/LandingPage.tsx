@@ -9,14 +9,15 @@ import SubHeroSection from "../Sections/SubHeroSection"
 import barChart from "../assets/icon/bar-chart.svg"
 import chart from "../assets/icon/chart.svg"
 import desktopComputer from "../assets/icon/desktop-computer.svg"
+import { Link } from "react-router"
 
 
 const LandingPage = () => {
     return (
         <>
             <Header>
-                <a href="/iniciar-sesion" className="border border-[#D9A425] hover:border-[#B3831D] transition-all px-4 py-2 rounded-xl text-center">Iniciar sesión</a>
-                <a href="/registrarse" className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center">Registrarse</a>
+                <Link to="/iniciar-sesion" className="border border-[#D9A425] hover:border-[#B3831D] transition-all px-4 py-2 rounded-xl text-center">Iniciar sesión</Link>
+                <Link to="/registrarse" className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center">Registrarse</Link>
             </Header>
             <HeroSection imageURL="/background/close-up-roulette-wheel-1.png">
                 <div className="flex flex-col justify-center items-center text-center font-medium leading-[22px] md:leading-[48px] px-4 flex-grow">

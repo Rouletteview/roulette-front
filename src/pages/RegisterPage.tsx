@@ -1,7 +1,7 @@
 import RegisterForm from "../components/forms/RegisterForm"
 import Header from "../components/Header"
 import img from "../assets/images/phone-auth.png"
-import { useLocation } from "react-router";
+import { Link, useLocation } from "react-router";
 import { useState } from "react";
 import Popup from "../components/PopUp";
 
@@ -20,13 +20,13 @@ const RegisterPage = () => {
   return (
     <>
       <Header>
-        <a href="/iniciar-sesion" className="border border-[#D9A425] hover:border-[#B3831D] transition-all px-4 py-2 rounded-xl text-center hidden md:block">Iniciar sesión</a>
-        <a
-          href="/"
+        <Link to="/iniciar-sesion" className="border border-[#D9A425] hover:border-[#B3831D] transition-all px-4 py-2 rounded-xl text-center hidden md:block">Iniciar sesión</Link>
+        <Link
+          to="/"
           className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-white "
         >
           Ir al inicio
-        </a>
+        </Link>
       </Header>
 
       <section
