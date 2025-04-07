@@ -19,28 +19,28 @@ const PricingContent = () => {
                             price="1.5"
                             subscription="Diario"
                             subSize="28px"
-                            priceSize="6xl"
+                            priceSize="7xl"
 
                         />
                         <PriceCard
                             price="3.0"
                             subscription="Semanal"
                             subSize="28px"
-                            priceSize="6xl"
+                            priceSize="7xl"
 
                         />
                         <PriceCard
                             price="5.0"
                             subscription="Mensual"
                             subSize="28px"
-                            priceSize="6xl"
+                            priceSize="7xl"
 
                         />
                         <PriceCard
                             price="25"
                             subscription="Anual"
                             subSize="28px"
-                            priceSize="6xl"
+                            priceSize="7xl"
 
                         />
 
