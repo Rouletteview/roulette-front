@@ -84,23 +84,23 @@ const PreFooter = () => {
                         <PriceCard
                             price="1.5"
                             subscription="Diario"
-                            priceSize="9xl"
+                           
 
                         />
                         <PriceCard
                             price="3.0"
                             subscription="Semanal"
-                            priceSize="9xl"
+                       
                         />
                         <PriceCard
                             price="5.0"
                             subscription="Mensual"
-                            priceSize="9xl"
+                          
                         />
                         <PriceCard
                             price="25"
                             subscription="Anual"
-                            priceSize="9xl"
+                           
                         />
                     </div>
                 </section>

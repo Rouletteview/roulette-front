@@ -11,7 +11,10 @@ createRoot(document.getElementById('root')!).render(
     <ApolloProvider client={client}>
       <BrowserRouter>
         <RouletteViewApp />
+        <div className="hidden text-9xl text-[38px]">
+        </div>
       </BrowserRouter>
     </ApolloProvider>
   </StrictMode>
+  
 )
