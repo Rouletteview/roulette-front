@@ -28,6 +28,7 @@ const ActivateUserRedirect = () => {
 
 const AppRouter = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  
 
   return (
   

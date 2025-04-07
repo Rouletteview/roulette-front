@@ -2,7 +2,8 @@ import Header from "../components/Header"
 import HeroSection from '../Sections/HeroSection'
 import NavBar from '../components/NavBar';
 import ChartSection from "../Sections/ChartSection";
-import WelcomeModal from "../components/WelcomeModal";
+import WelcomeModal from "../components/Modal/welcome-modal/WelcomeModal";
+
 
 const HomePage = () => {
 
@@ -10,8 +11,8 @@ const HomePage = () => {
 
   return (
     <>
-      <WelcomeModal />
-
+      <WelcomeModal/>
+      
       <Header>
         <NavBar />
       </Header>
