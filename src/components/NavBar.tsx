@@ -18,6 +18,7 @@ const NavBar = () => {
     const handleLogout = () => {
         logout();
         navigate('/');
+        localStorage.removeItem('hasShownModal')
     }
 
     return (
