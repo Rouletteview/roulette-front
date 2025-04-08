@@ -38,14 +38,14 @@ const NewPasswordForm = ({ token }: Props) => {
         }
 
         try {
-            const result = await ResetPassword({
+            await ResetPassword({
                 variables: {
                     newPassword: data.NewPassword,
                     validationToken: token,
                 },
             });
             navigate("/iniciar-sesion", { state: { message: "Contraseña cambiada con éxito", ok: true } });
-            console.log(result);
+
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
 

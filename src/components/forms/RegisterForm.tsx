@@ -10,6 +10,7 @@ import { useNavigate } from "react-router";
 
 import eyeOff from '../../assets/icon/eye-off.svg'
 import LoadingOverlay from "../LoadingOverlay";
+import { useCountries } from "../../hooks/useCountries";
 
 
 
@@ -25,6 +26,9 @@ const RegisterForm = () => {
     });
 
     const { registerUser, loading } = useRegister();
+    const { data, loading: countriesLoading } = useCountries();
+
+
 
 
     if (loading) return <LoadingOverlay />;
@@ -33,17 +37,19 @@ const RegisterForm = () => {
 
 
     const onSubmit = async (data: RegisterFormData) => {
+       
         try {
-   
+
             const [day, month, year] = data.birthDate.split("-");
             const birthDate = new Date(`${year}-${month}-${day}`);
-    
+
             if (isNaN(birthDate.getTime())) throw new Error("Fecha inválida");
-    
+
             const [name, ...lastnameArray] = data.fullName.trim().split(" ");
             const lastname = lastnameArray.join(" ") || "N/A";
             const phoneNumber = data.countryCode + data.phone;
-    
+        
+
             const response = await registerUser({
                 variables: {
                     FirstName: name,
@@ -51,15 +57,15 @@ const RegisterForm = () => {
                     Password: data.password,
                     Email: data.email,
                     Country: data.country,
-                    BirthDate: birthDate.toISOString(), 
+                    BirthDate: birthDate.toISOString(),
                     PhoneNumber: phoneNumber,
                 },
             });
-    
+
             console.log("Usuario registrado exitosamente:", response.data);
             navigate("/confirmar-correo", { state: { message: "Email confirmado con éxito", ok: true } });
-    
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             if (error.graphQLErrors?.length > 0) {
                 const graphQLError = error.graphQLErrors[0];
@@ -76,30 +82,57 @@ const RegisterForm = () => {
             }
         }
     };
-    
+
 
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="w-full  px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Input placeholder="Nombre completo" name="fullName" register={register("fullName")} error={errors.fullName?.message} />
-            <Input placeholder="Fecha de nacimiento" name="birthDate" type="date" register={register("birthDate")} error={errors.birthDate?.message} icon={arrowIcon} />
+                <Input placeholder="Fecha de nacimiento" name="birthDate" type="date" register={register("birthDate")} error={errors.birthDate?.message} icon={arrowIcon} />
 
                 <div className="flex gap-2 w-full">
-                    <div className=" max-w-[75px]"  >
-                        <Input placeholder="+00" name="countryCode"
+                    <div className="w-[115px]">
+                        <Input
+                            name="countryCode"
+                            placeholder="+00"
                             register={register("countryCode")}
                             error={errors.countryCode?.message}
-                            className="text-center"
+                            icon={arrowIcon}
+                            options={
+                                data?.GetCountriesWithPhonePrefixes.map((item: any) => ({
+                                    value: `+${item.PhonePrefix}`,
+                                    label: `+${item.PhonePrefix}`,
+                                }))
+                            }
                         />
                     </div>
 
-                    <div className="w-full">
-                        <Input placeholder="Teléfono" name="phone" register={register("phone")} error={errors.phone?.message} />
+                    <div className="flex-1">
+                        <Input
+                            placeholder="Teléfono"
+                            name="phone"
+                            register={register("phone")}
+                            error={errors.phone?.message}
+                        />
                     </div>
                 </div>
 
-                <Input placeholder="País" name="country" register={register("country")} error={errors.country?.message} />
+
+
+                <Input
+                    name="country"
+                    placeholder="País"
+                    register={register("country")}
+                    icon={arrowIcon}
+                    error={errors.country?.message}
+                    options={
+                        data?.GetCountriesWithPhonePrefixes.map((item: any) => ({
+                            value: item.Country,
+                            label: item.Country,
+                        }))
+                    }
+                />
                 <Input placeholder="Correo electrónico" name="email" register={register("email")} error={errors.email?.message} />
 
                 <div className="relative">
