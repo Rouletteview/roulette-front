@@ -26,7 +26,7 @@ const RegisterForm = () => {
     });
 
     const { registerUser, loading } = useRegister();
-    const { data, loading: countriesLoading } = useCountries();
+    const { data } = useCountries();
 
 
 
