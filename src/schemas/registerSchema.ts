@@ -14,7 +14,9 @@ export const registerSchema = z.object({
         .regex(/^\d{6,15}$/, "Número de teléfono inválido"),
     countryCode: z
         .string()
-        .regex(/^\+\d{1,4}$/, "Prefijo telefónico inválido"),
+        .trim() 
+        .regex(/^\+\d{1,4}(\s\d{1,15})?$/, "Prefijo telefónico inválido"),
+
     country: z
         .string()
         .min(1, "Debe seleccionar un país"),
