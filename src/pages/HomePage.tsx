@@ -4,6 +4,8 @@ import NavBar from '../components/NavBar';
 import ChartSection from "../Sections/ChartSection";
 import WelcomeModal from "../components/Modal/welcome-modal/WelcomeModal";
 import arrow from "../assets/icon/arrow-right-yellow.svg"
+import Chart from "../components/Chart";
+import { generateMockCandlestickData } from "../utils/mock/mockData";
 
 
 
@@ -11,7 +13,7 @@ import arrow from "../assets/icon/arrow-right-yellow.svg"
 
 const HomePage = () => {
 
-
+  const mockData = generateMockCandlestickData(50);
 
   return (
     <>
@@ -48,12 +50,13 @@ const HomePage = () => {
 
 
       <ChartSection>
+        {/* alerta movil */}
         <div className="flex justify-end w-full">
-        <div className="bg-[#121418F2] border-2 border-black px-6 py-2 rounded-2xl lg:hidden block mb-2">
-          <h1 className="text-white text-[12px] font-medium">Tu periodo de prueba termina el: <span className="text-[#D9A425]">23/03/25</span></h1>
+          <div className="bg-[#121418F2] border-2 border-black px-6 py-2 rounded-2xl lg:hidden block mb-2">
+            <h1 className="text-white text-[12px] font-medium">Tu periodo de prueba termina el: <span className="text-[#D9A425]">23/03/25</span></h1>
+          </div>
         </div>
-        </div>
-       
+
         <div className="flex flex-col lg:flex-row gap-x-6 items-baseline">
           <h1 className="text-xl lg:text-5xl text-white font-medium ">Sistema de <span className="font-bold">Gráficos</span> en vivo</h1>
           <a href="" className="text-sm lg:text-[18px] text-[#D9A425] underline font-medium">ver video tutorial de como operar en el gráfico</a>
@@ -64,7 +67,7 @@ const HomePage = () => {
               <h1 className="text-base lg:text-xl text-white font-medium inline-block border-x-1 border-white px-2"><span className="text-[#D9A425] ">Gráfico de velas</span>, zona del grafico <span className="text-[#D9A425] ">columna</span>, operando en el mercado de <span className="text-[#D9A425]">Micasino.com</span></h1>
             </div>
             <div className="flex justify-between">
-           
+
               <div className="flex flex-wrap gap-1 text-start items-center">
                 <div className="bg-[#121418F2] w-[150px] border-2 border-black py-1.5 px-2 rounded-lg whitespace-nowrap">
                   <span className="text-white text-base">Gráfico de velas</span>
@@ -82,12 +85,16 @@ const HomePage = () => {
                   </button>
                 </div>
               </div>
-            
+              {/* alerta desktop */}
               <div className="bg-[#121418F2] border-2 border-black px-6 py-2 rounded-2xl hidden lg:block">
                 <h1 className="text-white text-lg font-medium">Tu periodo de prueba termina el: <span className="text-[#D9A425]">23/03/25</span></h1>
               </div>
             </div>
           </div>
+        </section>
+        <section className="bg-[#0d1b2a] p-28" >
+          <Chart type="candlestick" data={mockData} width={800} height={620} />
+
         </section>
       </ChartSection>
     </>
