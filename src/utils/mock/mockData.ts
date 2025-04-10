@@ -1,4 +1,4 @@
-import { CandlestickData } from "lightweight-charts";
+import { CandlestickData, UTCTimestamp } from "lightweight-charts";
 
 
 
@@ -7,7 +7,7 @@ export function generateMockCandlestickData(count: number, startTime = Date.now(
     let lastClose = Math.random() * 100; 
   
     for (let i = 0; i < count; i++) {
-      const time = Math.floor(startTime + i * 60);
+      const time = Math.floor(startTime + i * 60) as UTCTimestamp;
   
       const open = lastClose;
       const change = (Math.random() - 0.5) * 20; 
