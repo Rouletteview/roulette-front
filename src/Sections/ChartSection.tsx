@@ -19,6 +19,8 @@ const ChartSection = () => {
 
   const mockData = generateMockCandlestickData(500);
 
+
+  // pendiente a refactorización
   return (
     <section className="bg-[#121418F2] py-6 lg:py-24 px-6 lg:px-24">
       {/* alerta movil */}
@@ -63,8 +65,8 @@ const ChartSection = () => {
           </div>
         </div>
       </section>
-
-      <section className="flex flex-col-reverse lg:flex-row">
+   
+      <section className="flex flex-col-reverse justify-center items-center lg:flex-row gap-y-4">
         <div className="flex w-full justify-center">
           {/* controls */}
           <div className="flex flex-col gap-3.5 p-2 justify-start">
@@ -80,9 +82,11 @@ const ChartSection = () => {
           </div>
 
           {/* ChartSection */}
+
           <div className="bg-[#0d1b2a] w-full lg:mx-2.5 ">
             <div className="p-4 flex flex-col items-center lg:items-start">
               <Chart type="candlestick" data={mockData} width={800} height={620} />
+
               <div className="flex flex-wrap gap-2 bg-[#0000004D] self-center lg:self-start w-auto p-2 rounded mt-4">
                 {numbers.map((item, i) => (
                   <div
@@ -95,10 +99,11 @@ const ChartSection = () => {
               </div>
             </div>
           </div>
-        </div>
 
+        </div>
+  
         {/* userInfo */}
-        <div className="bg-[#1a1a1a] text-white text-sm rounded p-4 w-full lg:w-[190px] h-auto self-center lg:self-start mt-4 lg:mt-0 ">
+        <div className="bg-[#1a1a1a] text-white text-sm rounded p-4 mx-8 w-full lg:w-[190px] h-auto self-center lg:self-start mt-4 lg:mt-0 ">
           <div className="flex items-center gap-2 mb-3">
             <img src={userIcon} alt="user icon" className="w-6 h-6" />
             <span className="font-medium">Miguel Rojas</span>
@@ -123,6 +128,7 @@ const ChartSection = () => {
           </div>
         </div>
       </section>
+    
 
     </section>
   )
