@@ -63,7 +63,7 @@ const NavBar = () => {
                     <img src={menuIcon} alt="Icono de menú" className="size-8" />
                 </button>
 
-               
+
                 <div
                     className={clsx(
                         "fixed inset-0 bg-[#000000CC] z-40 transition-opacity duration-300",
@@ -72,10 +72,10 @@ const NavBar = () => {
                     onClick={() => setIsOpen(false)}
                 />
 
-               
+
                 <div
                     className={clsx(
-                        "fixed bottom-0 left-0 right-0 bg-white z-50 rounded-t-3xl p-4 shadow-lg transition-transform duration-300 sm:hidden mx-4",
+                        "fixed bottom-0 left-0 right-0 bg-white z-50 rounded-t-3xl p-4 shadow-lg transition-transform duration-300 lg:hidden mx-4",
                         isOpen ? "translate-y-0" : "translate-y-full"
                     )}
                 >
