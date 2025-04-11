@@ -1,21 +1,18 @@
 import arrow from "../assets/icon/arrow-right-yellow.svg"
-import zoomIn from "../assets/icon/zoom-in.svg";
-import zoomOut from "../assets/icon/zoom-out.svg";
-import pencil from "../assets/icon/pencil.svg"
-import userIcon from "../assets/icon/user-icon.svg";
 import Chart from "../components/Chart";
 import { useRouletteNumbers } from "../utils/mock/mockRouletteNumbers";
 import { generateMockCandlestickData } from "../utils/mock/mockData";
+import UserInfo from "../components/UserInfo";
+import Controls from "../components/Controls";
+import Update from "../components/Update";
+import NumbersDisplay from "../components/NumbersDisplay";
+
 
 
 const ChartSection = () => {
   const numbers = useRouletteNumbers(15);
 
-  const colorClasses = {
-    red: "border-red-600 ",
-    white: "border-white ",
-    green: "border-green-600 ",
-  };
+
 
   const mockData = generateMockCandlestickData(500);
 
@@ -65,71 +62,39 @@ const ChartSection = () => {
           </div>
         </div>
       </section>
-   
-      <section className="flex flex-col-reverse justify-center items-center lg:flex-row gap-y-4">
-        <div className="flex w-full justify-center">
-          {/* controls */}
-          <div className="flex flex-col gap-3.5 p-2 justify-start">
-            <button className="cursor-pointer w-6 h-auto">
-              <img src={zoomIn} alt="" />
-            </button>
-            <button className="cursor-pointer w-6 h-auto">
-              <img src={zoomOut} alt="" />
-            </button>
-            <button className="cursor-pointer w-6 h-auto">
-              <img src={pencil} alt="" />
-            </button>
-          </div>
-
-          {/* ChartSection */}
-
-          <div className="bg-[#0d1b2a] w-full lg:mx-2.5 ">
-            <div className="p-4 flex flex-col items-center lg:items-start">
+      <section className="flex flex-col">
+        <div className="flex flex-col lg:flex-row w-full justify-center">
+          {/*  userInfo */}
+          <UserInfo />
+          <div className="order-1 lg:order-1 w-full lg:mx-2.5">
+            <div className="bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full">
+              {/* controls */}
+              <Controls />
+              {/* chart */}
               <Chart type="candlestick" data={mockData} width={800} height={620} />
+              {/* timer + update */}
+              <Update />
+            </div>
+            <div className="w-full flex flex-col-reverse justify-between lg:flex-row items-center lg:items-start gap-6 mt-4">
+              {/*  lista de numeros y probabilidades*/}
+              <NumbersDisplay numbers={numbers} />
 
-              <div className="flex flex-wrap gap-2 bg-[#0000004D] self-center lg:self-start w-auto p-2 rounded mt-4">
-                {numbers.map((item, i) => (
-                  <div
-                    key={i}
-                    className={`w-8 h-8 lg:w-10 lg:h-10 rounded-full border-3 flex items-center justify-center font-medium text-white text-[10px] md:text-sm ${colorClasses[item.color]}`}
-                  >
-                    {item.value}
+              <div className="flex flex-col items-center lg:flex-row gap-4">
+                <div className="flex flex-col sm:flex-row justify-start lg:justify-center items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className="bg-[#FF0000] rounded-full w-4 h-4 lg:w-7 lg:h-7" />
+                    <h2 className="text-white text-xs">00% de probabilidad al rojo</h2>
                   </div>
-                ))}
+                  <div className="flex items-center gap-2">
+                    <div className="bg-black rounded-full w-4 h-4 lg:w-7 lg:h-7" />
+                    <h2 className="text-white text-xs">00% de probabilidad al negro</h2>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-
-        </div>
-  
-        {/* userInfo */}
-        <div className="bg-[#1a1a1a] text-white text-sm rounded p-4 mx-8 w-full lg:w-[190px] h-auto self-center lg:self-start mt-4 lg:mt-0 ">
-          <div className="flex items-center gap-2 mb-3">
-            <img src={userIcon} alt="user icon" className="w-6 h-6" />
-            <span className="font-medium">Miguel Rojas</span>
-          </div>
-          <div className="text-[#d4a727]">
-            <div className="flex justify-between font-medium mb-1">
-              <span>Saldo inicial</span>
-              <span className="text-right">0.00</span>
-            </div>
-            <div className="flex justify-between font-medium mb-1">
-              <span>Saldo Final</span>
-              <span className="text-right">0.00</span>
-            </div>
-            <div className="flex justify-between font-medium mb-1">
-              <span>Utilidad</span>
-              <span className="text-right">0.00</span>
-            </div>
-            <div className="flex justify-between font-medium">
-              <span>Beneficio 1:1</span>
-              <span className="text-right">100%</span>
             </div>
           </div>
         </div>
       </section>
-    
-
     </section>
   )
 }

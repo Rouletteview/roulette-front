@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-type RouletteItem = {
+export type RouletteItem = {
     value: number;
     color: "red" | "white" | "green";
 };
