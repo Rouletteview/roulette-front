@@ -1,4 +1,5 @@
-import { RouletteItem } from "../utils/mock/mockRouletteNumbers"
+import { RouletteItem } from "../../utils/mock/mockRouletteNumbers";
+
 
 
 interface Props {
