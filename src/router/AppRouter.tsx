@@ -11,6 +11,7 @@ import CheckEmailPasswordPage from "../landing/pages/CheckEmailPasswordPage";
 import NewPasswordPage from "../landing/pages/NewPasswordPage";
 import HomePage from "../app/pages/HomePage";
 import NotFound from "../landing/pages/NotFound";
+import HistoryPage from "../app/pages/HistoryPage";
 
 const ActivateUserRedirect = () => {
   const params = new URLSearchParams(location.search);
@@ -47,11 +48,12 @@ const AppRouter = () => {
       <Route path="/resetPassword" element={<NewPasswordPage />} />
 
       <Route path="/activateUser" element={<ActivateUserRedirect />} />
-
+      {/* App */}
       <Route
         path="/home"
         element={isAuthenticated ? <HomePage /> : <Navigate to="/iniciar-sesion" />}
       />
+        <Route path="/historial" element={<HistoryPage />} />
 
       <Route path="/*" element={<NotFound />} />
 
