@@ -13,6 +13,7 @@ import { Link } from "react-router"
 import HeroSection from "../../sections/HeroSection"
 
 
+
 const LandingPage = () => {
     return (
         <>
