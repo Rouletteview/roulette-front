@@ -1,9 +1,11 @@
 import { useForm } from "react-hook-form";
-import Input from "./Input"
+
 import { useSendResetPassword } from "../../hooks/useSendResetPasswordEmail";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import LoadingOverlay from "../LoadingOverlay";
+import LoadingOverlay from "../../components/LoadingOverlay";
+import Input from "./forms/Input";
+
 
 interface FormInput {
   email: string;

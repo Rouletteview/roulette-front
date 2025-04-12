@@ -1,16 +1,20 @@
 import { useForm } from "react-hook-form"
-import { RegisterFormData, registerSchema } from "../../schemas/registerSchema"
+
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRegister } from "../../hooks/useRegister";
+
 import Input from "./Input";
 
-import arrowIcon from "../../assets/icon/arrow-down-white.svg"
+import arrowIcon from "../../../assets/icon/arrow-down-white.svg"
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-import eyeOff from '../../assets/icon/eye-off.svg'
-import LoadingOverlay from "../LoadingOverlay";
-import { useCountries } from "../../hooks/useCountries";
+import eyeOff from '../../../assets/icon/eye-off.svg'
+
+
+import LoadingOverlay from "../../../components/LoadingOverlay";
+import { useRegister } from "../../../hooks/useRegister";
+import { useCountries } from "../../../hooks/useCountries";
+import { RegisterFormData, registerSchema } from "../../schemas/registerSchema";
 
 
 
@@ -37,7 +41,7 @@ const RegisterForm = () => {
 
 
     const onSubmit = async (data: RegisterFormData) => {
-       
+
         try {
 
             const [day, month, year] = data.birthDate.split("-");
@@ -48,7 +52,7 @@ const RegisterForm = () => {
             const [name, ...lastnameArray] = data.fullName.trim().split(" ");
             const lastname = lastnameArray.join(" ") || "N/A";
             const phoneNumber = data.countryCode + data.phone;
-        
+
 
             const response = await registerUser({
                 variables: {

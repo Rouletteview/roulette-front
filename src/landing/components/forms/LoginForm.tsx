@@ -1,15 +1,16 @@
 import { useForm } from "react-hook-form";
-import { loginFormData, loginSchema } from "../../schemas/loginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLogin } from "../../hooks/useLogin";
+
 import Input from "./Input";
 import { useState } from "react";
 
 
-import eyeOff from '../../assets/icon/eye-off.svg'
+import eyeOff from '../../../assets/icon/eye-off.svg'
 import { Link, useNavigate } from "react-router";
-import LoadingOverlay from "../LoadingOverlay";
-import { useAuthStore } from "../../stores/authStore";
+import LoadingOverlay from "../../../components/LoadingOverlay";
+import { useAuthStore } from "../../../stores/authStore";
+import { useLogin } from "../../../hooks/useLogin";
+import { loginFormData, loginSchema } from "../../schemas/loginSchema";
 
 
 const LoginForm = () => {

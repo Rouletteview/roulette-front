@@ -1,13 +1,15 @@
 import { useState } from "react";
 import Input from "./Input"
 
-import eyeOff from '../../assets/icon/eye-off.svg'
-import { useResetPassword } from "../../hooks/useResetPassword";
+import eyeOff from '../../../assets/icon/eye-off.svg'
+
 import { useForm } from "react-hook-form";
-import { newPasswordFormData, newPasswordSchema } from '../../schemas/newPasswordSchema';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router";
-import LoadingOverlay from "../LoadingOverlay";
+import LoadingOverlay from "../../../components/LoadingOverlay";
+import { newPasswordFormData, newPasswordSchema } from "../../schemas/newPasswordSchema";
+import { useResetPassword } from "../../../hooks/useResetPassword";
+
 
 interface Props {
     token: string;

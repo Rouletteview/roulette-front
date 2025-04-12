@@ -1,4 +1,4 @@
-import updateIcon from '../assets/icon/update-icon.svg';
+import updateIcon from '../../assets/icon/update-icon.svg';
 
 const Update = () => {
   return (

@@ -1,6 +1,6 @@
-import Header from "../components/Header"
-import img from "../assets/images/phone-auth.png"
-import RecoveryForm from "../components/forms/RecoveryForm"
+import Header from "../../components/Header"
+import img from "../../assets/images/phone-auth.png"
+import RecoveryForm from "../components/RecoveryForm"
 import { Outlet } from "react-router"
 
 

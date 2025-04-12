@@ -1,9 +1,10 @@
-import LoginForm from "../components/forms/LoginForm"
-import Header from "../components/Header"
-import img from "../assets/images/phone-auth.png"
+
+import Header from "../../components/Header"
+import img from "../../assets/images/phone-auth.png"
 import { Link, useLocation } from "react-router";
 import Popup from "../components/PopUp";
 import { useState } from "react";
+import LoginForm from "../components/forms/LoginForm";
 
 
 const LoginPage = () => {

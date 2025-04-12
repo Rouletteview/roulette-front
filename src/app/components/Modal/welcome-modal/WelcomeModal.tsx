@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import closeModalIcon from '../../../assets/icon/close-modal.svg'
+import closeModalIcon from '../../../../assets/icon/close-modal.svg'
 
-import { useAuthStore } from '../../../stores/authStore';
+
 import WelcomeContent from './WelcomeContent';
 import PricingContent from './PricingContent';
+import { useAuthStore } from '../../../../stores/authStore';
 
 
 

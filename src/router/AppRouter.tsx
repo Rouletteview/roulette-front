@@ -1,15 +1,16 @@
 import { Navigate, Route, Routes, useNavigate, } from "react-router";
-import LandingPage from "../pages/LandingPage";
-import RegisterPage from "../pages/RegisterPage";
-import LoginPage from "../pages/LoginPage";
-import CheckEmailPage from "../pages/CheckEmailPage";
-import ResetPassword from "../pages/ResetPassword";
-import NewPasswordPage from "../pages/NewPasswordPage";
-import CheckEmailPasswordPage from "../pages/CheckEmailPasswordPage";
-import HomePage from "../pages/HomePage";
-import NotFound from "../pages/NotFound";
+import LandingPage from "../landing/pages/LandingPage";
+
 import { useEffect } from "react";
 import { useAuthStore } from "../stores/authStore";
+import RegisterPage from "../landing/pages/RegisterPage";
+import LoginPage from "../landing/pages/LoginPage";
+import CheckEmailPage from "../landing/pages/CheckEmailPage";
+import ResetPassword from "../landing/pages/ResetPassword";
+import CheckEmailPasswordPage from "../landing/pages/CheckEmailPasswordPage";
+import NewPasswordPage from "../landing/pages/NewPasswordPage";
+import HomePage from "../app/pages/HomePage";
+import NotFound from "../landing/pages/NotFound";
 
 const ActivateUserRedirect = () => {
   const params = new URLSearchParams(location.search);
@@ -28,11 +29,11 @@ const ActivateUserRedirect = () => {
 
 const AppRouter = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  
+
 
   return (
-  
- <Routes>
+
+    <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/registrarse" element={<RegisterPage />} />
 
@@ -53,10 +54,10 @@ const AppRouter = () => {
       />
 
       <Route path="/*" element={<NotFound />} />
-     
+
     </Routes>
-   
-   
+
+
   );
 };
 

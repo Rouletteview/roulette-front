@@ -1,4 +1,5 @@
-import PriceCard from "../../pre-footer/PriceCard"
+import PriceCard from "../../../../components/pre-footer/PriceCard"
+
 
 
 const PricingContent = () => {

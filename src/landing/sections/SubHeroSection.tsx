@@ -1,6 +1,6 @@
-import laptopAndSmartphone from '../assets/images/laptop.png'
-import finantialMarketImage from '../assets/images/financial-market.png'
-import laptopVideo from '../assets/videos/charts.mp4'
+import laptopAndSmartphone from '../../assets/images/laptop.png'
+import finantialMarketImage from '../../assets/images/financial-market.png'
+import laptopVideo from '../../assets/videos/charts.mp4'
 
 
 export const SubHeroSection = () => {

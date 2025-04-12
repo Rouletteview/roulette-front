@@ -1,4 +1,4 @@
-import userIcon from "../assets/icon/user-icon.svg";
+import userIcon from "../../assets/icon/user-icon.svg";
 
 const UserInfo = () => {
 

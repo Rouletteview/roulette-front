@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import clsx from 'clsx';
-import menuIcon from '../assets/icon/menu-hamburger.svg';
-import closeModalIcon from '../assets/icon/close-modal.svg';
-import homeIcon from '../assets/icon/homepage-icon.svg';
-import chartIcon from '../assets/icon/chart-icon.svg';
-import subIcon from '../assets/icon/sub-icon.svg'
-import historyIcon from '../assets/icon/history-icon.svg'
-import notiIcon from '../assets/icon/notification-icon.svg'
-import { useAuthStore } from '../stores/authStore';
+import menuIcon from '../../assets/icon/menu-hamburger.svg';
+import closeModalIcon from '../../assets/icon/close-modal.svg';
+import homeIcon from '../../assets/icon/homepage-icon.svg';
+import chartIcon from '../../assets/icon/chart.svg';
+import subIcon from '../../assets/icon/sub-icon.svg'
+import historyIcon from '../../assets/icon/history-icon.svg'
+import notiIcon from '../../assets/icon/notification-icon.svg'
+import { useAuthStore } from '../../stores/authStore';
+
 
 const NavBar = () => {
     const [isOpen, setIsOpen] = useState(false);

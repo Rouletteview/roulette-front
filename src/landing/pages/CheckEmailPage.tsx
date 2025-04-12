@@ -1,8 +1,8 @@
-import Header from "../components/Header"
-import img from "../assets/images/phone-auth.png"
+import Header from "../../components/Header"
+import img from "../../assets/images/phone-auth.png"
 
 
-const CheckEmailPasswordPage = () => {
+const CheckEmailPage = () => {
     return (
         <>
             <Header />
@@ -16,7 +16,7 @@ const CheckEmailPasswordPage = () => {
                     <div className="flex flex-col gap-y-[92px] justify-center items-center lg:mx-20  col-span-2 text-center">
                         <div className=" my-8">
                             <h1 className="text-lg md:text-[50px] text-white leading-8 md:leading-14 font-bold lg:mx-8 ">
-                                <span className="text-[#D9A425]">¡Te hemos enviado un enlace a tu correo!  </span>Haz clic en el enlace del correo para restablecer tu contraseña.
+                                <span className="text-[#D9A425]">¡Te hemos enviado un enlace a tu correo! </span>Accede a nuestra plataforma dándole click al link del correo, esto nos ayuda a verificar que tu correo es correcto
                             </h1>
                         </div>
 
@@ -44,4 +44,4 @@ const CheckEmailPasswordPage = () => {
     )
 }
 
-export default CheckEmailPasswordPage
+export default CheckEmailPage

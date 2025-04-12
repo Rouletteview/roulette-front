@@ -1,6 +1,6 @@
-import zoomIn from "../assets/icon/zoom-in.svg";
-import zoomOut from "../assets/icon/zoom-out.svg";
-import pencil from "../assets/icon/pencil.svg";
+import zoomIn from "../../assets/icon/zoom-in.svg";
+import zoomOut from "../../assets/icon/zoom-out.svg";
+import pencil from "../../assets/icon/pencil.svg";
 
 const Controls = () => {
   return (

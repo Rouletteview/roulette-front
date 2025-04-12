@@ -1,9 +1,11 @@
-import RegisterForm from "../components/forms/RegisterForm"
-import Header from "../components/Header"
-import img from "../assets/images/phone-auth.png"
+
+import img from "../../assets/images/phone-auth.png"
 import { Link, useLocation } from "react-router";
 import { useState } from "react";
 import Popup from "../components/PopUp";
+import Header from "../../components/Header";
+import RegisterForm from "../components/forms/RegisterForm";
+
 
 
 const RegisterPage = () => {

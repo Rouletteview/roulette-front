@@ -1,9 +1,11 @@
-import HeroCard from "../components/hero-section/HeroCard"
-import chartsIcon from "../assets/icon/charts-icon.svg"
-import seo from "../assets/icon/seo.svg"
-import chartIcon2 from "../assets/icon/chart-icon2.svg"
-import PriceCard from "../components/pre-footer/PriceCard"
+
+import chartsIcon from "../../assets/icon/charts-icon.svg"
+import seo from "../../assets/icon/seo.svg"
+import chartIcon2 from "../../assets/icon/chart-icon2.svg"
+import HeroCard from "../../components/hero-section/HeroCard"
+import PriceCard from "../../components/pre-footer/PriceCard"
 import QASection from "./QASection"
+
 
 
 

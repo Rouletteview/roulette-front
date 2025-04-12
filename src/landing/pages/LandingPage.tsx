@@ -1,14 +1,14 @@
-import Footer from "../components/Footer"
-import Header from "../components/Header"
-import HeroCard from "../components/hero-section/HeroCard"
-import HeroSection from "../Sections/HeroSection"
-import PreFooter from "../Sections/PreFooter"
-import SubHeroSection from "../Sections/SubHeroSection"
+import Footer from "../../components/Footer"
+import Header from "../../components/Header"
+import HeroCard from "../../components/hero-section/HeroCard"
+import HeroSection from "../../sections/HeroSection"
+import PreFooter from "../sections/PreFooter"
+import SubHeroSection from "../sections/SubHeroSection"
 
 // icons
-import barChart from "../assets/icon/bar-chart.svg"
-import chart from "../assets/icon/chart.svg"
-import desktopComputer from "../assets/icon/desktop-computer.svg"
+import barChart from "../../assets/icon/bar-chart.svg"
+import chart from "../../assets/icon/chart.svg"
+import desktopComputer from "../../assets/icon/desktop-computer.svg"
 import { Link } from "react-router"
 
 

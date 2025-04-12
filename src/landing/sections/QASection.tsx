@@ -1,4 +1,4 @@
-import FAQAccordion from "../components/pre-footer/FAQAccordion"
+import FAQAccordion from "../components/FAQAccordion"
 
 
 const QASection = () => {

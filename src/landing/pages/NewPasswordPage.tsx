@@ -1,8 +1,10 @@
-import NewPasswordForm from "../components/forms/NewPasswordForm"
-import Header from "../components/Header"
-import img from "../assets/images/phone-auth.png"
+
+import img from "../../assets/images/phone-auth.png"
 import { useNavigate, useSearchParams } from "react-router";
 import { useEffect } from "react";
+import Header from "../../components/Header";
+import NewPasswordForm from "../components/forms/NewPasswordForm";
+
 
 
 const NewPasswordPage = () => {

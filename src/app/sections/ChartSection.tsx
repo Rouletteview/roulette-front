@@ -1,11 +1,12 @@
-import arrow from "../assets/icon/arrow-right-yellow.svg"
+import arrow from "../../assets/icon/arrow-right-yellow.svg"
 import Chart from "../components/Chart";
-import { useRouletteNumbers } from "../utils/mock/mockRouletteNumbers";
-import { generateMockCandlestickData } from "../utils/mock/mockData";
+import { useRouletteNumbers } from "../../utils/mock/mockRouletteNumbers";
+import { generateMockCandlestickData } from "../../utils/mock/mockData";
 import UserInfo from "../components/UserInfo";
 import Controls from "../components/Controls";
 import Update from "../components/Update";
 import NumbersDisplay from "../components/NumbersDisplay";
+
 
 
 
