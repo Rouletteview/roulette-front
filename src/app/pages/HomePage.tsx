@@ -1,4 +1,5 @@
 
+
 import HeroSection from "../../sections/HeroSection"
 import WelcomeModal from "../components/Modal/welcome-modal/WelcomeModal"
 import AppLayout from "../layouts/AppLayout"
