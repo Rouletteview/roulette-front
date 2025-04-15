@@ -1,7 +1,6 @@
 import arrow from "../../assets/icon/arrow-right-yellow.svg"
 import Chart from "../components/Chart";
 import { useRouletteNumbers } from "../../utils/mock/mockRouletteNumbers";
-import { generateMockCandlestickData } from "../../utils/mock/mockData";
 import UserInfo from "../components/UserInfo";
 import Controls from "../components/Controls";
 import Update from "../components/Update";
@@ -9,13 +8,63 @@ import NumbersDisplay from "../components/NumbersDisplay";
 
 
 
+import { useRouletteById } from "../../hooks/useRouletteById";
+import { useState } from "react";
+import { usePersistentCandleData } from "../../hooks/usePersistentCandleData";
+import LoadingOverlay from "../../components/LoadingOverlay";
+import BetChips from "../components/BetChips";
+
+
+
+
+
+
+
+
+
+
 
 const ChartSection = () => {
-  const numbers = useRouletteNumbers(15);
+
+  const [gameType, setGameType] = useState("RedAndBlack");
+
+  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setGameType(event.target.value);
+  };
+
+
+  const { data = [], loading } = useRouletteById();
+
+  const lastNumbersData = data?.SimulateBet?.LastNumbers;
+  const latestNumber = lastNumbersData?.[0];
+
+  const gameTypeData = data?.SimulateBet?.GameProbabilities?.find(
+    (item: { GameType: string }) => item.GameType === `${gameType}`
+  )?.Probabilities || [];
+
+  const candleData = usePersistentCandleData(gameTypeData, latestNumber);
 
 
 
-  const mockData = generateMockCandlestickData(500);
+
+
+  const redAndBlackProbability = data?.SimulateBet?.GameProbabilities?.find(
+    (item: { GameType: string; }) => item.GameType === 'RedAndBlack'
+  )?.Probabilities || [];
+
+  const blackProbability = redAndBlackProbability.find(
+    (p: { Key: string }) => p.Key === 'Black'
+  )?.Probability || 0;
+
+  const redProbability = redAndBlackProbability.find(
+    (p: { Key: string }) => p.Key === 'Red'
+  )?.Probability || 0;
+
+
+
+  const rouletteItems = useRouletteNumbers(lastNumbersData);
+  if (loading) return <LoadingOverlay />
+
 
 
   // pendiente a refactorización
@@ -43,8 +92,19 @@ const ChartSection = () => {
               <div className="bg-[#121418F2] w-[150px] border-2 border-black py-1.5 px-2 rounded-lg whitespace-nowrap">
                 <span className="text-white text-base">Gráfico de velas</span>
               </div>
-              <div className="bg-[#121418F2] w-[150px] border-2 border-black py-1.5 px-2 rounded-lg whitespace-nowrap">
-                <span className="text-white text-base">Columnas</span>
+              <div className="bg-[#121418F2] w-[150px] border-2 border-black py-1.5 px-2 rounded-lg whitespace-nowrap text-white">
+                <select name="select "
+                  value={gameType}
+                  onChange={handleSelectChange}
+                  className="bg-transparent text-white text-base w-full outline-none">
+                  <option value="RedAndBlack" selected>Red And Black</option>
+                  <option value="OddAndEven">Odd And Even</option>
+                  <option value="HighAndLow">High And Low</option>
+                  <option value="Dozen">Dozen</option>
+                  <option value="Column">Column</option>
+
+                </select>
+                {/* <span className="text-white text-base">Columnas</span> */}
               </div>
               <div className="bg-[#121418F2] w-[150px] border-2 border-black py-1.5 px-2 rounded-lg whitespace-nowrap">
                 <span className="text-white text-base">Micasino.com</span>
@@ -63,39 +123,68 @@ const ChartSection = () => {
           </div>
         </div>
       </section>
-      <section className="flex flex-col">
-        <div className="flex flex-col lg:flex-row w-full justify-center">
-          {/*  userInfo */}
-          <UserInfo />
-          <div className="order-1 lg:order-1 w-full lg:mx-2.5">
-            <div className="bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full">
-              {/* controls */}
-              <Controls />
-              {/* chart */}
-              <Chart type="candlestick" data={mockData} width={800} height={620} />
-              {/* timer + update */}
-              <Update />
-            </div>
-            <div className="w-full flex flex-col-reverse justify-between lg:flex-row items-center lg:items-start gap-6 mt-4">
-              {/*  lista de numeros y probabilidades*/}
-              <NumbersDisplay numbers={numbers} />
+      <section className="flex flex-col lg:flex-row w-full gap-4">
+        {/* Contenido principal */}
+        <div className="order-2 lg:order-1 w-full lg:flex-1 lg:mx-2.5 flex flex-col">
 
-              <div className="flex flex-col items-center lg:flex-row gap-4">
-                <div className="flex flex-col sm:flex-row justify-start lg:justify-center items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-[#FF0000] rounded-full w-4 h-4 lg:w-7 lg:h-7" />
-                    <h2 className="text-white text-xs">00% de probabilidad al rojo</h2>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="bg-black rounded-full w-4 h-4 lg:w-7 lg:h-7" />
-                    <h2 className="text-white text-xs">00% de probabilidad al negro</h2>
-                  </div>
+          {/* Chart + BetChips (uno al lado del otro en mobile, separados en desktop) */}
+          <div className="flex flex-col-reverse lg:flex-row w-full gap-4">
+            {/* Contenedor del chart y controles */}
+            <div className="flex flex-row w-full pr-8 lg:pr-0">
+              <div className="flex flex-col w-full">
+              <div className="flex-1 bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full">
+                <Controls />
+                <Chart type="candlestick" data={candleData} width={1000} height={620} />
+                <Update />
+              </div>
+              <div className="w-full flex flex-col-reverse lg:flex-row justify-between items-center gap-6 mt-4">
+            <NumbersDisplay numbers={rouletteItems} />
+
+            <div className="flex flex-col items-center lg:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="bg-[#FF0000] rounded-full w-4 h-4 lg:w-7 lg:h-7" />
+                  <h2 className="text-white text-xs lg:text-sm">
+                    {Math.round(redProbability)}% de probabilidad al rojo
+                  </h2>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="bg-black rounded-full w-4 h-4 lg:w-7 lg:h-7" />
+                  <h2 className="text-white text-xs lg:text-sm">
+                    {Math.round(blackProbability)}% de probabilidad al negro
+                  </h2>
                 </div>
               </div>
             </div>
           </div>
+              </div>
+             
+              <div className="block lg:hidden w-auto">
+                <BetChips />
+              </div>
+            </div>
+
+            <div className="order-1 lg:order-2 flex-col items-center lg:items-start gap-4">
+              <UserInfo />
+              <div className="hidden lg:flex">
+                <BetChips />
+              </div>
+            </div>
+
+            {/* BetChips solo visible en mobile/tablet */}
+
+          </div>
+
+          {/* Sección inferior con números y probabilidades */}
+         
         </div>
+
+        {/* Sidebar: solo visible en desktop */}
+
+
       </section>
+
+
     </section>
   )
 }

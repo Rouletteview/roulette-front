@@ -11,7 +11,7 @@ createRoot(document.getElementById('root')!).render(
     <ApolloProvider client={client}>
       <BrowserRouter>
         <RouletteViewApp />
-        <div className="hidden text-9xl text-[38px]">
+        <div className="hidden text-9xl text-[38px] bg-[#121418F2]">
         </div>
       </BrowserRouter>
     </ApolloProvider>

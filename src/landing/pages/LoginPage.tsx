@@ -1,7 +1,7 @@
 
 import Header from "../../components/Header"
 import img from "../../assets/images/phone-auth.png"
-import { Link, useLocation } from "react-router";
+import { useLocation } from "react-router";
 import Popup from "../components/PopUp";
 import { useState } from "react";
 import LoginForm from "../components/forms/LoginForm";
@@ -22,16 +22,16 @@ const LoginPage = () => {
   return (
     <>
       <Header>
-        <Link
-          to="/"
+        <a
+          href="/"
           className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-white "
         >
           Ir al inicio
-        </Link>
+        </a>
       </Header>
       <section
         className="w-full  bg-center bg-cover flex items-center justify-center text-white relative"
-        style={{ backgroundImage: "url('/background/view-roulette-casino.png')" }}
+        style={{ backgroundImage: "url('/background/view-roulette-casino.webp')" }}
       >
         <div className="w-full min-h-screen grid lg:grid-cols-3 justify-center items-center px-6 pt-11  ">
 
