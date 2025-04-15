@@ -7,7 +7,7 @@ const NotFound = () => {
         <>
             <Header />
             <main className="w-full bg-center bg-cover flex items-center justify-center text-white"
-                style={{ backgroundImage: "url('/background/close-up-roulette-wheel-1.png')" }}
+                style={{ backgroundImage: "url('/background/close-up-roulette-wheel-1.webp')" }}
             >
 
                 <div className="hero-background w-full min-h-screen flex flex-col  justify-center items-center">

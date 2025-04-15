@@ -15,7 +15,7 @@ const HomePage = () => {
     <>
       <WelcomeModal />
       <AppLayout>
-        <HeroSection imageURL='/background/home-background.png'>
+        <HeroSection imageURL='/background/home-background.webp'>
           <div className='text-start mx-7 lg:mx-24'>
             <div className='flex flex-col justify-between gap-y-8 h-full'>
               <div className='max-w-4xl'>

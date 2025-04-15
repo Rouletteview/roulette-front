@@ -53,7 +53,7 @@ const AppRouter = () => {
         path="/home"
         element={isAuthenticated ? <HomePage /> : <Navigate to="/iniciar-sesion" />}
       />
-        <Route path="/historial" element={<HistoryPage />} />
+      <Route path="/historial" element={<HistoryPage />} />
 
       <Route path="/*" element={<NotFound />} />
 

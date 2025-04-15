@@ -18,7 +18,7 @@ const ResetPassword = () => {
     </Header>
     <section
       className="w-full  bg-center bg-cover flex items-center justify-center text-white relative"
-      style={{ backgroundImage: "url('/background/view-roulette-casino.png')" }}
+      style={{ backgroundImage: "url('/background/view-roulette-casino.webp')" }}
     >
       <div className="w-full min-h-screen grid lg:grid-cols-3 justify-center items-center px-6 pt-11  ">
         

@@ -9,7 +9,6 @@ import SubHeroSection from "../sections/SubHeroSection"
 import barChart from "../../assets/icon/bar-chart.svg"
 import chart from "../../assets/icon/chart.svg"
 import desktopComputer from "../../assets/icon/desktop-computer.svg"
-import { Link } from "react-router"
 import HeroSection from "../../sections/HeroSection"
 
 
@@ -18,10 +17,10 @@ const LandingPage = () => {
     return (
         <>
             <Header>
-                <Link to="/iniciar-sesion" className="border border-[#D9A425] hover:border-[#B3831D] transition-all px-4 py-2 rounded-xl text-center">Iniciar sesión</Link>
-                <Link to="/registrarse" className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center">Registrarse</Link>
+                <a href="/iniciar-sesion" className="border border-[#D9A425] hover:border-[#B3831D] transition-all px-4 py-2 rounded-xl text-center">Iniciar sesión</a>
+                <a href="/registrarse" className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center">Registrarse</a>
             </Header>
-            <HeroSection imageURL="/background/close-up-roulette-wheel-1.png">
+            <HeroSection imageURL="/background/close-up-roulette-wheel-1.webp">
                 <div className="flex flex-col justify-center items-center text-center font-medium leading-[22px] md:leading-[48px] px-4 flex-grow">
                     <div className="w-full max-w-[881px] flex flex-col gap-y-7">
                         <h1 className="text-xl md:text-[45px] mx-6 md:mx-28">

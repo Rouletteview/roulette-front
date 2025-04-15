@@ -6,7 +6,7 @@ import { useState } from "react";
 
 
 import eyeOff from '../../../assets/icon/eye-off.svg'
-import { Link, useNavigate } from "react-router";
+import {  useNavigate } from "react-router";
 import LoadingOverlay from "../../../components/LoadingOverlay";
 import { useAuthStore } from "../../../stores/authStore";
 import { useLogin } from "../../../hooks/useLogin";
@@ -93,7 +93,7 @@ const LoginForm = () => {
                             )}
                         </button>
                     </div>
-                    <Link to="/recuperar-password" className="my-4 text-right underline lg:text-xl">¿Olvidaste tu contraseña?</Link>
+                    <a href="/recuperar-password" className="my-4 text-right underline lg:text-xl">¿Olvidaste tu contraseña?</a>
                 </div>
                 {errorMessage && (
                     <p className="text-red-500 text-center mt-2">{errorMessage}</p>
@@ -106,7 +106,7 @@ const LoginForm = () => {
                 </button>
                 <div className="flex justify-center gap-x-2.5 lg:text-xl">
                     <span>¿No tienes cuenta?</span>
-                    <Link to="/registrarse" className="text-[#D9A425] underline">Crear cuenta</Link>
+                    <a href="/registrarse" className="text-[#D9A425] underline">Crear cuenta</a>
                 </div>
 
             </div>
