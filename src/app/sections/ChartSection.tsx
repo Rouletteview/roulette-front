@@ -124,41 +124,41 @@ const ChartSection = () => {
         </div>
       </section>
       <section className="flex flex-col lg:flex-row w-full gap-4">
-        {/* Contenido principal */}
+
         <div className="order-2 lg:order-1 w-full lg:flex-1 lg:mx-2.5 flex flex-col">
 
-          {/* Chart + BetChips (uno al lado del otro en mobile, separados en desktop) */}
+
           <div className="flex flex-col-reverse lg:flex-row w-full gap-4">
-            {/* Contenedor del chart y controles */}
+
             <div className="flex flex-row w-full pr-8 lg:pr-0">
               <div className="flex flex-col w-full">
-              <div className="flex-1 bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full">
-                <Controls />
-                <Chart type="candlestick" data={candleData} width={1000} height={620} />
-                <Update />
-              </div>
-              <div className="w-full flex flex-col-reverse lg:flex-row justify-between items-center gap-6 mt-4">
-            <NumbersDisplay numbers={rouletteItems} />
+                <div className="flex-1 bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full">
+                  <Controls />
+                  <Chart type="candlestick" data={candleData} width={1000} height={620} />
+                  <Update />
+                </div>
+                <div className="w-full flex flex-col-reverse lg:flex-row justify-between items-center gap-6 mt-4">
+                  <NumbersDisplay numbers={rouletteItems} />
 
-            <div className="flex flex-col items-center lg:flex-row gap-4">
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <div className="bg-[#FF0000] rounded-full w-4 h-4 lg:w-7 lg:h-7" />
-                  <h2 className="text-white text-xs lg:text-sm">
-                    {Math.round(redProbability)}% de probabilidad al rojo
-                  </h2>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="bg-black rounded-full w-4 h-4 lg:w-7 lg:h-7" />
-                  <h2 className="text-white text-xs lg:text-sm">
-                    {Math.round(blackProbability)}% de probabilidad al negro
-                  </h2>
+                  <div className="flex flex-col items-center lg:flex-row gap-4">
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <div className="bg-[#FF0000] rounded-full w-4 h-4 lg:w-7 lg:h-7" />
+                        <h2 className="text-white text-xs lg:text-sm">
+                          {Math.round(redProbability)}% de probabilidad al rojo
+                        </h2>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="bg-black rounded-full w-4 h-4 lg:w-7 lg:h-7" />
+                        <h2 className="text-white text-xs lg:text-sm">
+                          {Math.round(blackProbability)}% de probabilidad al negro
+                        </h2>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-              </div>
-             
+
               <div className="block lg:hidden w-auto">
                 <BetChips />
               </div>
@@ -171,15 +171,15 @@ const ChartSection = () => {
               </div>
             </div>
 
-            {/* BetChips solo visible en mobile/tablet */}
+
 
           </div>
 
-          {/* Sección inferior con números y probabilidades */}
-         
+
+
         </div>
 
-        {/* Sidebar: solo visible en desktop */}
+
 
 
       </section>
