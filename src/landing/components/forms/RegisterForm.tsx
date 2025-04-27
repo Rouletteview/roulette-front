@@ -87,6 +87,16 @@ const RegisterForm = () => {
         }
     };
 
+    const prefixOptions = data?.GetCountriesWithPhonePrefixes.map((item: any) => ({
+        value: `+${item.PhonePrefix}`,
+        label: `+${item.PhonePrefix}`,
+      }));
+
+      const sortedOptions = prefixOptions?.sort((a, b) =>
+        parseInt(a.value.replace("+", "")) - parseInt(b.value.replace("+", ""))
+      );
+   
+
 
 
     return (
@@ -103,12 +113,7 @@ const RegisterForm = () => {
                             register={register("countryCode")}
                             error={errors.countryCode?.message}
                             icon={arrowIcon}
-                            options={
-                                data?.GetCountriesWithPhonePrefixes.map((item: any) => ({
-                                    value: `+${item.PhonePrefix}`,
-                                    label: `+${item.PhonePrefix}`,
-                                }))
-                            }
+                            options={sortedOptions}
                         />
                     </div>
 
