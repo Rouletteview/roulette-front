@@ -3,10 +3,6 @@ import img from '../../assets/images/phone-auth.png'
 const PhoneImage = () => {
   return (
     <div className="">
-      {/* Video encima del teléfono */}
-
-
-      {/* Imagen del teléfono */}
       <div className="absolute bottom-0 right-0 hidden lg:block">
         <video
           src="https://s3-figma-videos-production-sig.figma.com/video/TEAM/1024046001654135541/4e6083b8dee0d3045bb386f004f7c63af06f5362?Expires=1746403200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=g3g842YsetBDCkgW96V-IBVc7pM6Ixvut6sISOfvEMDOkJdRuPtApYweeTb967T6kCaMGFgTipn2Ooq3eMzgetk3ZDg1eXcxX3woIQ8AET1hZ3eXgd6L0YKClxf6z-WewPKraSKZulvTNs2s2MHhmyFZrsbECfRdkkrsdcsTuPAlUGnslNas7SsfUn8bX4pWqjo91xqHqfTey484JruHrWb4L4P4BQ3ygRU7JjHgghvCKMZ5b96yWM7NfjKIlE6K6xiVjn5X8R4BNUBqC4ehlwjo-NUsPk11kl2CQKRmATfKpYWtLVxHTSSNywkYY1~jqfCPHg30ArMlCbmGd6ITRg__"
