@@ -3,30 +3,17 @@ import {
   createChart,
   ColorType,
   IChartApi,
-  ISeriesApi,
-  CandlestickData,
-  LineData,
-  CandlestickSeries,
-  LineSeries,
+  AreaData,
+  AreaSeries,
 } from 'lightweight-charts';
 
-type ChartType = 'candlestick' | 'line';
-
-type CommonData = CandlestickData | LineData;
-
 type ChartProps = {
-  type: ChartType;
-  data: CommonData[];
+  data: AreaData[];
   height?: number;
   width?: number;
-
 };
 
-
-
-
-const Chart: React.FC<ChartProps> = ({
-  type,
+const AreaChart: React.FC<ChartProps> = ({
   data,
   height = 400,
   width = 0
@@ -39,10 +26,10 @@ const Chart: React.FC<ChartProps> = ({
 
     const chart = createChart(chartContainerRef.current, {
       width: width || chartContainerRef.current.clientWidth,
-      height: height || 400,
+      height,
       layout: {
         background: { type: ColorType.Solid, color: '#0d1b2a' },
-        textColor: '#cbd5e1',
+        textColor: 'white',
       },
       grid: {
         vertLines: { color: 'rgba(255,255,255,0.05)' },
@@ -61,15 +48,22 @@ const Chart: React.FC<ChartProps> = ({
 
     chartRef.current = chart;
 
-    let series: ISeriesApi<'Candlestick'> | ISeriesApi<'Line'> | undefined;
-    if (type === 'candlestick') {
-      series = chart.addSeries(CandlestickSeries);
-    } else if (type === 'line') {
-      series = chart.addSeries(LineSeries);
-    }
+    const areaSeries = chart.addSeries(AreaSeries, {
+      lineColor: '#4C8056',
+      topColor: '#4C8056',
+      bottomColor: '#4C8056',
+    });
 
-    if (series) {
-      series.setData(data);
+    const validData = data
+      .filter(item => item && typeof item.time === 'string' && !isNaN(Number(item.value)))
+      .map(item => ({
+        time: item.time,
+        value: Number(item.value),
+      }));
+
+    if (validData.length > 0) {
+      areaSeries.setData(validData);
+      chart.timeScale().fitContent();
     }
 
     const resizeObserver = new ResizeObserver(() => {
@@ -87,9 +81,9 @@ const Chart: React.FC<ChartProps> = ({
       chart.remove();
       resizeObserver.disconnect();
     };
-  }, [type, data, height, width]);
+  }, [data, height, width]);
 
-  return <div ref={chartContainerRef} style={{ width: '100%', }} />;
+  return <div ref={chartContainerRef} style={{ width: '100%' }} />;
 };
 
-export default Chart;
+export default AreaChart;

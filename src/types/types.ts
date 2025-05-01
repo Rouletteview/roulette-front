@@ -1,3 +1,5 @@
+
+
 export enum chartTypes {
     Area = "Area",
     Lineal = "Lineal",
@@ -5,3 +7,4 @@ export enum chartTypes {
     VerticalColumn = "VerticalColumn",
     HorizontalColumn = "HorizontalColumn"
 }
+
