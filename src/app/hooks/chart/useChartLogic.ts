@@ -1,10 +1,21 @@
-import { ChartType } from "../../types/chart/types";
-import { useRouletteNumbers } from "../../utils/formatters/rouletterNumbers";
-import { useChartData } from "../../utils/mock/mockData";
-import { useRouletteById } from "../useRouletteById";
+import { ChartType } from "../../../types/chart/types";
+import { useRouletteNumbers } from "../../../utils/formatters/rouletterNumbers";
+
+import { useChartData } from "../../../utils/mock/mockData";
+import { useRouletteById } from "../../../hooks/useRouletteById";
+import { useCandleData } from "./data/useCandleData";
+import { useAreaChartData } from "./data/useAreaData";
+import { useLineChartData } from "./data/useLineData";
+import { useHistogramChartData } from "./data/useHistogramData";
 
 export function useChartLogic(gameType: string, selectedType: ChartType) {
+
+
+
+
+
   const { data = [], loading } = useRouletteById();
+
   const lastNumbersData = data?.SimulateBet?.LastNumbers;
   const latestNumber = lastNumbersData?.[0];
 
@@ -12,9 +23,12 @@ export function useChartLogic(gameType: string, selectedType: ChartType) {
     (item: { GameType: string }) => item.GameType === gameType
   )?.Probabilities || [];
 
+
+
   const redAndBlackProbability = data?.SimulateBet?.GameProbabilities?.find(
     (item: { GameType: string; }) => item.GameType === 'RedAndBlack'
   )?.Probabilities || [];
+
 
   const blackProbability = redAndBlackProbability.find(
     (p: { Key: string }) => p.Key === 'Black'
@@ -27,8 +41,15 @@ export function useChartLogic(gameType: string, selectedType: ChartType) {
 
 
   const rouletteItems = useRouletteNumbers(lastNumbersData);
+  const candleChartData = useCandleData(gameTypeData)
+  const areaChartData = useAreaChartData(gameTypeData)
+  const lineChartData = useLineChartData(gameTypeData)
+  const histogramChartData = useHistogramChartData(gameTypeData)
+
   //real-data
-  // const chartData = usePersistentCandleData(gameTypeData, latestNumber);
+  // const candleData = usePersistentCandleData(gameTypeData, latestNumber);
+  //candleMockData
+
   //mockData
   const { chartData: mockChartData } = useChartData(selectedType);
 
@@ -39,6 +60,10 @@ export function useChartLogic(gameType: string, selectedType: ChartType) {
     redProbability,
     blackProbability,
     latestNumber,
-    gameTypeData
+    gameTypeData,
+    candleChartData,
+    areaChartData,
+    lineChartData,
+    histogramChartData
   };
 }
