@@ -1,10 +1,11 @@
 
-import img from "../../assets/images/phone-auth.png"
+
 import { Link, useLocation } from "react-router";
 import { useState } from "react";
 import Popup from "../components/PopUp";
 import Header from "../../components/Header";
 import RegisterForm from "../components/forms/RegisterForm";
+import PhoneImage from "../../components/auth/PhoneImage";
 
 
 
@@ -53,17 +54,7 @@ const RegisterPage = () => {
             </div>
           </div>
 
-          <div className="absolute bottom-0 right-0 hidden lg:block">
-          <div className="relative z-10 drop-shadow-[0_0_25px_rgba(217, 164, 37, 1)]
-      before:content-[''] before:absolute before:-left-14 before:top-12 before:w-[177px] md:before:w-[250px] before:h-[169px] md:before:h-[272px] before:bg-[#D9A425] before:blur-[100px]  before:rounded-full before:-z-10
-      after:content-[''] after:absolute after:right-5 after:top-40 after:w-[210px] after:h-[200px] after:bg-[#D9A425] after:blur-[100px] after:rounded-full after:-z-10">
-              <img
-                src={img}
-                alt="Ilustración"
-                className="w-[250px] md:w-[350px] lg:w-[450px] xl:w-[500px] h-auto absolute bottom-0 right-0 lg:relative"
-              />
-            </div>
-          </div>
+          <PhoneImage />
         </div>
         {showPopup && <Popup message={message || "Mensaje no disponible"} onClose={closePopup} />}
       </section>

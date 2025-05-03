@@ -21,8 +21,6 @@ type LastNumberData = {
 
 export const useRouletteNumbers = (lastNumbersData: LastNumberData | LastNumberData[]): RouletteItem[] => {
 
-
-
     return useMemo(() => {
         if (!lastNumbersData) return []
         const list = Array.isArray(lastNumbersData) ? lastNumbersData : [lastNumbersData];

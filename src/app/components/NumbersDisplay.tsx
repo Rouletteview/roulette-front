@@ -1,4 +1,5 @@
-import { RouletteItem } from "../../utils/mock/mockRouletteNumbers";
+import { RouletteItem } from "../../utils/formatters/rouletterNumbers";
+
 
 
 
@@ -10,9 +11,9 @@ const colorClasses = {
     red: "border-red-600 ",
     white: "border-white ",
     green: "border-green-600 ",
-  };
+};
 
-  
+
 const NumbersDisplay = ({ numbers }: Props) => {
     return (
         <ul className="flex flex-wrap gap-2 bg-black/30 p-2 rounded">

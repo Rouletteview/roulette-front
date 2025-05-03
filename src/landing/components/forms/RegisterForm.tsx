@@ -18,7 +18,15 @@ import { RegisterFormData, registerSchema } from "../../schemas/registerSchema";
 
 
 
-
+type CountryPhonePrefix = {
+    PhonePrefix: string;
+  };
+  
+  type Option = {
+    value: string;
+    label: string;
+  };
+  
 
 const RegisterForm = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -87,6 +95,14 @@ const RegisterForm = () => {
         }
     };
 
+    const prefixOptions: Option[] = data?.GetCountriesWithPhonePrefixes.map((item: CountryPhonePrefix) => ({
+        value: `+${item.PhonePrefix}`,
+        label: `+${item.PhonePrefix}`,
+      })) || [];
+      
+      const sortedOptions: Option[] = prefixOptions.sort((a, b) =>
+        parseInt(a.value.replace("+", "")) - parseInt(b.value.replace("+", ""))
+      );
 
 
     return (
@@ -103,12 +119,7 @@ const RegisterForm = () => {
                             register={register("countryCode")}
                             error={errors.countryCode?.message}
                             icon={arrowIcon}
-                            options={
-                                data?.GetCountriesWithPhonePrefixes.map((item: any) => ({
-                                    value: `+${item.PhonePrefix}`,
-                                    label: `+${item.PhonePrefix}`,
-                                }))
-                            }
+                            options={sortedOptions}
                         />
                     </div>
 
