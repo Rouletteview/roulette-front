@@ -3,6 +3,7 @@
 
 import HeroSection from "../../sections/HeroSection"
 import WelcomeModal from "../components/Modal/welcome-modal/WelcomeModal"
+// import RouletteTable from "../components/RouletteTable"
 import AppLayout from "../layouts/AppLayout"
 import ChartSection from "../sections/ChartSection"
 
@@ -39,6 +40,7 @@ const HomePage = () => {
           </div>
         </HeroSection>
         <ChartSection />
+        {/* <RouletteTable/> */}
       </AppLayout>
 
     </>

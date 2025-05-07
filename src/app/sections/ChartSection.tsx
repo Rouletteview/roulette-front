@@ -43,7 +43,6 @@ const ChartSection = () => {
 
   const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = e.target.value as ChartType;
-    console.log('Selected type:', selected);
     setSelectedType(selected);
   };
 
@@ -86,18 +85,21 @@ const ChartSection = () => {
                   value={gameType}
                   onChange={handleSelectChange}
                   className="bg-transparent text-white text-base w-full outline-none">
-                  <option value="RedAndBlack" selected>Red And Black</option>
-                  <option value="OddAndEven">Odd And Even</option>
-                  <option value="HighAndLow">High And Low</option>
-                  <option value="Dozen">Dozen</option>
-                  <option value="Column">Column</option>
+                  <option value="RedAndBlack" selected>Rojo y Negro</option>
+                  <option value="OddAndEven">Par e Impar</option>
+                  <option value="HighAndLow">Alta y Baja</option>
+                  <option value="Dozen">Docena</option>
+                  <option value="Column">Columna</option>
                 </select>
               </div>
               <div className="bg-[#121418F2] w-[150px] border-2 border-black py-1.5 px-2 rounded-lg whitespace-nowrap">
                 <span className="text-white text-base">Micasino.com</span>
               </div>
               <div className="ml-4">
-                <HistoryIcon />
+                <a href="" className="flex items-baseline gap-x-1.5">
+                  <HistoryIcon />
+                  <span className="text-white text-sm font-medium underline underline-offset-1">ver historial</span>
+                </a>
               </div>
             </div>
             {/* alerta desktop */}
