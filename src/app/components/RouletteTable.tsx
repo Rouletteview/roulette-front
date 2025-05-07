@@ -1,15 +1,6 @@
-import { useState } from 'react';
-
 export default function RouletteTable() {
-    const [selectedNumber, setSelectedNumber] = useState(null);
-
-    // Función para manejar clics en los números
-    const handleNumberClick = (number) => {
-        setSelectedNumber(number);
-    };
-
     // Definimos los colores para los números
-    const getNumberColor = (number) => {
+    const getNumberColor = (number: number | string) => {
         if (number === 0 || number === '0') return 'bg-green-700';
         if ([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36].includes(Number(number))) {
             return 'bg-red-600';
@@ -80,7 +71,7 @@ export default function RouletteTable() {
                         <div className={`h-16 w-full ${getNumberColor(31)} ${getTextColor()} flex items-center justify-center text-2xl font-bold border border-white`}>31</div>
                         <div className={`h-16 w-full ${getNumberColor(34)} ${getTextColor()} flex items-center justify-center text-2xl font-bold border border-white`}>34</div>
                         <div className={`h-16 w-full bg-green-700 ${getTextColor()} flex items-center justify-center text-sm font-bold border border-white`}>2a1</div>
-                        
+
                     </div>
 
                     {/* Sección de docenas */}
