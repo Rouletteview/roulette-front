@@ -1,14 +1,36 @@
-import { ApolloClient, InMemoryCache } from "@apollo/client";
+import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
 import { useAuthStore } from "../stores/authStore";
-const token = useAuthStore.getState().token;
+import { onError } from "@apollo/client/link/error";
+
+const httpLink = createHttpLink({
+  uri: import.meta.env.VITE_GRAPHQL_URL,
+});
+
+const authLink = setContext((_, { headers }) => {
+  const token = useAuthStore.getState().token;
+  return {
+    headers: {
+      ...headers,
+      Authorization: token ? `Bearer ${token}` : "",
+    },
+  };
+});
+
+const errorLink = onError(({ graphQLErrors }) => {
+  if (graphQLErrors) {
+    for (const err of graphQLErrors) {
+      if (err.extensions?.code === 'UNAUTHENTICATED') {
+        useAuthStore.getState().logout();
+        window.location.href = '/iniciar-sesion';
+      }
+    }
+  }
+});
 
 const client = new ApolloClient({
-
-  uri: import.meta.env.VITE_GRAPHQL_URL,
+  link: errorLink.concat(authLink.concat(httpLink)),
   cache: new InMemoryCache(),
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
 });
 
 export default client;
