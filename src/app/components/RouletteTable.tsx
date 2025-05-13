@@ -1,5 +1,5 @@
 export default function RouletteTable() {
-    // Definimos los colores para los números
+  
     const getNumberColor = (number: number | string) => {
         if (number === 0 || number === '0') return 'bg-green-700';
         if ([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36].includes(Number(number))) {
@@ -8,7 +8,7 @@ export default function RouletteTable() {
         return 'bg-black';
     };
 
-    // Definimos el texto para los números (todos en blanco)
+  
     const getTextColor = () => 'text-white';
 
     return (
