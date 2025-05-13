@@ -56,6 +56,6 @@ export function useAreaChartData(data?: BetProbability[]) {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
-console.log(points)
+
   return points;
 }

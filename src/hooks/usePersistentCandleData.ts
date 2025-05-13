@@ -65,6 +65,6 @@ export function usePersistentCandleData(
     setHistorial((prev) => [...prev, newCandle].sort((a, b) => a.time - b.time));
     setLastWinAt(lastNumber.WinAt);
   }, [probabilities, lastNumber, lastWinAt, historial]);
-console.log('historial:', historial)
+
   return historial;
 }

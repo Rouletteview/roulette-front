@@ -17,7 +17,7 @@ import HistoryIcon from "../components/icon/HistoryIcon";
 const ChartSection = () => {
   const [gameType, setGameType] = useState("RedAndBlack");
   const [selectedType, setSelectedType] = useState<ChartType>('Candlestick');
-  console.log(gameType)
+
 
 
 
