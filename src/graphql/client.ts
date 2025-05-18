@@ -20,9 +20,10 @@ const authLink = setContext((_, { headers }) => {
 const errorLink = onError(({ graphQLErrors }) => {
   if (graphQLErrors) {
     for (const err of graphQLErrors) {
-      if (err.extensions?.code === 'UNAUTHENTICATED') {
-        useAuthStore.getState().logout();
-        window.location.href = '/iniciar-sesion';
+      if (err.code === "UNAUTHORIZED_ERROR") {
+        const { logout } = useAuthStore.getState();
+        logout();
+        window.location.replace("/iniciar-sesion");
       }
     }
   }
