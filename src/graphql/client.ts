@@ -20,7 +20,7 @@ const authLink = setContext((_, { headers }) => {
 const errorLink = onError(({ graphQLErrors }) => {
   if (graphQLErrors) {
     for (const err of graphQLErrors) {
-      if (err.code === "UNAUTHORIZED_ERROR") {
+      if (err.extensions?.code === "UNAUTHORIZED_ERROR") {
         const { logout } = useAuthStore.getState();
         logout();
         window.location.replace("/iniciar-sesion");
