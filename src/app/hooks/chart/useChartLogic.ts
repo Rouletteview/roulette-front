@@ -7,6 +7,7 @@ import { useCandleData } from "./data/useCandleData";
 import { useAreaChartData } from "./data/useAreaData";
 import { useLineChartData } from "./data/useLineData";
 import { useHistogramChartData } from "./data/useHistogramData";
+import { useMockAreaData, useMockCandleData, useMockHistogramData, useMockLineData } from "./useMockChartData";
 
 export function useChartLogic(gameType: string, selectedType: ChartType) {
 
@@ -41,10 +42,15 @@ export function useChartLogic(gameType: string, selectedType: ChartType) {
 
 
   const rouletteItems = useRouletteNumbers(lastNumbersData);
-  const candleChartData = useCandleData(gameTypeData)
-  const areaChartData = useAreaChartData(gameTypeData)
-  const lineChartData = useLineChartData(gameTypeData)
-  const histogramChartData = useHistogramChartData(gameTypeData)
+  const candleChartData = useCandleData(gameTypeData);
+  const areaChartData = useAreaChartData(gameTypeData);
+  const lineChartData = useLineChartData(gameTypeData);
+  const histogramChartData = useHistogramChartData(gameTypeData);
+  //mockData
+  const mockCandleChartData = useMockCandleData();
+  const mockLineChartData = useMockLineData();
+  const mockAreaChartData = useMockAreaData();
+  const mockHistogramChartData = useMockHistogramData();
 
   //real-data
   // const candleData = usePersistentCandleData(gameTypeData, latestNumber);
@@ -64,6 +70,11 @@ export function useChartLogic(gameType: string, selectedType: ChartType) {
     candleChartData,
     areaChartData,
     lineChartData,
-    histogramChartData
-  };
+    histogramChartData,
+    //mockData
+    mockCandleChartData,
+    mockLineChartData,
+    mockAreaChartData,
+    mockHistogramChartData
+    };
 }

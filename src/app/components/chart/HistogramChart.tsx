@@ -24,7 +24,7 @@ const HistogramChart: React.FC<ChartProps> = ({
   const [tooltipData, setTooltipData] = useState<{
     time: string;
     price: number;
-    isPositive: boolean;
+    color: string;
   } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
 
@@ -90,7 +90,6 @@ const HistogramChart: React.FC<ChartProps> = ({
     }
 
     chart.subscribeCrosshairMove((param: MouseEventParams) => {
-    
       if (
         param.point === undefined ||
         !param.time ||
@@ -108,7 +107,6 @@ const HistogramChart: React.FC<ChartProps> = ({
       const dataAtTime = validData.find(d => d.time === time);
       if (dataAtTime) {
         const date = new Date(time * 1000);
-        const isPositive = dataAtTime.value >= 0;
 
         setTooltipData({
           time: date.toLocaleString('es-ES', {
@@ -119,7 +117,7 @@ const HistogramChart: React.FC<ChartProps> = ({
             hour12: true,
           }),
           price: dataAtTime.value,
-          isPositive,
+          color: dataAtTime.color || 'rgba(32, 178, 108, 1)',
         });
 
         const tooltipWidth = 96;
@@ -175,7 +173,7 @@ const HistogramChart: React.FC<ChartProps> = ({
             fontSize: '12px',
             zIndex: 1000,
             pointerEvents: 'none',
-            border: `2px solid ${tooltipData.isPositive ? 'rgba(32, 178, 108, 1)' : 'rgba(239, 83, 80, 1)'}`,
+            border: `2px solid ${tooltipData.color}`,
             borderRadius: '2px',
             background: 'black',
             color: 'white',
@@ -184,7 +182,7 @@ const HistogramChart: React.FC<ChartProps> = ({
             MozOsxFontSmoothing: 'grayscale',
           }}
         >
-          <div style={{ color: tooltipData.isPositive ? '#0f0' : '#f00' }}>
+          <div style={{ color: tooltipData.color }}>
             Probabilidad
           </div>
           <div style={{ fontSize: '24px', margin: '4px 0px' }}>

@@ -32,11 +32,17 @@ const ChartSection = () => {
     rouletteItems,
     redProbability,
     blackProbability,
-    candleChartData,
-    areaChartData,
-    lineChartData,
-    histogramChartData
-    // candleData
+    // candleChartData,
+    // areaChartData,
+    // lineChartData,
+    // histogramChartData,
+
+    // mockData
+    mockCandleChartData,
+    mockLineChartData,
+    mockAreaChartData,
+    mockHistogramChartData
+
   } = useChartLogic(gameType, selectedType)
 
   if (loading) return <LoadingOverlay />
@@ -119,28 +125,28 @@ const ChartSection = () => {
                   <Suspense fallback={<LoadingOverlay />}>
                     {selectedType === 'Candlestick' && mockChartData.length > 0 && (
                       <CandleChart
-                        data={candleChartData}
+                        data={mockCandleChartData}
                         width={1000}
                         height={620}
                       />
                     )}
                     {selectedType === 'Area' && Array.isArray(mockChartData) && mockChartData.length > 0 && (
                       <AreaChart
-                        data={areaChartData}
+                        data={mockAreaChartData}
                         width={1000}
                         height={620}
                       />
                     )}
                     {selectedType === 'Lineal' && Array.isArray(mockChartData) && mockChartData.length > 0 && (
                       <LineChart
-                        data={lineChartData}
+                        data={mockLineChartData}
                         width={1000}
                         height={620}
                       />
                     )}
                     {selectedType === 'VerticalColumn' && Array.isArray(mockChartData) && mockChartData.length > 0 && (
                       <HistogramChart
-                        data={histogramChartData}
+                        data={mockHistogramChartData}
                         width={1000}
                         height={620}
                       />
