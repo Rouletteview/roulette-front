@@ -9,7 +9,7 @@ import { useLineChartData } from "./data/useLineData";
 import { useHistogramChartData } from "./data/useHistogramData";
 import { useMockAreaData, useMockCandleData, useMockHistogramData, useMockLineData } from "./useMockChartData";
 
-export function useChartLogic(gameType: string, selectedType: ChartType) {
+export function useChartLogic(gameType: string, selectedType: ChartType | '') {
 
 
 
