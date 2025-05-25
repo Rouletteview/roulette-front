@@ -2,28 +2,69 @@ import UserInfo from "../components/UserInfo";
 import Controls from "../components/Controls";
 import Update from "../components/Update";
 import NumbersDisplay from "../components/NumbersDisplay";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import BetChips from "../components/BetChips";
 import CandleChart from "../components/chart/CandleChart";
 import AreaChart from "../components/chart/AreaChart";
 import LineChart from '../components/chart/LineChart';
 import HistogramChart from "../components/chart/HistogramChart";
-import { ChartType, selectChartTypes } from "../../types/chart/types";
+import { ChartType, selectChartTypes, selectChartZoneTypes } from "../../types/chart/types";
 import { useChartLogic } from "../hooks/chart/useChartLogic";
 import HistoryIcon from "../components/icon/HistoryIcon";
+import { useSearchParams } from "react-router";
+import CustomDropdown from "../components/CustomDropdown";
 
+const ChartPlaceholder = () => (
+  <div className="flex items-center justify-center w-full h-[620px] bg-[#0d1b2a]">
+    <div className="text-center">
+      <h2 className="text-white text-xl font-medium mb-2">Selecciona un tipo de gráfico, una zona y un mercado</h2>
+      <p className="text-gray-400">Por favor, elige un tipo de gráfico, una zona y un mercado para visualizar los datos</p>
+    </div>
+  </div>
+);
 
 const ChartSection = () => {
-  const [gameType, setGameType] = useState("RedAndBlack");
-  const [selectedType, setSelectedType] = useState<ChartType>('Candlestick');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [gameType, setGameType] = useState("");
+  
+  const [selectedType, setSelectedType] = useState<ChartType | ''>('');
+
+
+  const chartTypeOptions = selectChartTypes.map(type => ({
+    label: type.label,
+    value: type.type,
+  }));
+
+
+
+  const chartZoneOptions = selectChartZoneTypes.map(zone => ({
+    label: zone.label,
+    value: zone.zone
+  }))
 
 
 
 
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    console.log(event.target.value)
-    setGameType(event.target.value);
+  useEffect(() => {
+    const chartType = searchParams.get('chartType') as ChartType;
+    const chartZone = searchParams.get('chartZone');
+    if (chartType && selectChartTypes.some(type => type.type === chartType)) {
+      setSelectedType(chartType);
+    }
+    if (chartZone) {
+      setGameType(chartZone);
+    }
+  }, [searchParams]);
+
+
+
+  const handleSelectChange = (value: string) => {
+    setGameType(value);
+    setSearchParams(prev => {
+      prev.set('chartZone', value);
+      return prev;
+    });
   };
 
   const {
@@ -32,24 +73,28 @@ const ChartSection = () => {
     rouletteItems,
     redProbability,
     blackProbability,
-    // candleChartData,
-    // areaChartData,
-    // lineChartData,
-    // histogramChartData,
+    candleChartData,
+    areaChartData,
+    histogramChartData,
+    lineChartData,
+    //mock
+    // mockCandleChartData,
+    // mockLineChartData,
+    // mockAreaChartData,
+    // mockHistogramChartData
+  } = useChartLogic(gameType, selectedType);
 
-    // mockData
-    mockCandleChartData,
-    mockLineChartData,
-    mockAreaChartData,
-    mockHistogramChartData
 
-  } = useChartLogic(gameType, selectedType)
 
-  if (loading) return <LoadingOverlay />
+  if (loading) return <LoadingOverlay />;
 
-  const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selected = e.target.value as ChartType;
-    setSelectedType(selected);
+
+  const handleTypeChange = (value: string) => {
+    setSelectedType(value as ChartType);
+    setSearchParams(prev => {
+      prev.set('chartType', value);
+      return prev;
+    });
   };
 
   // pendiente a refactorización
@@ -69,38 +114,49 @@ const ChartSection = () => {
       <section className="my-10">
         <div className="flex flex-col gap-9 lg:gap-2">
           <div className="lg:mx-8">
-            <h1 className="text-base lg:text-xl text-white font-medium inline-block border-x-1 border-white px-2"><span className="text-[#D9A425] ">Gráfico de velas</span>, zona del grafico <span className="text-[#D9A425] ">columna</span>, operando en el mercado de <span className="text-[#D9A425]">Micasino.com</span></h1>
+            <h1 className="text-base lg:text-xl text-white font-medium inline-block border-x-1 border-white px-2">
+              {!selectedType && !gameType ? (
+                <span className="text-gray-400">Selecciona un tipo de gráfico y una zona para comenzar</span>
+              ) : !selectedType ? (
+                <span className="text-gray-400">Selecciona un tipo de gráfico para continuar</span>
+              ) : !gameType ? (
+                <span className="text-gray-400">Selecciona una zona para continuar</span>
+              ) : (
+                <>
+                  <span className="text-[#D9A425]">{selectChartTypes.find(type => type.type === selectedType)?.label}</span>,
+                  zona del grafico <span className="text-[#D9A425]">{selectChartZoneTypes.find(zone => zone.zone === gameType)?.label}</span>,
+                  operando en el mercado de <span className="text-[#D9A425]">Micasino.com</span>
+                </>
+              )}
+            </h1>
           </div>
           <div className="flex justify-between">
             <div className="flex flex-wrap gap-1 text-start items-center">
-              <div className="bg-[#121418F2] w-auto border-2 border-black py-1.5 px-2 rounded-lg whitespace-nowrap">
-                <select
-                  className="text-white text-base"
-                  value={selectedType}
-                  onChange={handleTypeChange}
-                >
-                  {selectChartTypes.map((chart) => (
-                    <option value={chart.type} key={chart.type}>
-                      {chart.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="bg-[#121418F2] w-[150px] border-2 border-black py-1.5 px-2 rounded-lg whitespace-nowrap text-white">
-                <select name="select "
-                  value={gameType}
-                  onChange={handleSelectChange}
-                  className="bg-transparent text-white text-base w-full outline-none">
-                  <option value="RedAndBlack" selected>Rojo y Negro</option>
-                  <option value="OddAndEven">Par e Impar</option>
-                  <option value="HighAndLow">Alta y Baja</option>
-                  <option value="Dozen">Docena</option>
-                  <option value="Column">Columna</option>
-                </select>
-              </div>
-              <div className="bg-[#121418F2] w-[150px] border-2 border-black py-1.5 px-2 rounded-lg whitespace-nowrap">
-                <span className="text-white text-base">Micasino.com</span>
-              </div>
+              {/* CustomDropdown for Tipo de gráfico */}
+              <CustomDropdown
+                defaultLabel="Tipo de gráfico"
+                options={chartTypeOptions}
+                value={selectedType}
+                onChange={handleTypeChange}
+                className="mr-2"
+              />
+              {/* Keep the other selects as is for now */}
+              <CustomDropdown
+                defaultLabel="Zona de gráfico"
+                options={chartZoneOptions}
+                value={gameType}
+                onChange={handleSelectChange}
+                className="mr-2"
+              />
+
+              <CustomDropdown
+                defaultLabel="Mercado a operar"
+                options={[]}
+                value={''}
+                onChange={handleSelectChange}
+                className="mr-2"
+              />
+
               <div className="ml-4">
                 <a href="" className="flex items-baseline gap-x-1.5">
                   <HistoryIcon />
@@ -123,33 +179,40 @@ const ChartSection = () => {
                 <div className="flex-1 bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full">
                   <Controls />
                   <Suspense fallback={<LoadingOverlay />}>
-                    {selectedType === 'Candlestick' && mockChartData.length > 0 && (
-                      <CandleChart
-                        data={mockCandleChartData}
-                        width={1000}
-                        height={620}
-                      />
-                    )}
-                    {selectedType === 'Area' && Array.isArray(mockChartData) && mockChartData.length > 0 && (
-                      <AreaChart
-                        data={mockAreaChartData}
-                        width={1000}
-                        height={620}
-                      />
-                    )}
-                    {selectedType === 'Lineal' && Array.isArray(mockChartData) && mockChartData.length > 0 && (
-                      <LineChart
-                        data={mockLineChartData}
-                        width={1000}
-                        height={620}
-                      />
-                    )}
-                    {selectedType === 'VerticalColumn' && Array.isArray(mockChartData) && mockChartData.length > 0 && (
-                      <HistogramChart
-                        data={mockHistogramChartData}
-                        width={1000}
-                        height={620}
-                      />
+                    {/* || !searchParams.get('market') */}
+                    {!selectedType || !gameType ? (
+                      <ChartPlaceholder />
+                    ) : (
+                      <>
+                        {selectedType === 'Candlestick' && mockChartData.length > 0 && (
+                          <CandleChart
+                            data={candleChartData}
+                            width={1000}
+                            height={620}
+                          />
+                        )}
+                        {selectedType === 'Area' && Array.isArray(mockChartData) && mockChartData.length > 0 && (
+                          <AreaChart
+                            data={areaChartData}
+                            width={1000}
+                            height={620}
+                          />
+                        )}
+                        {selectedType === 'Lineal' && Array.isArray(mockChartData) && mockChartData.length > 0 && (
+                          <LineChart
+                            data={lineChartData}
+                            width={1000}
+                            height={620}
+                          />
+                        )}
+                        {selectedType === 'VerticalColumn' && Array.isArray(mockChartData) && mockChartData.length > 0 && (
+                          <HistogramChart
+                            data={histogramChartData}
+                            width={1000}
+                            height={620}
+                          />
+                        )}
+                      </>
                     )}
                   </Suspense>
                   <Update />
@@ -188,7 +251,7 @@ const ChartSection = () => {
         </div>
       </section>
     </section>
-  )
-}
+  );
+};
 
-export default ChartSection
+export default ChartSection;
