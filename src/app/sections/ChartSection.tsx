@@ -14,7 +14,7 @@ import { useChartLogic } from "../hooks/chart/useChartLogic";
 import HistoryIcon from "../components/icon/HistoryIcon";
 import { useSearchParams } from "react-router";
 import CustomDropdown from "../components/CustomDropdown";
-import BetModal from "../components/Modal/bet-modal";
+// import BetModal from "../components/Modal/bet-modal";
 
 const ChartPlaceholder = () => (
   <div className="flex items-center justify-center w-full h-[620px] bg-[#0d1b2a]">
@@ -73,15 +73,15 @@ const ChartSection = () => {
     rouletteItems,
     redProbability,
     blackProbability,
-    candleChartData,
-    areaChartData,
-    histogramChartData,
-    lineChartData,
+    // candleChartData,
+    // areaChartData,
+    // histogramChartData,
+    // lineChartData,
     //mock
-    // mockCandleChartData,
-    // mockLineChartData,
-    // mockAreaChartData,
-    // mockHistogramChartData
+    mockCandleChartData,
+    mockLineChartData,
+    mockAreaChartData,
+    mockHistogramChartData
   } = useChartLogic(gameType, selectedType);
 
 
@@ -178,7 +178,7 @@ const ChartSection = () => {
               <div className="flex flex-col w-full">
                 <div className="relative flex-1 bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full">
                   <Controls />
-                  <BetModal/>
+                  {/* <BetModal/> */}
                   <Suspense fallback={<LoadingOverlay />}>
                     {/* || !searchParams.get('market') */}
                     {!selectedType || !gameType ? (
@@ -187,28 +187,28 @@ const ChartSection = () => {
                       <>
                         {selectedType === 'Candlestick' && mockChartData.length > 0 && (
                           <CandleChart
-                            data={candleChartData}
+                            data={mockCandleChartData}
                             width={1000}
                             height={620}
                           />
                         )}
                         {selectedType === 'Area' && Array.isArray(mockChartData) && mockChartData.length > 0 && (
                           <AreaChart
-                            data={areaChartData}
+                            data={mockAreaChartData}
                             width={1000}
                             height={620}
                           />
                         )}
                         {selectedType === 'Lineal' && Array.isArray(mockChartData) && mockChartData.length > 0 && (
                           <LineChart
-                            data={lineChartData}
+                            data={mockLineChartData}
                             width={1000}
                             height={620}
                           />
                         )}
                         {selectedType === 'VerticalColumn' && Array.isArray(mockChartData) && mockChartData.length > 0 && (
                           <HistogramChart
-                            data={histogramChartData}
+                            data={mockHistogramChartData}
                             width={1000}
                             height={620}
                           />
