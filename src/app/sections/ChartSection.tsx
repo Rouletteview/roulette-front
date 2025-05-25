@@ -14,6 +14,7 @@ import { useChartLogic } from "../hooks/chart/useChartLogic";
 import HistoryIcon from "../components/icon/HistoryIcon";
 import { useSearchParams } from "react-router";
 import CustomDropdown from "../components/CustomDropdown";
+import BetModal from "../components/Modal/bet-modal";
 
 const ChartPlaceholder = () => (
   <div className="flex items-center justify-center w-full h-[620px] bg-[#0d1b2a]">
@@ -27,7 +28,7 @@ const ChartPlaceholder = () => (
 const ChartSection = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [gameType, setGameType] = useState("");
-  
+
   const [selectedType, setSelectedType] = useState<ChartType | ''>('');
 
 
@@ -35,7 +36,6 @@ const ChartSection = () => {
     label: type.label,
     value: type.type,
   }));
-
 
 
   const chartZoneOptions = selectChartZoneTypes.map(zone => ({
@@ -176,8 +176,9 @@ const ChartSection = () => {
           <div className="flex flex-col-reverse lg:flex-row w-full gap-4">
             <div className="flex flex-row w-full pr-8 lg:pr-0">
               <div className="flex flex-col w-full">
-                <div className="flex-1 bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full">
+                <div className="relative flex-1 bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full">
                   <Controls />
+                  <BetModal/>
                   <Suspense fallback={<LoadingOverlay />}>
                     {/* || !searchParams.get('market') */}
                     {!selectedType || !gameType ? (
