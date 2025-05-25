@@ -29,7 +29,7 @@ const mockDataHistogram: HistogramData[] = [
 type ChartType = 'Candlestick' | 'Area' | 'Lineal' | 'VerticalColumn';
 
 // hook para manejar el cambio de tipo de gráfico y los datos correspondientes
-export const useChartData = (initialType: ChartType) => {
+export const useChartData = (initialType: ChartType | '') => {
   const [chartData, setChartData] = useState<CandlestickData[] | AreaData[] | LineData[] | HistogramData[]>([]);
 
   useEffect(() => {

@@ -17,9 +17,13 @@ const LandingPage = () => {
     return (
         <>
             <Header>
-                <a href="/iniciar-sesion" className="border border-[#D9A425] hover:border-[#B3831D] transition-all px-4 py-2 rounded-xl text-center">Iniciar sesión</a>
-                <a href="/registrarse" className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center">Registrarse</a>
+                <a href="https://info.roulettesview.com/?" target="_blank" className="text-white text-sm md:text-lg text-center">Conocenos</a>
+                <div className="flex flex-col md:flex-row gap-2 md:gap-3.5">
+                <a href="/iniciar-sesion" className="border border-[#D9A425] hover:border-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-sm md:text-lg">Iniciar sesión</a>
+                <a href="/registrarse" className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-sm md:text-lg ">Registrarse</a>
+                </div>
             </Header>
+
             <HeroSection imageURL="/background/close-up-roulette-wheel-1.webp">
                 <div className="flex flex-col justify-center items-center text-center font-medium leading-[22px] md:leading-[48px] px-4 flex-grow">
                     <div className="w-full max-w-[881px] flex flex-col gap-y-7">
