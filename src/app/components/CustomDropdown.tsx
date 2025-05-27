@@ -42,11 +42,11 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ options, value, onChang
     const selectedOption = options.find(opt => opt.value === value);
 
     return (
-        <div className={`relative min-w-[215px] ${className || ''}`} ref={dropdownRef}>
-            {label && <span className="block mb-1 text-base text-white font-medium">{label}</span>}
+        <div className={`relative max-w-[215px] ${className || ''}`} ref={dropdownRef}>
+            {label && <span className="block mb-1 text-sm md:text-base text-white font-medium">{label}</span>}
             <button
                 type="button"
-                className="w-full flex justify-between items-center bg-[#121418F2] border-2 border-[#000000] rounded-lg px-4 py-2 text-left text-white font-medium focus:outline-none focus:ring-2 focus:ring-[#D9A425] transition"
+                className="w-full flex justify-between items-center text-sm md:text-base bg-[#121418F2] border-2 border-[#000000] rounded-lg px-4 py-2 text-left text-white font-medium focus:outline-none focus:ring-2 focus:ring-[#D9A425] transition"
                 onClick={() => setOpen((prev) => !prev)}
                 onKeyDown={handleKeyDown}
                 aria-haspopup="listbox"
