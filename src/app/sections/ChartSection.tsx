@@ -14,7 +14,7 @@ import { useChartLogic } from "../hooks/chart/useChartLogic";
 import HistoryIcon from "../components/icon/HistoryIcon";
 import { useSearchParams } from "react-router";
 import CustomDropdown from "../components/CustomDropdown";
-// import BetModal from "../components/Modal/bet-modal";
+import BetModal from "../components/Modal/bet-modal";
 
 const ChartPlaceholder = () => (
   <div className="flex items-center justify-center w-full h-[620px] bg-[#0d1b2a]">
@@ -28,6 +28,8 @@ const ChartPlaceholder = () => (
 const ChartSection = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [gameType, setGameType] = useState("");
+  const [openBetModal, setOpenBetModal] = useState<boolean>(false);
+  const [selectedChip, setSelectedChip] = useState<number | null>(null);
 
   const [selectedType, setSelectedType] = useState<ChartType | ''>('');
 
@@ -97,6 +99,14 @@ const ChartSection = () => {
     });
   };
 
+  const handleChipSelect = (value: number) => {
+    setSelectedChip(value);
+  };
+
+  const handleCloseBetModal = () => {
+    setOpenBetModal(false);
+  };
+
   // pendiente a refactorización
   return (
     <section className="bg-[#121418F2] py-6 lg:py-24 px-6 lg:px-24">
@@ -132,30 +142,33 @@ const ChartSection = () => {
           </div>
           <div className="flex justify-between">
             <div className="flex flex-wrap gap-1 text-start items-center">
-              {/* CustomDropdown for Tipo de gráfico */}
-              <CustomDropdown
-                defaultLabel="Tipo de gráfico"
-                options={chartTypeOptions}
-                value={selectedType}
-                onChange={handleTypeChange}
-                className="mr-2"
-              />
-              {/* Keep the other selects as is for now */}
-              <CustomDropdown
-                defaultLabel="Zona de gráfico"
-                options={chartZoneOptions}
-                value={gameType}
-                onChange={handleSelectChange}
-                className="mr-2"
-              />
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
 
-              <CustomDropdown
-                defaultLabel="Mercado a operar"
-                options={[]}
-                value={''}
-                onChange={handleSelectChange}
-                className="mr-2"
-              />
+                <CustomDropdown
+                  defaultLabel="Tipo de gráfico"
+                  options={chartTypeOptions}
+                  value={selectedType}
+                  onChange={handleTypeChange}
+                  className="mr-2"
+                />
+
+                <CustomDropdown
+                  defaultLabel="Zona de gráfico"
+                  options={chartZoneOptions}
+                  value={gameType}
+                  onChange={handleSelectChange}
+                  className="mr-2"
+                />
+
+                <CustomDropdown
+                  defaultLabel="Mercado a operar"
+                  options={[]}
+                  value={''}
+                  onChange={handleSelectChange}
+                  className="mr-2"
+                />
+              </div>
+
 
               <div className="ml-4">
                 <a href="" className="flex items-baseline gap-x-1.5">
@@ -174,11 +187,15 @@ const ChartSection = () => {
       <section className="flex flex-col lg:flex-row w-full gap-4">
         <div className="order-2 lg:order-1 w-full lg:flex-1 lg:mx-2.5 flex flex-col">
           <div className="flex flex-col-reverse lg:flex-row w-full gap-4">
-            <div className="flex flex-row w-full pr-8 lg:pr-0">
+            <div className="flex flex-row w-full pr-8 lg:pr-0 ">
               <div className="flex flex-col w-full">
                 <div className="relative flex-1 bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full">
                   <Controls />
-                  {/* <BetModal/> */}
+                  <BetModal
+                    showModal={openBetModal}
+                    onClose={handleCloseBetModal}
+                    selectedChip={selectedChip}
+                  />
                   <Suspense fallback={<LoadingOverlay />}>
                     {/* || !searchParams.get('market') */}
                     {!selectedType || !gameType ? (
@@ -239,13 +256,21 @@ const ChartSection = () => {
                 </div>
               </div>
               <div className="block lg:hidden w-auto">
-                <BetChips />
+                <BetChips
+                  setOpenBetModal={setOpenBetModal}
+                  selectedChip={selectedChip}
+                  onChipSelect={handleChipSelect}
+                />
               </div>
             </div>
             <div className="order-1 lg:order-2 flex-col items-center lg:items-start gap-4">
               <UserInfo />
               <div className="hidden lg:flex">
-                <BetChips />
+                <BetChips
+                  setOpenBetModal={setOpenBetModal}
+                  selectedChip={selectedChip}
+                  onChipSelect={handleChipSelect}
+                />
               </div>
             </div>
           </div>
@@ -256,3 +281,11 @@ const ChartSection = () => {
 };
 
 export default ChartSection;
+
+
+
+// <BetChips
+//   setOpenBetModal={setOpenBetModal}
+//   selectedChip={selectedChip}
+//   onChipSelect={handleChipSelect}
+// />
