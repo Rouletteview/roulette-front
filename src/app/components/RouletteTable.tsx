@@ -99,8 +99,8 @@ const RouletteTable = ({ selectedChip, onPlaceBet, bets = [] }: Props) => {
     };
 
     return (
-        <div className="bg-black p-4 font-bold text-center h-[750px] lg:h-full  lg:max-w-5xl mx-auto">
-            <div className="bg-black border-4 p-2 transform rotate-90 md:rotate-0 origin-center scale-75 md:scale-100 transition-transform duration-300 ">
+        <div className="bg-black p-4 font-bold text-center  h-[750px] lg:h-full mx-auto">
+            <div className="bg-black border-4 p-2 transform rotate-90 md:rotate-0 origin-center  scale-75 md:scale-100 transition-transform duration-300 ">
                 <div className="flex border-4 w-[700px] md:w-full border-green-800">
 
                     <div className="flex flex-col">
