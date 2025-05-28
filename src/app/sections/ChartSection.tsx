@@ -15,6 +15,8 @@ import HistoryIcon from "../components/icon/HistoryIcon";
 import { useSearchParams } from "react-router";
 import CustomDropdown from "../components/CustomDropdown";
 import BetModal from "../components/Modal/bet-modal";
+import ConfirmationModal from '../components/Modal/ConfirmationModal';
+import type { Bet } from '../components/Modal/bet-modal';
 
 const ChartPlaceholder = () => (
   <div className="flex items-center justify-center w-full h-[620px] bg-[#0d1b2a]">
@@ -30,6 +32,9 @@ const ChartSection = () => {
   const [gameType, setGameType] = useState("");
   const [openBetModal, setOpenBetModal] = useState<boolean>(false);
   const [selectedChip, setSelectedChip] = useState<number | null>(null);
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
+  const [betsToConfirm, setBetsToConfirm] = useState<Bet[]>([]);
+  const [bets, setBets] = useState<Bet[]>([]);
 
   const [selectedType, setSelectedType] = useState<ChartType | ''>('');
 
@@ -107,6 +112,25 @@ const ChartSection = () => {
     setOpenBetModal(false);
   };
 
+  const handleRequestConfirmation = (selectedBets: Bet[]) => {
+    setBetsToConfirm(selectedBets);
+    setOpenBetModal(false);
+    setConfirmationModalOpen(true);
+  };
+
+  const handleConfirmBets = () => {
+    // desde aquí se enviara la apuesta ya sea al backend o no se a donde
+    setConfirmationModalOpen(false);
+    setBetsToConfirm([]);
+    setBets([]);
+  };
+
+  const handleCloseConfirmationModal = () => {
+    //abrir modal otra vez.
+    setOpenBetModal(true);
+    setConfirmationModalOpen(false);
+  };
+
   // pendiente a refactorización
   return (
     <section className="bg-[#121418F2] py-6 lg:py-24 px-6 lg:px-24">
@@ -142,7 +166,7 @@ const ChartSection = () => {
           </div>
           <div className="flex justify-between">
             <div className="flex flex-wrap gap-1 text-start items-center">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-1">
 
                 <CustomDropdown
                   defaultLabel="Tipo de gráfico"
@@ -191,10 +215,21 @@ const ChartSection = () => {
               <div className="flex flex-col w-full">
                 <div className="relative flex-1 bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full">
                   <Controls />
+
                   <BetModal
                     showModal={openBetModal}
                     onClose={handleCloseBetModal}
                     selectedChip={selectedChip}
+                    onRequestConfirmation={handleRequestConfirmation}
+                    bets={bets}
+                    setBets={setBets}
+                  />
+                  <ConfirmationModal
+                    show={confirmationModalOpen}
+                    onClose={handleCloseConfirmationModal}
+                    onConfirm={handleConfirmBets}
+                    bets={betsToConfirm}
+
                   />
                   <Suspense fallback={<LoadingOverlay />}>
                     {/* || !searchParams.get('market') */}
@@ -283,9 +318,3 @@ const ChartSection = () => {
 export default ChartSection;
 
 
-
-// <BetChips
-//   setOpenBetModal={setOpenBetModal}
-//   selectedChip={selectedChip}
-//   onChipSelect={handleChipSelect}
-// />
