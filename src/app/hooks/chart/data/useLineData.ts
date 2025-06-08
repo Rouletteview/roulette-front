@@ -52,9 +52,8 @@ export function useLineChartData(data?: BetProbability[]) {
         return uniqueSorted;
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  console.log(points);
   return points;
 }

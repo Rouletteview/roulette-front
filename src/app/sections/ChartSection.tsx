@@ -195,7 +195,7 @@ const ChartSection = () => {
 
 
               <div className="ml-4">
-                <a href="" className="flex items-baseline gap-x-1.5">
+                <a href="/historial" className="flex items-baseline gap-x-1.5">
                   <HistoryIcon />
                   <span className="text-white text-sm font-medium underline underline-offset-1">ver historial</span>
                 </a>

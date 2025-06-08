@@ -20,13 +20,14 @@ import { RegisterFormData, registerSchema } from "../../schemas/registerSchema";
 
 type CountryPhonePrefix = {
     PhonePrefix: string;
-  };
-  
-  type Option = {
+    Country: string;
+};
+
+type Option = {
     value: string;
     label: string;
-  };
-  
+};
+
 
 const RegisterForm = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -39,7 +40,7 @@ const RegisterForm = () => {
 
     const { registerUser, loading } = useRegister();
     const { data } = useCountries();
-       
+
 
 
 
@@ -81,15 +82,14 @@ const RegisterForm = () => {
         } catch (error: any) {
             if (error.graphQLErrors?.length > 0) {
                 const graphQLError = error.graphQLErrors[0];
-                if (graphQLError.code === "ALREADY_EXIST") {
-                    setErrorMessage("Ya existe una cuenta registrada con este usuario");
+                if (graphQLError.code === "BAD_REQUEST") {
+                    setErrorMessage('El correo electrónico ya está registrado');
                 } else {
                     setErrorMessage(`Error: ${graphQLError.message}`);
                 }
             } else if (error.networkError) {
                 setErrorMessage("Error de red. Por favor, verifica tu conexión.");
             } else {
-                console.log(error);
                 setErrorMessage("Ocurrió un error inesperado. Por favor, intenta nuevamente.");
             }
         }
@@ -98,11 +98,11 @@ const RegisterForm = () => {
     const prefixOptions: Option[] = data?.GetCountriesWithPhonePrefixes.map((item: CountryPhonePrefix) => ({
         value: `+${item.PhonePrefix}`,
         label: `+${item.PhonePrefix}`,
-      })) || [];
-      
-      const sortedOptions: Option[] = prefixOptions.sort((a, b) =>
+    })) || [];
+
+    const sortedOptions: Option[] = prefixOptions.sort((a, b) =>
         parseInt(a.value.replace("+", "")) - parseInt(b.value.replace("+", ""))
-      );
+    );
 
 
     return (
@@ -142,7 +142,7 @@ const RegisterForm = () => {
                     icon={arrowIcon}
                     error={errors.country?.message}
                     options={
-                        data?.GetCountriesWithPhonePrefixes.map((item: any) => ({
+                        data?.GetCountriesWithPhonePrefixes.map((item: CountryPhonePrefix) => ({
                             value: item.Country,
                             label: item.Country,
                         }))
