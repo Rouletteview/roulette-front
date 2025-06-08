@@ -1,26 +1,43 @@
 import Footer from "../../components/Footer"
 import Header from "../../components/Header"
 import HeroCard from "../../components/hero-section/HeroCard"
-
 import PreFooter from "../sections/PreFooter"
 import SubHeroSection from "../sections/SubHeroSection"
+
 
 // icons
 import barChart from "../../assets/icon/bar-chart.svg"
 import chart from "../../assets/icon/chart.svg"
 import desktopComputer from "../../assets/icon/desktop-computer.svg"
 import HeroSection from "../../sections/HeroSection"
-
-
+import { useAuth } from "../../hooks/useAuth"
 
 const LandingPage = () => {
+    const { user } = useAuth();
+
     return (
         <>
             <Header>
-                <a href="https://info.roulettesview.com/?" target="_blank" className="text-white text-sm md:text-lg text-center">Conocenos</a>
+                <a href="https://info.roulettesview.com/about/" target="_blank" className="text-white text-sm md:text-lg text-center">Conocenos</a>
                 <div className="flex flex-col md:flex-row gap-2 md:gap-3.5">
-                <a href="/iniciar-sesion" className="border border-[#D9A425] hover:border-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-sm md:text-lg">Iniciar sesión</a>
-                <a href="/registrarse" className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-sm md:text-lg ">Registrarse</a>
+                    {user ? (
+                        <div className="flex items-center gap-4">
+                            <div className="text-white text-sm md:text-lg">
+                                Hola, <span className="text-[#D9A425]">{user.name}</span>
+                            </div>
+                            <a
+                                href="/home"
+                                className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-sm md:text-lg"
+                            >
+                                Ir al Home
+                            </a>
+                        </div>
+                    ) : (
+                        <>
+                            <a href="/iniciar-sesion" className="border border-[#D9A425] hover:border-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-sm md:text-lg">Iniciar sesión</a>
+                            <a href="/registrarse" className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-sm md:text-lg ">Registrarse</a>
+                        </>
+                    )}
                 </div>
             </Header>
 

@@ -11,6 +11,8 @@ import LoadingOverlay from "../../../components/LoadingOverlay";
 import { useAuthStore } from "../../../stores/authStore";
 import { useLogin } from "../../../hooks/useLogin";
 import { loginFormData, loginSchema } from "../../schemas/loginSchema";
+import { useQuery } from "@apollo/client";
+import { GET_USER_INFO } from "../../../graphql/query/getUserInfo";
 
 
 const LoginForm = () => {
@@ -25,6 +27,7 @@ const LoginForm = () => {
     });
 
     const { Login, loading } = useLogin();
+    const { refetch: getUserInfo } = useQuery(GET_USER_INFO, { skip: true });
 
     if (loading) return <LoadingOverlay />;
 
@@ -32,6 +35,7 @@ const LoginForm = () => {
 
     const onSubmit = async (data: loginFormData) => {
         setErrorMessage("");
+
         try {
 
             const resp = await Login({
@@ -43,16 +47,30 @@ const LoginForm = () => {
 
             const token = resp.data.Login.Token;
             login(token);
-            navigate('/home')
+
+            const userInfo = await getUserInfo();
+            if (userInfo.data?.GetUserInfo) {
+                const { FirstName, LastName, Email } = userInfo.data.GetUserInfo;
+                localStorage.setItem('user', JSON.stringify({
+                    name: `${FirstName} ${LastName}`,
+                    email: Email
+                }));
+            }
+
+            navigate('/home');
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
+
+
             if (error.graphQLErrors?.length > 0) {
                 const graphQLError = error.graphQLErrors[0];
+
                 if (graphQLError.code === "BAD_REQUEST") {
                     setErrorMessage('El correo electrónico o la contraseña ingresados son incorrectos');
                 } else {
                     setErrorMessage(`Error: ${graphQLError.message}`);
                 }
+
             } else if (error.networkError) {
                 setErrorMessage("Error de red. Por favor, verifica tu conexión.");
             } else {

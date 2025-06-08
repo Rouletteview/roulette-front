@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import { CandlestickData, AreaData, LineData, HistogramData } from 'lightweight-charts';
 
+export let areaData: AreaData[] = [];
+export let lineData: LineData[] = [];
+export let histogramData: HistogramData[] = [];
+export let defaultCandlestickData: CandlestickData[] = [];
+
 // mock data para los distintos tipos de gráficos
 const mockDataCandlestick: CandlestickData[] = [
   { time: '2021-07-30', open: 100, high: 110, low: 95, close: 105 },
@@ -40,23 +45,35 @@ export const useChartData = (initialType: ChartType | '') => {
         newData = [...mockDataCandlestick];
         break;
       case 'Area':
-        console.log('Setting area data');
         newData = [...mockDataArea];
         break;
       case 'Lineal':
-        console.log('Setting line data');
         newData = [...mockDataLine];
         break;
       case 'VerticalColumn':
-        console.log('Setting histogram data');
         newData = [...mockDataHistogram];
         break;
       default:
-        console.log('Setting default candlestick data');
         newData = [...mockDataCandlestick];
     }
     setChartData(newData);
   }, [initialType]);
 
   return { chartData };
+};
+
+export const setAreaData = (data: AreaData[]) => {
+  areaData = data;
+};
+
+export const setLineData = (data: LineData[]) => {
+  lineData = data;
+};
+
+export const setHistogramData = (data: HistogramData[]) => {
+  histogramData = data;
+};
+
+export const setDefaultCandlestickData = (data: CandlestickData[]) => {
+  defaultCandlestickData = data;
 };

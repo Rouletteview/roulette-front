@@ -1,5 +1,5 @@
 import pricing from '../../../../assets/images/pricing.png'
-import tour from '../../../../assets/videos/tour.mp4'
+import tour from '../../../../assets/videos/charts.mp4'
 import informative from '../../../../assets/images/informative.png'
 
 type Props = {
