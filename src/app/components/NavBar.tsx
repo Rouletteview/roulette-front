@@ -4,10 +4,10 @@ import clsx from 'clsx';
 import menuIcon from '../../assets/icon/menu-hamburger.svg';
 import closeModalIcon from '../../assets/icon/close-modal.svg';
 import homeIcon from '../../assets/icon/homepage-icon.svg';
-import chartIcon from '../../assets/icon/chart-icon.svg';
+// import chartIcon from '../../assets/icon/chart-icon.svg';
 import subIcon from '../../assets/icon/sub-icon.svg'
 import historyIcon from '../../assets/icon/history-icon.svg'
-import notiIcon from '../../assets/icon/notification-icon.svg'
+// import notiIcon from '../../assets/icon/notification-icon.svg'
 import { useAuthStore } from '../../stores/authStore';
 
 
@@ -19,10 +19,10 @@ const NavBar = () => {
 
     const navLinks = [
         { name: "Inicio", path: "/home", icon: homeIcon },
-        { name: "Probar Gráficos", path: "/graficos", icon: chartIcon },
+        // { name: "Probar Gráficos", path: "/graficos", icon: chartIcon },
         { name: "Subscripción", path: "/subscripcion", icon: subIcon },
         { name: "Historial", path: "/historial", icon: historyIcon },
-        { name: "Notificaciones", path: "/notificaciones", icon: notiIcon },
+        // { name: "Notificaciones", path: "/notificaciones", icon: notiIcon },
     ];
 
     const handleLogout = () => {
