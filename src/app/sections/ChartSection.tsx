@@ -10,13 +10,20 @@ import AreaChart from "../components/chart/AreaChart";
 import LineChart from '../components/chart/LineChart';
 import HistogramChart from "../components/chart/HistogramChart";
 import { ChartType, selectChartTypes, selectChartZoneTypes } from "../../types/chart/types";
-import { useChartLogic } from "../hooks/chart/useChartLogic";
 import HistoryIcon from "../components/icon/HistoryIcon";
 import { useSearchParams } from "react-router";
 import CustomDropdown from "../components/CustomDropdown";
 import BetModal from "../components/Modal/bet-modal";
 import ConfirmationModal from '../components/Modal/ConfirmationModal';
 import type { Bet } from '../components/Modal/bet-modal';
+import { useQuery } from "@apollo/client";
+import { GET_ROULETTE_TABLES } from "../../graphql/query/getRouletteTables";
+import { useFormattedChartData, GameType } from "../../hooks/useFormattedChartData";
+import { GET_ROULETTE_TABLES_PROBABILITIES } from "../../graphql/query/getRouletteTableProbabilities";
+import { chartTypes } from "../../types/types";
+import { UTCTimestamp } from "lightweight-charts";
+import { GET_LAST_ROULETTE_TABLE_NUMBERS } from "../../graphql/query/getLastRouletteTableNumbers";
+import { useRouletteNumbers } from "../../utils/formatters/rouletterNumbers";
 
 const ChartPlaceholder = () => (
   <div className="flex items-center justify-center w-full h-[620px] bg-[#0d1b2a]">
@@ -27,74 +34,143 @@ const ChartPlaceholder = () => (
   </div>
 );
 
+
+interface RouletteTable {
+  Id: string;
+  Name: string;
+  Provider: string;
+}
+
 const ChartSection = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [gameType, setGameType] = useState("");
+  const [gameType, setGameType] = useState<GameType | ''>('');
   const [openBetModal, setOpenBetModal] = useState<boolean>(false);
   const [selectedChip, setSelectedChip] = useState<number | null>(null);
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [betsToConfirm, setBetsToConfirm] = useState<Bet[]>([]);
   const [bets, setBets] = useState<Bet[]>([]);
-
   const [selectedType, setSelectedType] = useState<ChartType | ''>('');
+  const [selectedTable, setSelectedTable] = useState('')
+  const [selectedTableLabel, setSelectedTableLabel] = useState('')
+  const [marketSearch, setMarketSearch] = useState("");
+  const [marketPage, setMarketPage] = useState(1);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const limit = 10;
 
+  // Debounce para la búsqueda
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(marketSearch);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [marketSearch]);
+
+
+
+
+  const startDate = new Date();
+  startDate.setHours(0, 0, 0, 0);
+
+  const endDate = new Date();
+  endDate.setHours(23, 59, 59, 999)
+
+
+  const { data, loading: marketLoading, error: errorTables } = useQuery(GET_ROULETTE_TABLES, {
+    variables: {
+      Query: debouncedSearch || "",
+      Skip: (marketPage - 1) * 10,
+      Limit: limit
+    },
+
+  });
+  console.log(errorTables)
+
+
+  const totalCount = data?.GetRouletteTables.Total || 0;
+  const marketHasNextPage = totalCount > 0 && (marketPage * limit) < totalCount;
+  const marketHasPrevPage = marketPage > 1;
+
+
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const tableOptions = data?.GetRouletteTables?.Tables?.map((table: RouletteTable) => ({
+    label: `${table.Name} - ${table.Provider.charAt(0).toUpperCase() + table.Provider.slice(1)}`,
+    value: table.Id
+  })) || [];
 
   const chartTypeOptions = selectChartTypes.map(type => ({
     label: type.label,
     value: type.type,
   }));
 
-
   const chartZoneOptions = selectChartZoneTypes.map(zone => ({
     label: zone.label,
     value: zone.zone
   }))
 
-
-
-
   useEffect(() => {
     const chartType = searchParams.get('chartType') as ChartType;
-    const chartZone = searchParams.get('chartZone');
+    const chartZone = searchParams.get('chartZone') as GameType;
+    const table = searchParams.get('table');
     if (chartType && selectChartTypes.some(type => type.type === chartType)) {
       setSelectedType(chartType);
     }
-    if (chartZone) {
+    if (chartZone && selectChartZoneTypes.some(zone => zone.zone === chartZone)) {
       setGameType(chartZone);
     }
-  }, [searchParams]);
+    if (table) {
+      setSelectedTable(table);
+
+      const tableOption = tableOptions.find((option: { label: string; value: string }) => option.value === table);
+      if (tableOption) {
+        setSelectedTableLabel(tableOption.label);
+      }
+    }
+  }, [searchParams, tableOptions]);
+
+  const chartData = {
+    TableId: selectedTable,
+    GameType: gameType,
+    StartDate: startDate.toISOString(),
+    EndDate: endDate.toISOString()
+  }
+  const { data: rouletteProbData, loading: chartLoading, error: errorProbabilities } = useQuery(GET_ROULETTE_TABLES_PROBABILITIES, {
+    variables: {
+      TableId: chartData.TableId || "",
+      GameType: chartData.GameType,
+      StartDate: chartData.StartDate,
+      EndDate: chartData.EndDate
+    },
+  });
+
+  console.log(errorProbabilities)
+  const { data: chartNumbersData } = useQuery(GET_LAST_ROULETTE_TABLE_NUMBERS, {
+    variables: {
+      TableId: chartData.TableId,
+      Limit: 14
+    }
+  })
+
+  const numeros = chartNumbersData?.GetLastRouletteTableNumbers;
+
+  const formattedNumbers = useRouletteNumbers(numeros || [])
+
+  const chartFormattedData = useFormattedChartData({
+    data: rouletteProbData?.GetRouletteTableProbabilities || [],
+    chartType: selectedType ? chartTypes[selectedType as keyof typeof chartTypes] : chartTypes.Candlestick
+  });
+
 
 
 
   const handleSelectChange = (value: string) => {
-    setGameType(value);
+    setGameType(value as GameType);
     setSearchParams(prev => {
       prev.set('chartZone', value);
       return prev;
     });
   };
-
-  const {
-    loading,
-    mockChartData,
-    rouletteItems,
-    redProbability,
-    blackProbability,
-    // candleChartData,
-    // areaChartData,
-    // histogramChartData,
-    // lineChartData,
-    //mock
-    mockCandleChartData,
-    mockLineChartData,
-    mockAreaChartData,
-    mockHistogramChartData
-  } = useChartLogic(gameType, selectedType);
-
-
-
-  if (loading) return <LoadingOverlay />;
-
 
   const handleTypeChange = (value: string) => {
     setSelectedType(value as ChartType);
@@ -103,6 +179,17 @@ const ChartSection = () => {
       return prev;
     });
   };
+
+
+  const handleTableChange = (value: string, label?: string) => {
+    setSelectedTable(value);
+    setSelectedTableLabel(label || '');
+    setSearchParams(prev => {
+      prev.set('table', value);
+      return prev;
+    });
+  };
+
 
   const handleChipSelect = (value: number) => {
     setSelectedChip(value);
@@ -126,9 +213,20 @@ const ChartSection = () => {
   };
 
   const handleCloseConfirmationModal = () => {
-    //abrir modal otra vez.
     setOpenBetModal(true);
     setConfirmationModalOpen(false);
+  };
+
+
+  const handleMarketSearch = (query: string) => {
+
+    setMarketSearch(query)
+    setMarketPage(1)
+  };
+
+  const handleMarketPageChange = (page: number) => {
+
+    setMarketPage(page)
   };
 
   // pendiente a refactorización
@@ -149,17 +247,25 @@ const ChartSection = () => {
         <div className="flex flex-col gap-9 lg:gap-2">
           <div className="lg:mx-8">
             <h1 className="text-base lg:text-xl text-white font-medium inline-block border-x-1 border-white px-2">
-              {!selectedType && !gameType ? (
-                <span className="text-gray-400">Selecciona un tipo de gráfico y una zona para comenzar</span>
+              {!selectedType && !gameType && !selectedTable ? (
+                <span className="text-gray-400">Selecciona un tipo de gráfico, una zona y una mesa para comenzar</span>
+              ) : !gameType && !selectedTable ? (
+                <span className="text-gray-400">Selecciona un tipo de zona y una mesa para comenzar</span>
+              ) : !selectedType && !gameType ? (
+                <span className="text-gray-400">Selecciona un tipo de gráfico y una zona para continuar</span>
+              ) : !selectedType && !selectedTable ? (
+                <span className="text-gray-400">Selecciona un tipo de gráfico y una mesa para continuar</span>
               ) : !selectedType ? (
                 <span className="text-gray-400">Selecciona un tipo de gráfico para continuar</span>
+              ) : !selectedTable ? (
+                <span className="text-gray-400">Selecciona una mesa para continuar</span>
               ) : !gameType ? (
                 <span className="text-gray-400">Selecciona una zona para continuar</span>
               ) : (
                 <>
                   <span className="text-[#D9A425]">{selectChartTypes.find(type => type.type === selectedType)?.label}</span>,
                   zona del grafico <span className="text-[#D9A425]">{selectChartZoneTypes.find(zone => zone.zone === gameType)?.label}</span>,
-                  operando en el mercado de <span className="text-[#D9A425]">Micasino.com</span>
+                  operando en el mercado de <span className="text-[#D9A425]">{selectedTableLabel}</span>
                 </>
               )}
             </h1>
@@ -186,9 +292,18 @@ const ChartSection = () => {
 
                 <CustomDropdown
                   defaultLabel="Mercado a operar"
-                  options={[]}
-                  value={''}
-                  onChange={handleSelectChange}
+                  paginated
+                  searchable
+                  options={tableOptions}
+                  value={selectedTable}
+                  onChange={handleTableChange}
+                  searchQuery={marketSearch}
+                  onSearchQueryChange={handleMarketSearch}
+                  page={marketPage}
+                  onPageChange={handleMarketPageChange}
+                  hasNextPage={marketHasNextPage}
+                  hasPrevPage={marketHasPrevPage}
+                  loading={marketLoading}
                   className="mr-2"
                 />
               </div>
@@ -232,62 +347,53 @@ const ChartSection = () => {
 
                   />
                   <Suspense fallback={<LoadingOverlay />}>
-                    {/* || !searchParams.get('market') */}
-                    {!selectedType || !gameType ? (
+                    {!selectedType || !gameType || !selectedTable ? (
                       <ChartPlaceholder />
                     ) : (
                       <>
-                        {selectedType === 'Candlestick' && mockChartData.length > 0 && (
+                        {selectedType === 'Candlestick' && (
                           <CandleChart
-                            data={mockCandleChartData}
+                            data={chartFormattedData as { time: UTCTimestamp; open: number; high: number; low: number; close: number; }[]}
                             width={1000}
                             height={620}
+                            loading={chartLoading}
                           />
                         )}
-                        {selectedType === 'Area' && Array.isArray(mockChartData) && mockChartData.length > 0 && (
+                        {selectedType === 'Area' && (
                           <AreaChart
-                            data={mockAreaChartData}
+                            data={chartFormattedData as { time: UTCTimestamp; value: number }[]}
                             width={1000}
                             height={620}
+                            loading={chartLoading}
                           />
                         )}
-                        {selectedType === 'Lineal' && Array.isArray(mockChartData) && mockChartData.length > 0 && (
+                        {selectedType === 'Lineal' && (
                           <LineChart
-                            data={mockLineChartData}
+                            data={chartFormattedData as { time: UTCTimestamp; value: number }[]}
                             width={1000}
                             height={620}
+                            loading={chartLoading}
                           />
                         )}
-                        {selectedType === 'VerticalColumn' && Array.isArray(mockChartData) && mockChartData.length > 0 && (
+                        {selectedType === 'VerticalColumn' && (
                           <HistogramChart
-                            data={mockHistogramChartData}
+                            data={chartFormattedData as { time: UTCTimestamp; value: number; color: string }[]}
                             width={1000}
                             height={620}
+                            loading={chartLoading}
                           />
                         )}
                       </>
                     )}
                   </Suspense>
-                  <Update />
+                  <Update
+                    selectedType={selectedType}
+                    gameType={gameType}
+                    selectedTable={selectedTable}
+                  />
                 </div>
                 <div className="w-full flex flex-col-reverse lg:flex-row justify-between items-center gap-6 mt-4">
-                  <NumbersDisplay numbers={rouletteItems} />
-                  <div className="flex flex-col items-center lg:flex-row gap-4">
-                    <div className="flex flex-col sm:flex-row items-center gap-4">
-                      <div className="flex items-center gap-2">
-                        <div className="bg-[#FF0000] rounded-full w-4 h-4 lg:w-7 lg:h-7" />
-                        <h2 className="text-white text-xs lg:text-sm">
-                          {Math.round(redProbability)}% de probabilidad al rojo
-                        </h2>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="bg-black rounded-full w-4 h-4 lg:w-7 lg:h-7" />
-                        <h2 className="text-white text-xs lg:text-sm">
-                          {Math.round(blackProbability)}% de probabilidad al negro
-                        </h2>
-                      </div>
-                    </div>
-                  </div>
+                  <NumbersDisplay numbers={formattedNumbers} />
                 </div>
               </div>
               <div className="block lg:hidden w-auto">

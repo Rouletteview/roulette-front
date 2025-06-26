@@ -21,13 +21,13 @@ import { RegisterFormData, registerSchema } from "../../schemas/registerSchema";
 type CountryPhonePrefix = {
     PhonePrefix: string;
     Country: string;
-};
-
-type Option = {
+  };
+  
+  type Option = {
     value: string;
     label: string;
-};
-
+  };
+  
 
 const RegisterForm = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -40,7 +40,7 @@ const RegisterForm = () => {
 
     const { registerUser, loading } = useRegister();
     const { data } = useCountries();
-
+       
 
 
 
@@ -98,11 +98,11 @@ const RegisterForm = () => {
     const prefixOptions: Option[] = data?.GetCountriesWithPhonePrefixes.map((item: CountryPhonePrefix) => ({
         value: `+${item.PhonePrefix}`,
         label: `+${item.PhonePrefix}`,
-    })) || [];
-
-    const sortedOptions: Option[] = prefixOptions.sort((a, b) =>
+      })) || [];
+      
+      const sortedOptions: Option[] = prefixOptions.sort((a, b) =>
         parseInt(a.value.replace("+", "")) - parseInt(b.value.replace("+", ""))
-    );
+      );
 
 
     return (

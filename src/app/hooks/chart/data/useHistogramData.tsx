@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { UTCTimestamp } from 'lightweight-charts';
 
-type BetProbability = {
-  Key: string;
-  Probability: number;
+type RouletteProbability = {
+  Date: string;
+  Tag: string;
+  Value: number;
 };
 
 type HistogramPoint = {
@@ -12,51 +13,45 @@ type HistogramPoint = {
   color: string;
 };
 
-export function useHistogramChartData(data?: BetProbability[]) {
-  const [points, setPoints] = useState<HistogramPoint[]>([]);
+export function useHistogramChartData(data?: RouletteProbability[]) {
+  return useMemo(() => {
+    if (!data || data.length === 0) return [];
 
-  useEffect(() => {
-    if (!data || data.length === 0) return;
+    const points: HistogramPoint[] = [];
 
-    const newPoints: HistogramPoint[] = [];
-    const existingTimes = new Set(points.map(p => p.time));
+    // Ordenar datos por fecha
+    const sortedData = [...data].sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
 
-    let baseTime: number = points.length
-      ? points[points.length - 1].time + 60
-      : Math.floor(Date.now() / 1000);
+    for (const item of sortedData) {
+      // Convertir la fecha de la API a timestamp UTC
+      const timestamp = Math.floor(new Date(item.Date).getTime() / 1000) as UTCTimestamp;
 
-    for (const item of data) {
-      while (existingTimes.has(baseTime as UTCTimestamp)) {
-        baseTime += 60;
+      // Evita duplicar tiempos
+      if (points.find((p) => p.time === timestamp)) {
+        continue;
       }
 
-      newPoints.push({
-        time: baseTime as UTCTimestamp,
-        value: Math.round(item.Probability),
-        color: item.Probability >= 50 ? '#0f0' : '#f00', 
-      });
+      // Determinar color basado en el Tag o el valor
+      let color = '#2962FF'; // Color por defecto
+      if (item.Tag === 'Red') {
+        color = '#FF0000';
+      } else if (item.Tag === 'Black') {
+        color = '#000000';
+      } else if (item.Tag === 'Green' || item.Tag === 'Zero') {
+        color = '#00FF00';
+      } else if (item.Value >= 50) {
+        color = '#0f0';
+      } else {
+        color = '#f00';
+      }
 
-      existingTimes.add(baseTime as UTCTimestamp);
-      baseTime += 60;
-    }
-
-    if (newPoints.length > 0) {
-      setPoints((prev) => {
-        const combined = [...prev, ...newPoints];
-        const uniqueSorted = combined
-          .reduce((acc, curr) => {
-            if (!acc.find(p => p.time === curr.time)) {
-              acc.push(curr);
-            }
-            return acc;
-          }, [] as HistogramPoint[])
-          .sort((a, b) => a.time - b.time);
-        return uniqueSorted;
+      points.push({
+        time: timestamp,
+        value: Math.round(item.Value),
+        color,
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    return points.sort((a, b) => a.time - b.time);
   }, [data]);
-
-  
-  return points;
 }
