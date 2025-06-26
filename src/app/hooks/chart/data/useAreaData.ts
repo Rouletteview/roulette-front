@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { UTCTimestamp } from 'lightweight-charts';
 
-type BetProbability = {
-  Key: string;
-  Probability: number;
+type RouletteProbability = {
+  Date: string;
+  Tag: string;
+  Value: number;
 };
 
 type AreaPoint = {
@@ -11,51 +12,30 @@ type AreaPoint = {
   value: number;
 };
 
-export function useAreaChartData(data?: BetProbability[]) {
-  const [points, setPoints] = useState<AreaPoint[]>([]);
+export function useAreaChartData(data?: RouletteProbability[]) {
+  return useMemo(() => {
+    if (!data || data.length === 0) return [];
 
-  useEffect(() => {
-    if (!data || data.length === 0) return;
+    const points: AreaPoint[] = [];
 
-    const newPoints: AreaPoint[] = [];
-    const existingTimes = new Set(points.map(p => p.time));
+    // Ordenar datos por fecha
+    const sortedData = [...data].sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
 
-    let baseTime: number = points.length
-      ? points[points.length - 1].time + 60
-      : Math.floor(Date.now() / 1000);
+    for (const item of sortedData) {
+      // Convertir la fecha de la API a timestamp UTC
+      const timestamp = Math.floor(new Date(item.Date).getTime() / 1000) as UTCTimestamp;
 
-    for (const item of data) {
-      // Find the next available timestamp
-      while (existingTimes.has(baseTime as UTCTimestamp)) {
-        baseTime += 60;
+      // Evita duplicar tiempos
+      if (points.find((p) => p.time === timestamp)) {
+        continue;
       }
 
-      newPoints.push({
-        time: baseTime as UTCTimestamp,
-        value: Math.round(item.Probability),
-      });
-
-      existingTimes.add(baseTime as UTCTimestamp);
-      baseTime += 60;
-    }
-
-    if (newPoints.length > 0) {
-      setPoints((prev) => {
-        const combined = [...prev, ...newPoints];
-        // Remove duplicates and sort
-        const uniqueSorted = combined
-          .reduce((acc, curr) => {
-            if (!acc.find(p => p.time === curr.time)) {
-              acc.push(curr);
-            }
-            return acc;
-          }, [] as AreaPoint[])
-          .sort((a, b) => a.time - b.time);
-        return uniqueSorted;
+      points.push({
+        time: timestamp,
+        value: Math.round(item.Value),
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    return points.sort((a, b) => a.time - b.time);
   }, [data]);
-
-  return points;
 }

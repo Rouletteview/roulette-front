@@ -35,6 +35,7 @@ const LoginForm = () => {
 
     const onSubmit = async (data: loginFormData) => {
         setErrorMessage("");
+        console.log(data.email, data.password)
 
         try {
 

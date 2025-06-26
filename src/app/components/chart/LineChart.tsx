@@ -13,12 +13,14 @@ type ChartProps = {
   data: LineData[];
   height?: number;
   width?: number;
+  loading?: boolean;
 };
 
 const LineChart: React.FC<ChartProps> = ({
   data,
   height = 400,
-  width = 0
+  width = 0,
+  loading = false
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -91,10 +93,10 @@ const LineChart: React.FC<ChartProps> = ({
       color: 'rgba(141, 52, 249, 1)',
       lineWidth: 2,
     });
-    
+
     const validData = data
-    .filter(item => item && typeof item.time === 'number' && !isNaN(item.value))
-    .sort((a, b) => Number(a.time) - Number(b.time));
+      .filter(item => item && typeof item.time === 'number' && !isNaN(item.value))
+      .sort((a, b) => Number(a.time) - Number(b.time));
 
 
     if (validData.length > 0) {
@@ -175,6 +177,27 @@ const LineChart: React.FC<ChartProps> = ({
 
   return (
     <div style={{ position: 'relative', width: '100%' }}>
+      {loading && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#0d1b2a',
+            zIndex: 10,
+          }}
+        >
+          <div className="flex flex-col items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D9A425]"></div>
+            <p className="text-white mt-4 text-sm">Cargando datos...</p>
+          </div>
+        </div>
+      )}
       <div ref={chartContainerRef} style={{ width: '100%' }} />
       {tooltipData && tooltipPosition && (
         <div

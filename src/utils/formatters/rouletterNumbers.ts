@@ -15,8 +15,6 @@ const getColor = (num: number): RouletteItem["color"] => {
 
 type LastNumberData = {
     Number: number;
-    __typename?: string;
-    WinAt?: string;
 };
 
 export const useRouletteNumbers = (lastNumbersData: LastNumberData | LastNumberData[]): RouletteItem[] => {

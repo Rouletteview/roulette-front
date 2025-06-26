@@ -15,7 +15,7 @@ const colorClasses = {
 
 
 const NumbersDisplay = ({ numbers }: Props) => {
-    const lastNumbers = numbers.slice(-21);
+    const lastNumbers = numbers;
     return (
         <ul className="flex flex-wrap gap-2 bg-black/30 p-2 rounded">
             {lastNumbers.map((item, i) => (
