@@ -1,3 +1,4 @@
+import { UTCTimestamp } from "lightweight-charts";
 import AreaChart from "../../app/components/chart/AreaChart";
 import CandleChart from "../../app/components/chart/CandleChart";
 import HistogramChart from "../../app/components/chart/HistogramChart";
@@ -29,3 +30,8 @@ export const chartTypes = {
 
 
 export type ChartType = keyof typeof chartTypes;
+
+export type MultiSeriesData = {
+  id: string;
+  data: { time: UTCTimestamp; value: number; color?: string }[] | { time: UTCTimestamp; open: number; high: number; low: number; close: number }[];
+};

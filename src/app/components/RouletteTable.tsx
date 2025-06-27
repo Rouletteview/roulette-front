@@ -123,7 +123,7 @@ const RouletteTable = ({ selectedChip, onPlaceBet, bets = [] }: Props) => {
                         >
                             0
                             {renderBetChip(getBetForPosition('0'))}
-                        </div>
+                    </div>
                     </div>
 
                     <div className="flex-1 h-full">
@@ -142,7 +142,7 @@ const RouletteTable = ({ selectedChip, onPlaceBet, bets = [] }: Props) => {
                                         {renderBetChip(getBetForPosition(num.toString()))}
                                     </div>
                                 ))}
-                            </div>
+                </div>
                         ))}
                     </div>
 
@@ -161,7 +161,7 @@ const RouletteTable = ({ selectedChip, onPlaceBet, bets = [] }: Props) => {
                             </div>
                         ))}
                     </div>
-                </div>
+                    </div>
 
                 <div className="flex px-16  border-x-4 w-[700px] md:w-full ">
                     <div className="flex-1 flex">
@@ -195,8 +195,8 @@ const RouletteTable = ({ selectedChip, onPlaceBet, bets = [] }: Props) => {
                             3a DOCENA
                             {renderBetChip(getBetForPosition('dozen-3'))}
                         </div>
+                        </div>
                     </div>
-                </div>
 
                 <div className="flex px-16 border-x-4  w-[700px] md:w-full border-t-0 ">
                     <div className="flex flex-1">
