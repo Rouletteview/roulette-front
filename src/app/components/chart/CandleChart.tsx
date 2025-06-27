@@ -7,10 +7,11 @@ import {
   CandlestickSeries,
   MouseEventParams,
   Time,
+  UTCTimestamp,
 } from 'lightweight-charts';
 
 type ChartProps = {
-  data: CandlestickData[];
+  data: { time: UTCTimestamp; open: number; high: number; low: number; close: number }[];
   height?: number;
   width?: number;
   loading?: boolean;
@@ -71,8 +72,6 @@ const CandleChart: React.FC<ChartProps> = ({
         tickMarkFormatter: (time: number) => {
           const date = new Date(time * 1000);
           return date.toLocaleString('es-ES', {
-            day: '2-digit',
-            month: 'long',
             hour: '2-digit',
             minute: '2-digit',
             hour12: true
@@ -98,6 +97,10 @@ const CandleChart: React.FC<ChartProps> = ({
       wickDownColor: '#ef5350',
     });
 
+    if (!data || !Array.isArray(data)) {
+      return;
+    }
+
     const validData = data
       .filter(item =>
         item &&
@@ -122,7 +125,7 @@ const CandleChart: React.FC<ChartProps> = ({
       chart.timeScale().fitContent();
     }
 
-  
+
     chart.subscribeCrosshairMove((param: MouseEventParams) => {
       if (
         param.point === undefined ||
@@ -157,8 +160,8 @@ const CandleChart: React.FC<ChartProps> = ({
           isUp,
         });
 
-        const toolTipWidth = 96;
-        const toolTipHeight = 80;
+        const toolTipWidth = 120;
+        const toolTipHeight = 100;
         const toolTipMargin = 15;
 
         let left = param.point.x + toolTipMargin;
@@ -226,28 +229,31 @@ const CandleChart: React.FC<ChartProps> = ({
             position: 'absolute',
             top: `${tooltipPosition.y}px`,
             left: `${tooltipPosition.x}px`,
-            width: '96px',
-            height: '115px',
-            padding: '8px',
+            width: '120px',
+            minHeight: '100px',
+            padding: '12px',
             boxSizing: 'border-box',
             fontSize: '12px',
             textAlign: 'left',
             zIndex: 1000,
             pointerEvents: 'none',
-            border: `2px solid ${tooltipData.isUp ? 'rgba(38, 166, 154, 1)' : 'rgba(239, 83, 80, 1)'}`,
-            borderRadius: '2px',
-            background: 'black',
+            border: `2px solid ${tooltipData.isUp ? 'rgba(38, 166, 154, 1)' : '#ef5350'}`,
+            borderRadius: '4px',
+            background: 'rgba(0, 0, 0, 0.95)',
             color: 'white',
             fontFamily: "-apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif",
             WebkitFontSmoothing: 'antialiased',
             MozOsxFontSmoothing: 'grayscale',
+            backdropFilter: 'blur(4px)',
           }}
         >
-          <div style={{ color: tooltipData.isUp ? 'rgba(38, 166, 154, 1)' : 'rgba(239, 83, 80, 1)' }}>Probabilidad</div>
-          <div style={{ fontSize: '24px', margin: '4px 0px', color: 'white' }}>
+          <div style={{ color: tooltipData.isUp ? 'rgba(38, 166, 154, 1)' : '#ef5350', fontWeight: 'bold', marginBottom: '8px' }}>
+            {tooltipData.isUp ? 'Alcista' : 'Bajista'}
+          </div>
+          <div style={{ fontSize: '20px', margin: '8px 0px', color: 'white', fontWeight: 'bold' }}>
             {Math.round(100 * tooltipData.price) / 100}%
           </div>
-          <div style={{ color: 'white' }}>
+          <div style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '10px', marginTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.2)', paddingTop: '6px' }}>
             {tooltipData.time}
           </div>
         </div>

@@ -352,16 +352,25 @@ const ChartSection = () => {
                     ) : (
                       <>
                         {selectedType === 'Candlestick' && (
-                          <CandleChart
-                            data={chartFormattedData as { time: UTCTimestamp; open: number; high: number; low: number; close: number; }[]}
-                            width={1000}
-                            height={620}
-                            loading={chartLoading}
-                          />
+                          chartFormattedData.length > 0 && chartFormattedData[0]?.data && chartFormattedData[0].data.length > 0 ? (
+                            <CandleChart
+                              data={chartFormattedData[0].data as unknown as { time: UTCTimestamp; open: number; high: number; low: number; close: number; }[]}
+                              width={1000}
+                              height={620}
+                              loading={chartLoading}
+                            />
+                          ) : (
+                            <div className="flex items-center justify-center w-full h-[620px] bg-[#0d1b2a]">
+                              <div className="text-center">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D9A425] mx-auto mb-4"></div>
+                                <p className="text-white text-sm">Cargando datos del gráfico...</p>
+                              </div>
+                            </div>
+                          )
                         )}
                         {selectedType === 'Area' && (
                           <AreaChart
-                            data={chartFormattedData as { time: UTCTimestamp; value: number }[]}
+                            data={chartFormattedData}
                             width={1000}
                             height={620}
                             loading={chartLoading}
@@ -369,7 +378,7 @@ const ChartSection = () => {
                         )}
                         {selectedType === 'Lineal' && (
                           <LineChart
-                            data={chartFormattedData as { time: UTCTimestamp; value: number }[]}
+                            data={chartFormattedData}
                             width={1000}
                             height={620}
                             loading={chartLoading}
@@ -377,7 +386,7 @@ const ChartSection = () => {
                         )}
                         {selectedType === 'VerticalColumn' && (
                           <HistogramChart
-                            data={chartFormattedData as { time: UTCTimestamp; value: number; color: string }[]}
+                            data={chartFormattedData}
                             width={1000}
                             height={620}
                             loading={chartLoading}

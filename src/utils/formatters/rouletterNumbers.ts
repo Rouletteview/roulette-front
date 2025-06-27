@@ -28,3 +28,44 @@ export const useRouletteNumbers = (lastNumbersData: LastNumberData | LastNumberD
         }));
     }, [lastNumbersData]);
 };
+
+
+export const translateRouletteTag = (tag: string): string => {
+    const translations: Record<string, string> = {
+
+        'Red': 'Rojo',
+        'Black': 'Negro',
+        'Green': 'Verde',
+        'Zero': 'Cero',
+
+        'Even': 'Par',
+        'Odd': 'Impar',
+
+     
+        'Low': '1 a 18',
+        'High': '19 a 36',
+
+       
+        'FirstDozen': '1a Docena',
+        'SecondDozen': '2a Docena',
+        'ThirdDozen': '3a Docena',
+        'Dozen1': '1a Docena',
+        'Dozen2': '2a Docena',
+        'Dozen3': '3a Docena',
+
+       
+        'FirstColumn': '1a Columna',
+        'SecondColumn': '2a Columna',
+        'ThirdColumn': '3a Columna',
+        'Column1': '1a Columna',
+        'Column2': '2a Columna',
+        'Column3': '3a Columna',
+
+        '0': '0',
+        '00': '00',
+        
+        'default': tag
+    };
+
+    return translations[tag] || translations['default'];
+};

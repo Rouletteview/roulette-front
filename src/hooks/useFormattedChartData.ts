@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { chartTypes } from "../types/types";
 import { UTCTimestamp } from "lightweight-charts";
+import { chartTypes } from "../types/types";
 
 type RawEntry = {
   Date: string;
@@ -15,13 +15,19 @@ export type GameType =
   | 'OddEven'
   | 'RedBlack';
 
+type GroupedData = { date: string; entries: RawEntry[] };
+type MultiSeries = {
+  id: string;
+  data: { time: UTCTimestamp; value: number; color?: string }[] | { time: UTCTimestamp; open: number; high: number; low: number; close: number }[];
+};
+
 export const useFormattedChartData = ({
   data,
   chartType
 }: {
-  data: RawEntry[],
-  chartType: chartTypes
-}) => {
+  data: RawEntry[];
+  chartType: chartTypes;
+}): MultiSeries[] => {
 
   const formatted = useMemo(() => {
     if (!data || data.length === 0) return [];
@@ -30,12 +36,15 @@ export const useFormattedChartData = ({
 
     switch (chartType) {
       case 'Candlestick':
-        return formatCandleChart(grouped);
+        return [{
+          id: 'Candlestick',
+          data: formatCandleChart(grouped)
+        }];
       case 'Area':
       case 'Lineal':
-        return formatSimpleXY(grouped);
+        return formatMultipleLines(grouped);
       case 'VerticalColumn':
-        return formatHistogramData(grouped);
+        return formatMultipleHistograms(grouped);
       default:
         return [];
     }
@@ -44,7 +53,7 @@ export const useFormattedChartData = ({
   return formatted;
 };
 
-const groupByDate = (data: RawEntry[]) => {
+const groupByDate = (data: RawEntry[]): GroupedData[] => {
   const map = new Map<string, RawEntry[]>();
 
   for (const item of data) {
@@ -61,41 +70,48 @@ const groupByDate = (data: RawEntry[]) => {
   }));
 };
 
-const formatSimpleXY = (
-  grouped: { date: string; entries: RawEntry[] }[]
-) => {
-  return grouped.map(({ date, entries }) => {
-    const firstEntry = entries[0];
-    return {
-      time: new Date(date).getTime() / 1000 as UTCTimestamp,
-      value: firstEntry ? firstEntry.Value : 0
-    };
+
+const formatMultipleLines = (grouped: GroupedData[]): MultiSeries[] => {
+  const seriesMap: Record<string, { time: UTCTimestamp; value: number }[]> = {};
+
+  grouped.forEach(({ date, entries }) => {
+    const time = new Date(date).getTime() / 1000 as UTCTimestamp;
+    entries.forEach(({ Tag, Value }) => {
+      if (!seriesMap[Tag]) {
+        seriesMap[Tag] = [];
+      }
+      seriesMap[Tag].push({ time, value: Value });
+    });
   });
+
+  return Object.entries(seriesMap).map(([id, data]) => ({ id, data }));
 };
 
-const formatHistogramData = (
-  grouped: { date: string; entries: RawEntry[] }[]
-) => {
-  let prevValue = 0;
-  return grouped.map(({ date, entries }, idx) => {
-    const firstEntry = entries[0];
-    const value = firstEntry ? firstEntry.Value : 0;
-    let color = 'rgba(32, 178, 108, 1)'; 
-    if (idx > 0) {
-      color = value >= prevValue ? 'rgba(32, 178, 108, 1)' : 'rgba(255, 82, 82, 1)';
-    }
-    prevValue = value;
-    return {
-      time: new Date(date).getTime() / 1000 as UTCTimestamp,
-      value,
-      color
-    };
+
+const formatMultipleHistograms = (grouped: GroupedData[]): MultiSeries[] => {
+  const seriesMap: Record<string, { time: UTCTimestamp; value: number; color: string }[]> = {};
+  const lastValues: Record<string, number> = {};
+
+  grouped.forEach(({ date, entries }) => {
+    const time = new Date(date).getTime() / 1000 as UTCTimestamp;
+
+    entries.forEach(({ Tag, Value }) => {
+      const prev = lastValues[Tag] ?? Value;
+      const color = Value >= prev ? 'rgba(32, 178, 108, 1)' : 'rgba(255, 82, 82, 1)';
+      lastValues[Tag] = Value;
+
+      if (!seriesMap[Tag]) {
+        seriesMap[Tag] = [];
+      }
+      seriesMap[Tag].push({ time, value: Value, color });
+    });
   });
+
+  return Object.entries(seriesMap).map(([id, data]) => ({ id, data }));
 };
 
-const formatCandleChart = (
-  grouped: { date: string; entries: RawEntry[] }[]
-) => {
+
+const formatCandleChart = (grouped: GroupedData[]) => {
   return grouped.map(({ date, entries }) => {
     const values = entries.map(e => e.Value);
     return {

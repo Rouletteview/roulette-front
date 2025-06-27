@@ -6,10 +6,13 @@ import {
   HistogramSeries,
   HistogramData,
   MouseEventParams,
+  ISeriesApi,
 } from 'lightweight-charts';
+import { MultiSeriesData } from '../../../types/chart/types';
+import { translateRouletteTag } from '../../../utils/formatters/rouletterNumbers';
 
 type ChartProps = {
-  data: HistogramData[];
+  data: MultiSeriesData[];
   height?: number;
   width?: number;
   loading?: boolean;
@@ -25,8 +28,7 @@ const HistogramChart: React.FC<ChartProps> = ({
   const chartRef = useRef<IChartApi | null>(null);
   const [tooltipData, setTooltipData] = useState<{
     time: string;
-    price: number;
-    color: string;
+    series: { id: string; value: number; color: string }[];
   } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
 
@@ -62,8 +64,6 @@ const HistogramChart: React.FC<ChartProps> = ({
         tickMarkFormatter: (time: number) => {
           const date = new Date(time * 1000);
           return date.toLocaleString('es-ES', {
-            day: '2-digit',
-            month: 'long',
             hour: '2-digit',
             minute: '2-digit',
             hour12: true,
@@ -78,16 +78,30 @@ const HistogramChart: React.FC<ChartProps> = ({
 
     chartRef.current = chart;
 
-    const histogramSeries = chart.addSeries(HistogramSeries, {
-      color: 'rgba(32, 178, 108, 1)',
+
+    const seriesMap = new Map<string, ISeriesApi<'Histogram'>>();
+    const allValidData: HistogramData[] = [];
+
+    data.forEach((series) => {
+      if ('value' in series.data[0] && 'color' in series.data[0]) {
+        const histogramSeries = chart.addSeries(HistogramSeries, {
+          color: 'rgba(32, 178, 108, 1)', 
+        });
+
+        const validData = series.data
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .filter(item => item && typeof item.time === 'number' && !isNaN((item as any).value))
+          .sort((a, b) => Number(a.time) - Number(b.time));
+
+        if (validData.length > 0) {
+          histogramSeries.setData(validData as HistogramData[]);
+          seriesMap.set(series.id, histogramSeries);
+          allValidData.push(...(validData as HistogramData[]));
+        }
+      }
     });
 
-    const validData = data
-      .filter(item => item && typeof item.time === 'number' && !isNaN(item.value))
-      .sort((a, b) => Number(a.time) - Number(b.time));
-
-    if (validData.length > 0) {
-      histogramSeries.setData(validData);
+    if (seriesMap.size > 0) {
       chart.timeScale().fitContent();
     }
 
@@ -106,8 +120,23 @@ const HistogramChart: React.FC<ChartProps> = ({
       }
 
       const time = param.time as number;
-      const dataAtTime = validData.find(d => d.time === time);
-      if (dataAtTime) {
+      const seriesData: { id: string; value: number; color: string }[] = [];
+
+      // Recopilar datos de todas las series en el tiempo actual
+      data.forEach((series) => {
+        const dataAtTime = series.data.find(d => d.time === time);
+        if (dataAtTime && 'value' in dataAtTime && 'color' in dataAtTime) {
+          seriesData.push({
+            id: series.id,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            value: (dataAtTime as any).value,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            color: (dataAtTime as any).color || 'rgba(32, 178, 108, 1)',
+          });
+        }
+      });
+
+      if (seriesData.length > 0) {
         const date = new Date(time * 1000);
 
         setTooltipData({
@@ -118,12 +147,11 @@ const HistogramChart: React.FC<ChartProps> = ({
             minute: '2-digit',
             hour12: true,
           }),
-          price: dataAtTime.value,
-          color: dataAtTime.color || 'rgba(32, 178, 108, 1)',
+          series: seriesData
         });
 
-        const tooltipWidth = 96;
-        const tooltipHeight = 80;
+        const tooltipWidth = Math.max(150, Math.max(...seriesData.map(s => s.id.length * 8)) + 60);
+        const tooltipHeight = 80 + (seriesData.length * 25);
         const margin = 15;
 
         let left = param.point.x + margin;
@@ -190,28 +218,34 @@ const HistogramChart: React.FC<ChartProps> = ({
             position: 'absolute',
             top: `${tooltipPosition.y}px`,
             left: `${tooltipPosition.x}px`,
-            width: '96px',
-            height: '115px',
-            padding: '8px',
+            width: `${Math.max(150, Math.max(...tooltipData.series.map(s => s.id.length * 8)) + 60)}px`,
+            minHeight: `${80 + (tooltipData.series.length * 25)}px`,
+            padding: '12px',
             fontSize: '12px',
             zIndex: 1000,
             pointerEvents: 'none',
-            border: `2px solid ${tooltipData.color}`,
-            borderRadius: '2px',
-            background: 'black',
+            border: `2px solid ${tooltipData.series[0]?.color || 'rgba(32, 178, 108, 1)'}`,
+            borderRadius: '4px',
+            background: 'rgba(0, 0, 0, 0.95)',
             color: 'white',
             fontFamily: "-apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif",
             WebkitFontSmoothing: 'antialiased',
             MozOsxFontSmoothing: 'grayscale',
+            backdropFilter: 'blur(4px)',
           }}
         >
-          <div style={{ color: tooltipData.color }}>
-            Probabilidad
+          <div style={{ color: 'rgba(32, 178, 108, 1)', fontWeight: 'bold', marginBottom: '8px' }}>Probabilidades</div>
+          {tooltipData.series.map((series) => (
+            <div key={series.id} style={{ margin: '6px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ color: series.color, fontSize: '11px', fontWeight: '500', flex: 1 }}>{translateRouletteTag(series.id)}</div>
+              <div style={{ fontSize: '14px', color: 'white', fontWeight: 'bold', marginLeft: '8px' }}>
+                {Math.round(100 * series.value) / 100}%
+              </div>
+            </div>
+          ))}
+          <div style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '10px', marginTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.2)', paddingTop: '6px' }}>
+            {tooltipData.time}
           </div>
-          <div style={{ fontSize: '24px', margin: '4px 0px' }}>
-            {Math.round(100 * tooltipData.price) / 100}%
-          </div>
-          <div>{tooltipData.time}</div>
         </div>
       )}
     </div>
