@@ -11,7 +11,7 @@ const Update = ({ selectedType, gameType, selectedTable }: UpdateProps) => {
   const location = useLocation();
   const [countdown, setCountdown] = useState(30);
 
- 
+
   const allSelected = selectedType && gameType && selectedTable;
 
 
@@ -22,12 +22,29 @@ const Update = ({ selectedType, gameType, selectedTable }: UpdateProps) => {
   }, [location.search, allSelected])
 
   useEffect(() => {
- 
+  
+    const savedScrollPosition = sessionStorage.getItem('scrollPosition');
+    if (savedScrollPosition) {
+      const position = JSON.parse(savedScrollPosition);
+      window.scrollTo(position.x, position.y);
+      sessionStorage.removeItem('scrollPosition');
+    }
+  }, []);
+
+  useEffect(() => {
+
     if (!allSelected) {
       return;
     }
 
     if (countdown === 0) {
+   
+      const scrollPosition = {
+        x: window.scrollX,
+        y: window.scrollY
+      };
+      sessionStorage.setItem('scrollPosition', JSON.stringify(scrollPosition));
+
       window.location.reload();
     }
 

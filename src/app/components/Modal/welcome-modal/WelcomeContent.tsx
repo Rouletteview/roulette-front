@@ -36,14 +36,14 @@ const WelcomeContent = ({ onShowPricing }: Props) => {
                         <source src={tour} type="video/mp4" />
                         Tu navegador no soporta la reproducción de videos.
                     </video>
-                    <a href="" className="bg-[#D9A425] hover:bg-[#B3831D] transition-all text-white text-xs font-bold py-2 rounded-lg">
+                    <a href="https://www.youtube.com/watch?v=hKoYWpw89lc" target='_blank' className="bg-[#D9A425] hover:bg-[#B3831D] transition-all text-white text-xs font-bold py-2 rounded-lg">
                         Tour de la plataforma
                     </a>
                 </div>
 
                 <div className="flex flex-col gap-y-4 w-full lg:w-[194px] px-14 md:px-0">
                     <img src={informative} alt="" className="h-[188px] rounded-lg" />
-                    <a href="https://www.listoapp.cl" target='_blank' className="bg-[#D9A425] hover:bg-[#B3831D] transition-all text-white text-xs font-bold py-2 rounded-lg">
+                    <a href="https://info.roulettesview.com/como-funciona/" target='_blank' className="bg-[#D9A425] hover:bg-[#B3831D] transition-all text-white text-xs font-bold py-2 rounded-lg">
                         Sección informativa
                     </a>
                 </div>
