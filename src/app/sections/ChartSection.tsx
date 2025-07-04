@@ -2,7 +2,7 @@ import UserInfo from "../components/UserInfo";
 import Controls from "../components/Controls";
 import Update from "../components/Update";
 import NumbersDisplay from "../components/NumbersDisplay";
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState, useEffect, useRef } from "react";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import BetChips from "../components/BetChips";
 import CandleChart from "../components/chart/CandleChart";
@@ -34,11 +34,116 @@ const ChartPlaceholder = () => (
   </div>
 );
 
+const FullscreenChartModal = ({
+  isOpen,
+  onClose,
+  children,
+  chartType,
+  selectedTableLabel
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+  chartType: string;
+  selectedTableLabel: string;
+}) => {
+  const [isClosing, setIsClosing] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+    } else if (isClosing) {
+
+      const timeout = setTimeout(() => setShouldRender(false), 300);
+      return () => clearTimeout(timeout);
+    } else {
+      setShouldRender(false);
+    }
+  }, [isOpen, isClosing]);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsClosing(false);
+      onClose();
+    }, 300);
+  };
+
+
+  if (!shouldRender) return null;
+
+  return (
+    <div
+      className={`fixed inset-0 z-50 lg:hidden transition-all duration-300 ease-in-out ${isOpen && !isClosing
+        ? 'opacity-100 visible'
+        : 'opacity-0 invisible'
+        }`}
+    >
+   
+      <div
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        onClick={handleClose}
+      />
+
+   
+      <div className={`relative h-full flex flex-col transform transition-all duration-300 ease-in-out ${isOpen && !isClosing
+        ? 'translate-y-0 scale-100'
+        : 'translate-y-4 scale-95'
+        }`}>
+      
+        <div className="flex items-center justify-between p-4 bg-[#0d1b2a]/95 backdrop-blur-sm border-b border-gray-700/50 shadow-lg">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-[#D9A425] rounded-full animate-pulse"></div>
+              <span className="text-white text-sm font-medium">{chartType}</span>
+            </div>
+            <span className="text-gray-400 text-xs">•</span>
+            <span className="text-gray-400 text-xs truncate max-w-[120px]">{selectedTableLabel}</span>
+          </div>
+          <button
+            onClick={handleClose}
+            className="p-3 text-white hover:bg-gray-700/50 rounded-full transition-all duration-200 hover:scale-110 active:scale-95"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
+
+    
+        <div className="flex-1 bg-[#0d1b2a] p-2 sm:p-4 overflow-hidden">
+          <div className="h-full w-full">
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 interface RouletteTable {
   Id: string;
   Name: string;
   Provider: string;
+}
+
+function useContainerWidth() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    function updateWidth() {
+      if (ref.current) {
+        setWidth(ref.current.offsetWidth);
+      }
+    }
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
+
+  return [ref, width] as const;
 }
 
 const ChartSection = () => {
@@ -55,9 +160,24 @@ const ChartSection = () => {
   const [marketSearch, setMarketSearch] = useState("");
   const [marketPage, setMarketPage] = useState(1);
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [isChartFullscreen, setIsChartFullscreen] = useState(false);
   const limit = 10;
+  const [chartContainerRef, chartContainerWidth] = useContainerWidth();
 
-  // Debounce para la búsqueda
+
+  useEffect(() => {
+    const wasFullscreen = sessionStorage.getItem('chartFullscreen') === 'true';
+    if (wasFullscreen) {
+      setIsChartFullscreen(true);
+    }
+  }, []);
+
+
+  useEffect(() => {
+    sessionStorage.setItem('chartFullscreen', isChartFullscreen ? 'true' : 'false');
+  }, [isChartFullscreen]);
+
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(marketSearch);
@@ -272,7 +392,7 @@ const ChartSection = () => {
           </div>
           <div className="flex justify-between">
             <div className="flex flex-wrap gap-1 text-start items-center">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-1">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-1 w-full">
 
                 <CustomDropdown
                   defaultLabel="Tipo de gráfico"
@@ -306,15 +426,17 @@ const ChartSection = () => {
                   loading={marketLoading}
                   className="mr-2"
                 />
+
+                <div className="ml-4">
+                  <a href="/historial" className="flex items-baseline gap-x-1.5">
+                    <HistoryIcon />
+                    <span className="text-white text-sm font-medium underline underline-offset-1">ver historial</span>
+                  </a>
+                </div>
               </div>
 
 
-              <div className="ml-4">
-                <a href="/historial" className="flex items-baseline gap-x-1.5">
-                  <HistoryIcon />
-                  <span className="text-white text-sm font-medium underline underline-offset-1">ver historial</span>
-                </a>
-              </div>
+
             </div>
             {/* alerta desktop */}
             <div className="bg-[#121418F2] border-2 border-black px-6 py-2 rounded-2xl hidden lg:block">
@@ -328,7 +450,10 @@ const ChartSection = () => {
           <div className="flex flex-col-reverse lg:flex-row w-full gap-4">
             <div className="flex flex-row w-full pr-8 lg:pr-0 ">
               <div className="flex flex-col w-full">
-                <div className="relative flex-1 bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full">
+                <div
+                  ref={chartContainerRef}
+                  className="relative flex-1 bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full max-w-full overflow-x-hidden"
+                >
                   <Controls />
 
                   <BetModal
@@ -344,62 +469,81 @@ const ChartSection = () => {
                     onClose={handleCloseConfirmationModal}
                     onConfirm={handleConfirmBets}
                     bets={betsToConfirm}
-
                   />
                   <Suspense fallback={<LoadingOverlay />}>
                     {!selectedType || !gameType || !selectedTable ? (
                       <ChartPlaceholder />
                     ) : (
                       <>
-                        {selectedType === 'Candlestick' && (
-                          chartFormattedData.length > 0 && chartFormattedData[0]?.data && chartFormattedData[0].data.length > 0 ? (
-                            <CandleChart
-                              data={chartFormattedData[0].data as unknown as { time: UTCTimestamp; open: number; high: number; low: number; close: number; }[]}
-                              width={1000}
+                        <div
+                          className="lg:cursor-default cursor-pointer relative group w-full max-w-full overflow-x-hidden"
+                          onClick={() => {
+                            if (window.innerWidth < 1024) {
+                              setIsChartFullscreen(true);
+                            }
+                          }}
+                        >
+                          <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-all duration-200 lg:hidden pointer-events-none z-10 rounded-lg" />
+                          <div className="absolute top-4 right-4 lg:hidden z-20">
+                            <div className="bg-black/50 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            </div>
+                          </div>
+                          {selectedType === 'Candlestick' && (
+                            chartFormattedData.length > 0 && chartFormattedData[0]?.data && chartFormattedData[0].data.length > 0 ? (
+                              <CandleChart
+                                data={chartFormattedData[0].data as unknown as { time: UTCTimestamp; open: number; high: number; low: number; close: number; }[]}
+                                width={chartContainerWidth || 320}
+                                height={620}
+                                loading={chartLoading}
+                              />
+                            ) : (
+                              <div className="flex items-center justify-center w-full h-[620px] bg-[#0d1b2a]">
+                                <div className="text-center">
+                                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D9A425] mx-auto mb-4"></div>
+                                  <p className="text-white text-sm">Cargando datos del gráfico...</p>
+                                </div>
+                              </div>
+                            )
+                          )}
+                          {selectedType === 'Area' && (
+                            <AreaChart
+                              data={chartFormattedData}
+                              width={chartContainerWidth || 320}
                               height={620}
                               loading={chartLoading}
                             />
-                          ) : (
-                            <div className="flex items-center justify-center w-full h-[620px] bg-[#0d1b2a]">
-                              <div className="text-center">
-                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D9A425] mx-auto mb-4"></div>
-                                <p className="text-white text-sm">Cargando datos del gráfico...</p>
-                              </div>
-                            </div>
-                          )
-                        )}
-                        {selectedType === 'Area' && (
-                          <AreaChart
-                            data={chartFormattedData}
-                            width={1000}
-                            height={620}
-                            loading={chartLoading}
-                          />
-                        )}
-                        {selectedType === 'Lineal' && (
-                          <LineChart
-                            data={chartFormattedData}
-                            width={1000}
-                            height={620}
-                            loading={chartLoading}
-                          />
-                        )}
-                        {selectedType === 'VerticalColumn' && (
-                          <HistogramChart
-                            data={chartFormattedData}
-                            width={1000}
-                            height={620}
-                            loading={chartLoading}
-                          />
-                        )}
+                          )}
+                          {selectedType === 'Lineal' && (
+                            <LineChart
+                              data={chartFormattedData}
+                              width={chartContainerWidth || 320}
+                              height={620}
+                              loading={chartLoading}
+                            />
+                          )}
+                          {selectedType === 'VerticalColumn' && (
+                            <HistogramChart
+                              data={chartFormattedData}
+                              width={chartContainerWidth || 320}
+                              height={620}
+                              loading={chartLoading}
+                            />
+                          )}
+                        </div>
                       </>
                     )}
                   </Suspense>
-                  <Update
-                    selectedType={selectedType}
-                    gameType={gameType}
-                    selectedTable={selectedTable}
-                  />
+            
+                  {!isChartFullscreen && (
+                    <Update
+                      selectedType={selectedType}
+                      gameType={gameType}
+                      selectedTable={selectedTable}
+                    />
+                  )}
                 </div>
                 <div className="w-full flex flex-col-reverse lg:flex-row justify-between items-center gap-6 mt-4">
                   <NumbersDisplay numbers={formattedNumbers} />
@@ -426,6 +570,73 @@ const ChartSection = () => {
           </div>
         </div>
       </section>
+
+      <FullscreenChartModal
+        isOpen={isChartFullscreen}
+        onClose={() => setIsChartFullscreen(false)}
+        chartType={selectChartTypes.find(type => type.type === selectedType)?.label || ''}
+        selectedTableLabel={selectedTableLabel}
+      >
+        <Suspense fallback={<LoadingOverlay />}>
+          {!selectedType || !gameType || !selectedTable ? (
+            <ChartPlaceholder />
+          ) : (
+            <>
+              {selectedType === 'Candlestick' && (
+                chartFormattedData.length > 0 && chartFormattedData[0]?.data && chartFormattedData[0].data.length > 0 ? (
+                  <CandleChart
+                    data={chartFormattedData[0].data as unknown as { time: UTCTimestamp; open: number; high: number; low: number; close: number; }[]}
+                    width={1000}
+                    height={620}
+                    loading={chartLoading}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center w-full h-[620px] bg-[#0d1b2a]">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D9A425] mx-auto mb-4"></div>
+                      <p className="text-white text-sm">Cargando datos del gráfico...</p>
+                    </div>
+                  </div>
+                )
+              )}
+              {selectedType === 'Area' && (
+                <AreaChart
+                  data={chartFormattedData}
+                  width={1000}
+                  height={620}
+                  loading={chartLoading}
+                />
+              )}
+              {selectedType === 'Lineal' && (
+                <LineChart
+                  data={chartFormattedData}
+                  width={1000}
+                  height={620}
+                  loading={chartLoading}
+                />
+              )}
+              {selectedType === 'VerticalColumn' && (
+                <HistogramChart
+                  data={chartFormattedData}
+                  width={1000}
+                  height={620}
+                  loading={chartLoading}
+                />
+              )}
+        
+              <div className="absolute bottom-4 right-4 left-4 flex justify-end pointer-events-none">
+                <div className="pointer-events-auto">
+                  <Update
+                    selectedType={selectedType}
+                    gameType={gameType}
+                    selectedTable={selectedTable}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+        </Suspense>
+      </FullscreenChartModal>
     </section>
   );
 };

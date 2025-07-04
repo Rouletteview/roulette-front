@@ -1,6 +1,5 @@
 import zoomIn from "../../assets/icon/zoom-in.svg";
 import zoomOut from "../../assets/icon/zoom-out.svg";
-import pencil from "../../assets/icon/pencil.svg";
 
 const Controls = () => {
   return (
@@ -10,9 +9,6 @@ const Controls = () => {
     </button>
     <button className="cursor-pointer w-6 h-auto">
       <img src={zoomOut} alt="Zoom Out" />
-    </button>
-    <button className="cursor-pointer w-6 h-auto">
-      <img src={pencil} alt="Edit" />
     </button>
   </div>
   )
