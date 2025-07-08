@@ -6,7 +6,6 @@ import {
   LineData,
   LineSeries,
   MouseEventParams,
-  Time,
   ISeriesApi,
 } from 'lightweight-charts';
 import { MultiSeriesData } from '../../../types/chart/types';
@@ -30,7 +29,7 @@ const LineChart: React.FC<ChartProps> = ({
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [tooltipData, setTooltipData] = useState<{
     time: string;
-    series: { id: string; value: number; color: string }[];
+    series: { id: string; value: number; color: string; tag?: string }[];
   } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
 
@@ -143,19 +142,21 @@ const LineChart: React.FC<ChartProps> = ({
       }
 
       const time = param.time as number;
-      const seriesData: { id: string; value: number; color: string }[] = [];
+      const seriesData: { id: string; value: number; color: string; tag?: string }[] = [];
 
 
-      seriesMap.forEach((series, seriesId) => {
-        const data = series.data();
-        const pointData = data.find((d) => d.time === time) as LineData<Time> | undefined;
-
-        if (pointData && 'value' in pointData) {
-          const color = seriesColors[Array.from(seriesMap.keys()).indexOf(seriesId) % seriesColors.length];
+      seriesMap.forEach((_series, seriesId) => {
+        const originalPoint = data.find(s => s.id === seriesId)?.data.find(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (d: any) => d.time === time
+        );
+        const color = seriesColors[Array.from(seriesMap.keys()).indexOf(seriesId) % seriesColors.length];
+        if (originalPoint && 'value' in originalPoint) {
           seriesData.push({
             id: seriesId,
-            value: pointData.value,
-            color
+            value: originalPoint.value,
+            color,
+            tag: (originalPoint as { tag?: string })?.tag
           });
         }
       });
@@ -263,12 +264,14 @@ const LineChart: React.FC<ChartProps> = ({
             backdropFilter: 'blur(4px)',
           }}
         >
-          <div style={{ color: 'rgba(141, 52, 249, 1)', fontWeight: 'bold', marginBottom: '8px' }}>Probabilidades</div>
+          <div style={{ color: 'rgba(141, 52, 249, 1)', fontWeight: 'bold', marginBottom: '8px' }}>Resultados</div>
           {tooltipData.series.map((series) => (
             <div key={series.id} style={{ margin: '6px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ color: series.color, fontSize: '11px', fontWeight: '500', flex: 1 }}>{translateRouletteTag(series.id)}</div>
+              <div style={{ color: series.color, fontSize: '11px', fontWeight: '500', flex: 1 }}>
+                {series.tag ? translateRouletteTag(series.tag) : series.id}
+              </div>
               <div style={{ fontSize: '14px', color: 'white', fontWeight: 'bold', marginLeft: '8px' }}>
-                {Math.round(100 * series.value) / 100}%
+                {Math.round(100 * series.value) / 100}
               </div>
             </div>
           ))}

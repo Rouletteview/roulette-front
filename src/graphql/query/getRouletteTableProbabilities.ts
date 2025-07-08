@@ -1,19 +1,22 @@
 import { gql } from '@apollo/client';
 
 export const GET_ROULETTE_TABLES_PROBABILITIES = gql`
- query GetRouletteTableProbabilities($TableId: String!, $GameType: GameType!, $StartDate: DateTime!, $EndDate: DateTime!) {
+query GetRouletteTableProbabilities($request: GetRouletteTableProbabilitiesRequest!) {
     GetRouletteTableProbabilities(
-        request: {
-            TableId: $TableId
-            GameType: $GameType
-            StartDate: $StartDate
-            EndDate: $EndDate
-        }
+        request: $request
     ) {
-        Date
-        Tag
-        Value
+        Probabilities {
+            Tag
+            Value
+            Count
+        }
+        Results {
+            Date
+            Tag
+            Number
+        }
     }
 }
+
 
 `;

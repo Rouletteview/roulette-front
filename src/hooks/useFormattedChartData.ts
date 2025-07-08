@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useMemo } from "react";
 import { UTCTimestamp } from "lightweight-charts";
 import { chartTypes } from "../types/types";
@@ -5,7 +6,7 @@ import { chartTypes } from "../types/types";
 type RawEntry = {
   Date: string;
   Tag: string;
-  Value: number;
+  Number: number;
 };
 
 export type GameType =
@@ -29,22 +30,33 @@ export const useFormattedChartData = ({
   chartType: chartTypes;
 }): MultiSeries[] => {
 
+
+
   const formatted = useMemo(() => {
     if (!data || data.length === 0) return [];
 
-    const grouped = groupByDate(data);
+
+    const sortedData = [...data].sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
+
+    const grouped = groupByDate(sortedData);
 
     switch (chartType) {
       case 'Candlestick':
         return [{
           id: 'Candlestick',
-          data: formatCandleChart(grouped)
+          data: formatCandleChart(grouped) as { time: UTCTimestamp; open: number; high: number; low: number; close: number }[]
         }];
       case 'Area':
       case 'Lineal':
-        return formatMultipleLines(grouped);
+        return formatMultipleLines(grouped).map(series => ({
+          ...series,
+          data: series.data as { time: UTCTimestamp; value: number; color?: string }[]
+        }));
       case 'VerticalColumn':
-        return formatMultipleHistograms(grouped);
+        return formatMultipleHistograms(grouped).map(series => ({
+          ...series,
+          data: series.data as { time: UTCTimestamp; value: number; color: string }[]
+        }));
       default:
         return [];
     }
@@ -72,54 +84,108 @@ const groupByDate = (data: RawEntry[]): GroupedData[] => {
 
 
 const formatMultipleLines = (grouped: GroupedData[]): MultiSeries[] => {
-  const seriesMap: Record<string, { time: UTCTimestamp; value: number }[]> = {};
+
+  const data: { time: UTCTimestamp; value: number; tag?: string }[] = [];
 
   grouped.forEach(({ date, entries }) => {
-    const time = new Date(date).getTime() / 1000 as UTCTimestamp;
-    entries.forEach(({ Tag, Value }) => {
-      if (!seriesMap[Tag]) {
-        seriesMap[Tag] = [];
-      }
-      seriesMap[Tag].push({ time, value: Value });
+
+    const sortedEntries = entries.sort((a, b) => {
+      const dateA = new Date(a.Date).getTime();
+      const dateB = new Date(b.Date).getTime();
+      return dateA - dateB;
+    });
+
+    const baseTime = new Date(date).getTime() / 1000 as UTCTimestamp;
+
+    sortedEntries.forEach(({ Number, Tag }, index) => {
+      const time = (baseTime + index) as UTCTimestamp;
+      data.push({ time, value: Number, tag: Tag });
     });
   });
 
-  return Object.entries(seriesMap).map(([id, data]) => ({ id, data }));
+
+  data.sort((a, b) => a.time - b.time);
+
+  return [{ id: 'Números', data }];
 };
 
 
 const formatMultipleHistograms = (grouped: GroupedData[]): MultiSeries[] => {
-  const seriesMap: Record<string, { time: UTCTimestamp; value: number; color: string }[]> = {};
-  const lastValues: Record<string, number> = {};
+
+  const data: { time: UTCTimestamp; value: number; color: string; tag?: string }[] = [];
+  let lastValue = 0;
 
   grouped.forEach(({ date, entries }) => {
-    const time = new Date(date).getTime() / 1000 as UTCTimestamp;
 
-    entries.forEach(({ Tag, Value }) => {
-      const prev = lastValues[Tag] ?? Value;
-      const color = Value >= prev ? 'rgba(32, 178, 108, 1)' : 'rgba(255, 82, 82, 1)';
-      lastValues[Tag] = Value;
+    const sortedEntries = entries.sort((a, b) => {
+      const dateA = new Date(a.Date).getTime();
+      const dateB = new Date(b.Date).getTime();
+      return dateA - dateB;
+    });
 
-      if (!seriesMap[Tag]) {
-        seriesMap[Tag] = [];
-      }
-      seriesMap[Tag].push({ time, value: Value, color });
+    const baseTime = new Date(date).getTime() / 1000 as UTCTimestamp;
+
+    sortedEntries.forEach(({ Number, Tag }, index) => {
+      const time = (baseTime + index) as UTCTimestamp;
+      const color = Number >= lastValue ? 'rgba(32, 178, 108, 1)' : 'rgba(255, 82, 82, 1)';
+      lastValue = Number;
+      data.push({ time, value: Number, color, tag: Tag });
     });
   });
 
-  return Object.entries(seriesMap).map(([id, data]) => ({ id, data }));
+
+  data.sort((a, b) => a.time - b.time);
+
+  return [{ id: 'Números', data }];
 };
 
 
 const formatCandleChart = (grouped: GroupedData[]) => {
-  return grouped.map(({ date, entries }) => {
-    const values = entries.map(e => e.Value);
+
+  const allEntries = grouped.flatMap(g => g.entries);
+  const map = new Map<string, RawEntry[]>();
+
+  allEntries.forEach(entry => {
+    const dateObj = new Date(entry.Date);
+    const key = `${dateObj.getFullYear()}-${dateObj.getMonth() + 1}-${dateObj.getDate()} ${dateObj.getHours()}:${dateObj.getMinutes()}`;
+    if (!map.has(key)) map.set(key, []);
+    map.get(key)!.push(entry);
+  });
+
+
+  let prevClose: number | undefined = undefined;
+  let prevCloseTag: string | undefined = undefined;
+  const candles = Array.from(map.entries()).sort((a, b) => {
+
+    const dateA = new Date(a[1][0].Date).getTime();
+    const dateB = new Date(b[1][0].Date).getTime();
+    return dateA - dateB;
+  }).map(([_, entries]) => {
+
+    const sorted = entries.sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
+    const values = sorted.map(e => e.Number).filter(val => val !== undefined && !isNaN(val));
+    const tags = sorted.map(e => e.Tag);
+    const time = Math.floor(new Date(sorted[0].Date).getTime() / 1000) as UTCTimestamp;
+    const close = values[values.length - 1];
+    const closeTag = tags[tags.length - 1];
+    const open = prevClose !== undefined ? prevClose : close;
+    const openTag = prevCloseTag !== undefined ? prevCloseTag : closeTag;
+    const high = Math.max(open, ...values);
+    const low = Math.min(open, ...values);
+    prevClose = close;
+    prevCloseTag = closeTag;
+
     return {
-      time: new Date(date).getTime() / 1000 as UTCTimestamp,
-      open: values[0] || 0,
-      high: Math.max(...values) || 0,
-      low: Math.min(...values) || 0,
-      close: values[values.length - 1] || 0
+      time,
+      open,
+      close,
+      high,
+      low,
+      openTag,
+      closeTag
     };
   });
+
+
+  return candles.sort((a, b) => a.time - b.time);
 };

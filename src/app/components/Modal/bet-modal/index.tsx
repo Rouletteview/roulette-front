@@ -48,14 +48,6 @@ const BetModal = ({ showModal, onClose, selectedChip, onRequestConfirmation, bet
         handleClose();
     };
 
-    // const getTotalBetAmount = () => {
-    //     return bets.reduce((total, bet) => total + bet.amount, 0);
-    // };
-
-    // const handleClearBets = () => {
-    //     setBets([]);
-    // };
-
     const handleClose = () => {
         setIsAnimating(false);
         setTimeout(() => {

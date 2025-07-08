@@ -9,9 +9,15 @@ import {
   Time,
   UTCTimestamp,
 } from 'lightweight-charts';
+import { translateRouletteTag } from '../../../utils/formatters/rouletterNumbers';
+
+type CustomCandlestickData = CandlestickData<Time> & {
+  openTag?: string;
+  closeTag?: string;
+};
 
 type ChartProps = {
-  data: { time: UTCTimestamp; open: number; high: number; low: number; close: number }[];
+  data: { time: UTCTimestamp; open: number; high: number; low: number; close: number; openTag?: string; closeTag?: string }[];
   height?: number;
   width?: number;
   loading?: boolean;
@@ -26,10 +32,17 @@ const CandleChart: React.FC<ChartProps> = ({
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
+
   const [tooltipData, setTooltipData] = useState<{
     time: string;
     price: number;
     isUp: boolean;
+    open: number;
+    close: number;
+    high: number;
+    low: number;
+    openTag?: string;
+    closeTag?: string;
   } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
 
@@ -98,6 +111,7 @@ const CandleChart: React.FC<ChartProps> = ({
     });
 
     if (!data || !Array.isArray(data)) {
+      console.log('CandleChart: No valid data');
       return;
     }
 
@@ -120,9 +134,14 @@ const CandleChart: React.FC<ChartProps> = ({
       }))
       .sort((a, b) => Number(a.time) - Number(b.time));
 
+    console.log('validData', validData)
+
+
     if (validData.length > 0) {
       series.setData(validData);
       chart.timeScale().fitContent();
+    } else {
+      console.log('CandleChart: No valid data after filtering');
     }
 
 
@@ -140,14 +159,15 @@ const CandleChart: React.FC<ChartProps> = ({
         return;
       }
 
-      const data = series.data();
       const time = param.time as number;
-      const candleData = data.find(d => d.time === time) as CandlestickData<Time> | undefined;
+      const candleData = data.find(d => d.time === time) as CustomCandlestickData | undefined;
 
       if (candleData && 'close' in candleData) {
         const timestamp = typeof time === 'number' ? time : Number(time);
         const date = new Date(timestamp * 1000);
         const isUp = candleData.close >= candleData.open;
+        const customData = candleData
+        console.log('customData', customData)
         setTooltipData({
           time: date.toLocaleString('es-ES', {
             day: '2-digit',
@@ -158,6 +178,12 @@ const CandleChart: React.FC<ChartProps> = ({
           }),
           price: candleData.close,
           isUp,
+          open: candleData.open,
+          close: candleData.close,
+          high: candleData.high,
+          low: candleData.low,
+          openTag: customData.openTag,
+          closeTag: customData.closeTag,
         });
 
         const toolTipWidth = 120;
@@ -229,8 +255,8 @@ const CandleChart: React.FC<ChartProps> = ({
             position: 'absolute',
             top: `${tooltipPosition.y}px`,
             left: `${tooltipPosition.x}px`,
-            width: '120px',
-            minHeight: '100px',
+            width: '160px',
+            minHeight: '120px',
             padding: '12px',
             boxSizing: 'border-box',
             fontSize: '12px',
@@ -248,10 +274,16 @@ const CandleChart: React.FC<ChartProps> = ({
           }}
         >
           <div style={{ color: tooltipData.isUp ? 'rgba(38, 166, 154, 1)' : '#ef5350', fontWeight: 'bold', marginBottom: '8px' }}>
-            {tooltipData.isUp ? 'Alcista' : 'Bajista'}
+            Resultados
           </div>
           <div style={{ fontSize: '20px', margin: '8px 0px', color: 'white', fontWeight: 'bold' }}>
-            {Math.round(100 * tooltipData.price) / 100}%
+            {Math.round(100 * tooltipData.price) / 100}
+          </div>
+          <div style={{ margin: '8px 0', fontSize: '13px' }}>
+            <div>Abre: <b>{tooltipData.open}</b> {tooltipData.openTag && `(${translateRouletteTag(tooltipData.openTag)})`}</div>
+            <div>Cierra: <b>{tooltipData.close}</b> {tooltipData.closeTag && `(${translateRouletteTag(tooltipData.closeTag)})`}</div>
+            <div>Máximo: <b>{tooltipData.high}</b></div>
+            <div>Mínimo: <b>{tooltipData.low}</b></div>
           </div>
           <div style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '10px', marginTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.2)', paddingTop: '6px' }}>
             {tooltipData.time}
