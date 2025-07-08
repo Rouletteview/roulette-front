@@ -6,7 +6,6 @@ import {
   AreaData,
   AreaSeries,
   MouseEventParams,
-  Time,
   ISeriesApi,
 } from 'lightweight-charts';
 import { MultiSeriesData } from '../../../types/chart/types';
@@ -30,11 +29,10 @@ const AreaChart: React.FC<ChartProps> = ({
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [tooltipData, setTooltipData] = useState<{
     time: string;
-    series: { id: string; value: number; color: string }[];
+    series: { id: string; value: number; color: string; tag?: string }[];
   } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
 
-  // Colores para las diferentes series
   const seriesColors = [
     { line: 'rgba(38, 166, 154, 1)', top: 'rgba(38, 166, 154, 0.28)', bottom: 'rgba(38, 166, 154, 0.05)' },
     { line: 'rgba(141, 52, 249, 1)', top: 'rgba(141, 52, 249, 0.28)', bottom: 'rgba(141, 52, 249, 0.05)' },
@@ -144,24 +142,24 @@ const AreaChart: React.FC<ChartProps> = ({
       }
 
       const time = param.time as number;
-      const seriesData: { id: string; value: number; color: string }[] = [];
+      const seriesData: { id: string; value: number; color: string, tag?: string }[] = [];
 
- 
-      seriesMap.forEach((series, seriesId) => {
-        const data = series.data();
-        const pointData = data.find((d) => d.time === time) as AreaData<Time> | undefined;
 
-        if (pointData && 'value' in pointData) {
-          const colorIndex = Array.from(seriesMap.keys()).indexOf(seriesId);
-          const color = seriesColors[colorIndex % seriesColors.length].line;
+      seriesMap.forEach((_series, seriesId) => {
+        const originalPoint = data.find(s => s.id === seriesId)?.data.find(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (d: any) => d.time === time
+        );
+        const colorSet = seriesColors[Array.from(seriesMap.keys()).indexOf(seriesId) % seriesColors.length];
+        if (originalPoint && 'value' in originalPoint) {
           seriesData.push({
             id: seriesId,
-            value: pointData.value,
-            color
+            value: originalPoint.value,
+            tag: (originalPoint as { tag?: string })?.tag,
+            color: colorSet.line
           });
         }
       });
-
       if (seriesData.length > 0) {
         const timestamp = typeof time === 'number' ? time : Number(time);
         const date = new Date(timestamp * 1000);
@@ -175,6 +173,7 @@ const AreaChart: React.FC<ChartProps> = ({
             hour12: true
           }),
           series: seriesData
+
         });
 
         const toolTipWidth = Math.max(150, Math.max(...seriesData.map(s => s.id.length * 8)) + 60);
@@ -268,7 +267,10 @@ const AreaChart: React.FC<ChartProps> = ({
           <div style={{ color: 'rgba(38, 166, 154, 1)', fontWeight: 'bold', marginBottom: '8px' }}>Probabilidades</div>
           {tooltipData.series.map((series) => (
             <div key={series.id} style={{ margin: '6px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ color: series.color, fontSize: '11px', fontWeight: '500', flex: 1 }}>{translateRouletteTag(series.id)}</div>
+              <div style={{ color: series.color, fontSize: '11px', fontWeight: '500', flex: 1 }}>
+                {series.value}
+                {series.tag ? ` (${translateRouletteTag(series.tag)})` : ''}
+              </div>
               <div style={{ fontSize: '14px', color: 'white', fontWeight: 'bold', marginLeft: '8px' }}>
                 {Math.round(100 * series.value) / 100}%
               </div>

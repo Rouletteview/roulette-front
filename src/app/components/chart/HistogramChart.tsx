@@ -28,7 +28,7 @@ const HistogramChart: React.FC<ChartProps> = ({
   const chartRef = useRef<IChartApi | null>(null);
   const [tooltipData, setTooltipData] = useState<{
     time: string;
-    series: { id: string; value: number; color: string }[];
+    series: { id: string; value: number; color: string; tag?: string }[];
   } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
 
@@ -85,7 +85,7 @@ const HistogramChart: React.FC<ChartProps> = ({
     data.forEach((series) => {
       if ('value' in series.data[0] && 'color' in series.data[0]) {
         const histogramSeries = chart.addSeries(HistogramSeries, {
-          color: 'rgba(32, 178, 108, 1)', 
+          color: 'rgba(32, 178, 108, 1)',
         });
 
         const validData = series.data
@@ -120,7 +120,7 @@ const HistogramChart: React.FC<ChartProps> = ({
       }
 
       const time = param.time as number;
-      const seriesData: { id: string; value: number; color: string }[] = [];
+      const seriesData: { id: string; value: number; color: string; tag?: string }[] = [];
 
       // Recopilar datos de todas las series en el tiempo actual
       data.forEach((series) => {
@@ -132,6 +132,7 @@ const HistogramChart: React.FC<ChartProps> = ({
             value: (dataAtTime as any).value,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             color: (dataAtTime as any).color || 'rgba(32, 178, 108, 1)',
+            tag: (dataAtTime as { tag?: string })?.tag
           });
         }
       });
@@ -237,7 +238,9 @@ const HistogramChart: React.FC<ChartProps> = ({
           <div style={{ color: 'rgba(32, 178, 108, 1)', fontWeight: 'bold', marginBottom: '8px' }}>Probabilidades</div>
           {tooltipData.series.map((series) => (
             <div key={series.id} style={{ margin: '6px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ color: series.color, fontSize: '11px', fontWeight: '500', flex: 1 }}>{translateRouletteTag(series.id)}</div>
+              <div style={{ color: series.color, fontSize: '11px', fontWeight: '500', flex: 1 }}>
+                {series.tag ? translateRouletteTag(series.tag) : series.id}
+              </div>
               <div style={{ fontSize: '14px', color: 'white', fontWeight: 'bold', marginLeft: '8px' }}>
                 {Math.round(100 * series.value) / 100}%
               </div>

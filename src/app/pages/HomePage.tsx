@@ -1,12 +1,11 @@
-
-
-
 import HeroSection from "../../sections/HeroSection"
 import WelcomeModal from "../components/Modal/welcome-modal/WelcomeModal"
 
 // import RouletteTable from "../components/RouletteTable"
 import AppLayout from "../layouts/AppLayout"
 import ChartSection from "../sections/ChartSection"
+// import HorizontalHistogramChart from "../components/chart/HorizontalHistogramChart"
+
 
 
 
@@ -41,7 +40,13 @@ const HomePage = () => {
           </div>
         </HeroSection>
         <ChartSection />
-       
+
+
+        {/* <div className="flex justify-center items-center w-full">
+          <HorizontalHistogramChart />
+        </div> */}
+
+
       </AppLayout>
 
     </>

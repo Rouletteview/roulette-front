@@ -5,24 +5,33 @@ interface UpdateProps {
   selectedType?: string;
   gameType?: string;
   selectedTable?: string;
+  loading?: boolean;
 }
 
-const Update = ({ selectedType, gameType, selectedTable }: UpdateProps) => {
+const Update = ({ selectedType, gameType, selectedTable, loading }: UpdateProps) => {
   const location = useLocation();
   const [countdown, setCountdown] = useState(30);
+ 
 
 
   const allSelected = selectedType && gameType && selectedTable;
 
+  useEffect(() => {
+    if (loading) {
+      setCountdown(30);
+    }
+  }, [loading])
+
 
   useEffect(() => {
+
     if (allSelected) {
-      setCountdown(30)
+      setCountdown(30);
     }
   }, [location.search, allSelected])
 
   useEffect(() => {
-  
+
     const savedScrollPosition = sessionStorage.getItem('scrollPosition');
     if (savedScrollPosition) {
       const position = JSON.parse(savedScrollPosition);
@@ -37,8 +46,9 @@ const Update = ({ selectedType, gameType, selectedTable }: UpdateProps) => {
       return;
     }
 
+
     if (countdown === 0) {
-   
+
       const scrollPosition = {
         x: window.scrollX,
         y: window.scrollY
@@ -53,7 +63,7 @@ const Update = ({ selectedType, gameType, selectedTable }: UpdateProps) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [countdown, allSelected]);
+  }, [countdown, allSelected, loading]);
 
   return (
     <div className="flex items-center gap-4 w-full justify-end my-1">

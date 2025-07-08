@@ -50,6 +50,7 @@ const FullscreenChartModal = ({
   const [isClosing, setIsClosing] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
 
+
   useEffect(() => {
     if (isOpen) {
       setShouldRender(true);
@@ -80,18 +81,18 @@ const FullscreenChartModal = ({
         : 'opacity-0 invisible'
         }`}
     >
-   
+
       <div
         className="absolute inset-0 bg-black/80 backdrop-blur-sm"
         onClick={handleClose}
       />
 
-   
+
       <div className={`relative h-full flex flex-col transform transition-all duration-300 ease-in-out ${isOpen && !isClosing
         ? 'translate-y-0 scale-100'
         : 'translate-y-4 scale-95'
         }`}>
-      
+
         <div className="flex items-center justify-between p-4 bg-[#0d1b2a]/95 backdrop-blur-sm border-b border-gray-700/50 shadow-lg">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
@@ -111,7 +112,7 @@ const FullscreenChartModal = ({
           </button>
         </div>
 
-    
+
         <div className="flex-1 bg-[#0d1b2a] p-2 sm:p-4 overflow-hidden">
           <div className="h-full w-full">
             {children}
@@ -163,6 +164,7 @@ const ChartSection = () => {
   const [isChartFullscreen, setIsChartFullscreen] = useState(false);
   const limit = 10;
   const [chartContainerRef, chartContainerWidth] = useContainerWidth();
+  
 
 
   useEffect(() => {
@@ -254,15 +256,37 @@ const ChartSection = () => {
     GameType: gameType,
     StartDate: startDate.toISOString(),
     EndDate: endDate.toISOString()
+
+
   }
+
+  console.log({
+    TableId: chartData.TableId || "",
+    GameType: chartData.GameType,
+    StartDate: chartData.StartDate,
+    EndDate: chartData.EndDate
+  })
+
+  // const queryVariables = {
+  //   TableId: chartData.TableId || "",
+  //   GameType: chartData.GameType,
+  //   StartDate: chartData.StartDate,
+  //   EndDate: chartData.EndDate
+  // }
+
   const { data: rouletteProbData, loading: chartLoading, error: errorProbabilities } = useQuery(GET_ROULETTE_TABLES_PROBABILITIES, {
     variables: {
-      TableId: chartData.TableId || "",
-      GameType: chartData.GameType,
-      StartDate: chartData.StartDate,
-      EndDate: chartData.EndDate
-    },
+      request: {
+        TableId: chartData.TableId,
+        GameType: chartData.GameType,
+        StartDate: chartData.StartDate,
+        EndDate: chartData.EndDate
+      }
+    }
   });
+
+
+  console.log(rouletteProbData?.GetRouletteTableProbabilities.Results)
 
   console.log(errorProbabilities)
   const { data: chartNumbersData } = useQuery(GET_LAST_ROULETTE_TABLE_NUMBERS, {
@@ -273,15 +297,14 @@ const ChartSection = () => {
   })
 
   const numeros = chartNumbersData?.GetLastRouletteTableNumbers;
+ 
 
   const formattedNumbers = useRouletteNumbers(numeros || [])
 
   const chartFormattedData = useFormattedChartData({
-    data: rouletteProbData?.GetRouletteTableProbabilities || [],
+    data: rouletteProbData?.GetRouletteTableProbabilities.Results || [],
     chartType: selectedType ? chartTypes[selectedType as keyof typeof chartTypes] : chartTypes.Candlestick
   });
-
-
 
 
   const handleSelectChange = (value: string) => {
@@ -454,7 +477,8 @@ const ChartSection = () => {
                   ref={chartContainerRef}
                   className="relative flex-1 bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full max-w-full overflow-x-hidden"
                 >
-                  <Controls />
+
+                  <Controls setIsChartFullscreen={setIsChartFullscreen} />
 
                   <BetModal
                     showModal={openBetModal}
@@ -477,12 +501,8 @@ const ChartSection = () => {
                       <>
                         <div
                           className="lg:cursor-default cursor-pointer relative group w-full max-w-full overflow-x-hidden"
-                          onClick={() => {
-                            if (window.innerWidth < 1024) {
-                              setIsChartFullscreen(true);
-                            }
-                          }}
                         >
+
                           <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-all duration-200 lg:hidden pointer-events-none z-10 rounded-lg" />
                           <div className="absolute top-4 right-4 lg:hidden z-20">
                             <div className="bg-black/50 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -493,12 +513,16 @@ const ChartSection = () => {
                           </div>
                           {selectedType === 'Candlestick' && (
                             chartFormattedData.length > 0 && chartFormattedData[0]?.data && chartFormattedData[0].data.length > 0 ? (
-                              <CandleChart
-                                data={chartFormattedData[0].data as unknown as { time: UTCTimestamp; open: number; high: number; low: number; close: number; }[]}
-                                width={chartContainerWidth || 320}
-                                height={620}
-                                loading={chartLoading}
-                              />
+                              (() => {
+                                return (
+                                  <CandleChart
+                                    data={chartFormattedData[0].data as unknown as { time: UTCTimestamp; open: number; high: number; low: number; close: number; openTag?: string; closeTag?: string }[]}
+                                    width={chartContainerWidth || 320}
+                                    height={620}
+                                    loading={chartLoading}
+                                  />
+                                );
+                              })()
                             ) : (
                               <div className="flex items-center justify-center w-full h-[620px] bg-[#0d1b2a]">
                                 <div className="text-center">
@@ -536,17 +560,20 @@ const ChartSection = () => {
                       </>
                     )}
                   </Suspense>
-            
-                  {!isChartFullscreen && (
-                    <Update
-                      selectedType={selectedType}
-                      gameType={gameType}
-                      selectedTable={selectedTable}
-                    />
-                  )}
+
+
+                  <Update
+                    selectedType={selectedType}
+                    gameType={gameType}
+                    selectedTable={selectedTable}
+                    loading={chartLoading}
+                  />
                 </div>
                 <div className="w-full flex flex-col-reverse lg:flex-row justify-between items-center gap-6 mt-4">
-                  <NumbersDisplay numbers={formattedNumbers} />
+                  <NumbersDisplay
+                    numbers={formattedNumbers}
+                    loading={chartLoading}
+                  />
                 </div>
               </div>
               <div className="block lg:hidden w-auto">
@@ -570,6 +597,7 @@ const ChartSection = () => {
           </div>
         </div>
       </section>
+
 
       <FullscreenChartModal
         isOpen={isChartFullscreen}
@@ -623,7 +651,7 @@ const ChartSection = () => {
                   loading={chartLoading}
                 />
               )}
-        
+
               <div className="absolute bottom-4 right-4 left-4 flex justify-end pointer-events-none">
                 <div className="pointer-events-auto">
                   <Update
