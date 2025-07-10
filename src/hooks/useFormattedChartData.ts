@@ -14,7 +14,13 @@ export type GameType =
   | 'Dozen'
   | 'HighLow'
   | 'OddEven'
-  | 'RedBlack';
+  | 'RedBlack'
+  | 'StraightUp'
+  | 'VoisinDuZero'
+  | 'Orphelins'
+  | 'TiersDuCylindre'
+  | 'PlayZero'
+  ;
 
 type GroupedData = { date: string; entries: RawEntry[] };
 type MultiSeries = {

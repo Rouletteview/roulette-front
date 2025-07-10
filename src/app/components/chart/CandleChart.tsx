@@ -134,8 +134,6 @@ const CandleChart: React.FC<ChartProps> = ({
       }))
       .sort((a, b) => Number(a.time) - Number(b.time));
 
-    console.log('validData', validData)
-
 
     if (validData.length > 0) {
       series.setData(validData);
@@ -223,6 +221,7 @@ const CandleChart: React.FC<ChartProps> = ({
       resizeObserver.disconnect();
     };
   }, [data, height, width]);
+
 
   return (
     <div style={{ position: 'relative', width: '100%' }}>

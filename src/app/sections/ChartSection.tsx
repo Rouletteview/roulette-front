@@ -4,7 +4,6 @@ import Update from "../components/Update";
 import NumbersDisplay from "../components/NumbersDisplay";
 import { Suspense, useState, useEffect, useRef } from "react";
 import LoadingOverlay from "../../components/LoadingOverlay";
-import BetChips from "../components/BetChips";
 import CandleChart from "../components/chart/CandleChart";
 import AreaChart from "../components/chart/AreaChart";
 import LineChart from '../components/chart/LineChart';
@@ -13,9 +12,9 @@ import { ChartType, selectChartTypes, selectChartZoneTypes } from "../../types/c
 import HistoryIcon from "../components/icon/HistoryIcon";
 import { useSearchParams } from "react-router";
 import CustomDropdown from "../components/CustomDropdown";
-import BetModal from "../components/Modal/bet-modal";
-import ConfirmationModal from '../components/Modal/ConfirmationModal';
-import type { Bet } from '../components/Modal/bet-modal';
+// import BetModal from "../components/Modal/bet-modal";
+// import ConfirmationModal from '../components/Modal/ConfirmationModal';
+// import type { Bet } from '../components/Modal/bet-modal';
 import { useQuery } from "@apollo/client";
 import { GET_ROULETTE_TABLES } from "../../graphql/query/getRouletteTables";
 import { useFormattedChartData, GameType } from "../../hooks/useFormattedChartData";
@@ -24,6 +23,7 @@ import { chartTypes } from "../../types/types";
 import { UTCTimestamp } from "lightweight-charts";
 import { GET_LAST_ROULETTE_TABLE_NUMBERS } from "../../graphql/query/getLastRouletteTableNumbers";
 import { useRouletteNumbers } from "../../utils/formatters/rouletterNumbers";
+import BetButtons from "../components/bet/BetButtons";
 
 const ChartPlaceholder = () => (
   <div className="flex items-center justify-center w-full h-[620px] bg-[#0d1b2a]">
@@ -150,11 +150,11 @@ function useContainerWidth() {
 const ChartSection = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [gameType, setGameType] = useState<GameType | ''>('');
-  const [openBetModal, setOpenBetModal] = useState<boolean>(false);
-  const [selectedChip, setSelectedChip] = useState<number | null>(null);
-  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
-  const [betsToConfirm, setBetsToConfirm] = useState<Bet[]>([]);
-  const [bets, setBets] = useState<Bet[]>([]);
+  // const [openBetModal, setOpenBetModal] = useState<boolean>(false);
+  // const [selectedChip, setSelectedChip] = useState<number | null>(null);
+  // const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
+  // const [betsToConfirm, setBetsToConfirm] = useState<Bet[]>([]);
+  // const [bets, setBets] = useState<Bet[]>([]);
   const [selectedType, setSelectedType] = useState<ChartType | ''>('');
   const [selectedTable, setSelectedTable] = useState('')
   const [selectedTableLabel, setSelectedTableLabel] = useState('')
@@ -164,7 +164,7 @@ const ChartSection = () => {
   const [isChartFullscreen, setIsChartFullscreen] = useState(false);
   const limit = 10;
   const [chartContainerRef, chartContainerWidth] = useContainerWidth();
-  
+
 
 
   useEffect(() => {
@@ -286,7 +286,7 @@ const ChartSection = () => {
   });
 
 
-  console.log(rouletteProbData?.GetRouletteTableProbabilities.Results)
+  console.log(rouletteProbData?.GetRouletteTableProbabilities.Probabilities)
 
   console.log(errorProbabilities)
   const { data: chartNumbersData } = useQuery(GET_LAST_ROULETTE_TABLE_NUMBERS, {
@@ -297,7 +297,7 @@ const ChartSection = () => {
   })
 
   const numeros = chartNumbersData?.GetLastRouletteTableNumbers;
- 
+
 
   const formattedNumbers = useRouletteNumbers(numeros || [])
 
@@ -334,31 +334,31 @@ const ChartSection = () => {
   };
 
 
-  const handleChipSelect = (value: number) => {
-    setSelectedChip(value);
-  };
+  // const handleChipSelect = (value: number) => {
+  //   setSelectedChip(value);
+  // };
 
-  const handleCloseBetModal = () => {
-    setOpenBetModal(false);
-  };
+  // const handleCloseBetModal = () => {
+  //   setOpenBetModal(false);
+  // };
 
-  const handleRequestConfirmation = (selectedBets: Bet[]) => {
-    setBetsToConfirm(selectedBets);
-    setOpenBetModal(false);
-    setConfirmationModalOpen(true);
-  };
+  // const handleRequestConfirmation = (selectedBets: Bet[]) => {
+  //   setBetsToConfirm(selectedBets);
+  //   setOpenBetModal(false);
+  //   setConfirmationModalOpen(true);
+  // };
 
-  const handleConfirmBets = () => {
-    // desde aquí se enviara la apuesta ya sea al backend o no se a donde
-    setConfirmationModalOpen(false);
-    setBetsToConfirm([]);
-    setBets([]);
-  };
+  // const handleConfirmBets = () => {
+  //   // desde aquí se enviara la apuesta ya sea al backend o no se a donde
+  //   setConfirmationModalOpen(false);
+  //   setBetsToConfirm([]);
+  //   setBets([]);
+  // };
 
-  const handleCloseConfirmationModal = () => {
-    setOpenBetModal(true);
-    setConfirmationModalOpen(false);
-  };
+  // const handleCloseConfirmationModal = () => {
+  //   setOpenBetModal(true);
+  //   setConfirmationModalOpen(false);
+  // };
 
 
   const handleMarketSearch = (query: string) => {
@@ -471,7 +471,7 @@ const ChartSection = () => {
       <section className="flex flex-col lg:flex-row w-full gap-4">
         <div className="order-2 lg:order-1 w-full lg:flex-1 lg:mx-2.5 flex flex-col">
           <div className="flex flex-col-reverse lg:flex-row w-full gap-4">
-            <div className="flex flex-row w-full pr-8 lg:pr-0 ">
+            <div className="flex flex-row w-full">
               <div className="flex flex-col w-full">
                 <div
                   ref={chartContainerRef}
@@ -480,20 +480,20 @@ const ChartSection = () => {
 
                   <Controls setIsChartFullscreen={setIsChartFullscreen} />
 
-                  <BetModal
+                  {/* <BetModal
                     showModal={openBetModal}
                     onClose={handleCloseBetModal}
                     selectedChip={selectedChip}
                     onRequestConfirmation={handleRequestConfirmation}
                     bets={bets}
                     setBets={setBets}
-                  />
-                  <ConfirmationModal
-                    show={confirmationModalOpen}
-                    onClose={handleCloseConfirmationModal}
-                    onConfirm={handleConfirmBets}
-                    bets={betsToConfirm}
-                  />
+                  /> */}
+                  {/* <ConfirmationModal
+                        show={confirmationModalOpen}
+                        onClose={handleCloseConfirmationModal}
+                        onConfirm={handleConfirmBets}
+                        bets={betsToConfirm}
+                      /> */}
                   <Suspense fallback={<LoadingOverlay />}>
                     {!selectedType || !gameType || !selectedTable ? (
                       <ChartPlaceholder />
@@ -504,13 +504,13 @@ const ChartSection = () => {
                         >
 
                           <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-all duration-200 lg:hidden pointer-events-none z-10 rounded-lg" />
-                          <div className="absolute top-4 right-4 lg:hidden z-20">
+                          {/* <div className="absolute top-4 right-4 lg:hidden z-20">
                             <div className="bg-black/50 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                               </svg>
                             </div>
-                          </div>
+                          </div> */}
                           {selectedType === 'Candlestick' && (
                             chartFormattedData.length > 0 && chartFormattedData[0]?.data && chartFormattedData[0].data.length > 0 ? (
                               (() => {
@@ -569,28 +569,37 @@ const ChartSection = () => {
                     loading={chartLoading}
                   />
                 </div>
-                <div className="w-full flex flex-col-reverse lg:flex-row justify-between items-center gap-6 mt-4">
+                <div className="w-full flex flex-col lg:flex-row justify-between items-center gap-6 mt-4">
+                  <div className="block lg:hidden w-full">
+                    {/* <BetChips
+                  setOpenBetModal={setOpenBetModal}
+                  selectedChip={selectedChip}
+                  onChipSelect={handleChipSelect}
+                /> */}
+                    <BetButtons
+                      gameType={gameType}
+                      probabilities={rouletteProbData?.GetRouletteTableProbabilities.Probabilities}
+                    />
+                  </div>
                   <NumbersDisplay
                     numbers={formattedNumbers}
                     loading={chartLoading}
                   />
                 </div>
               </div>
-              <div className="block lg:hidden w-auto">
-                <BetChips
-                  setOpenBetModal={setOpenBetModal}
-                  selectedChip={selectedChip}
-                  onChipSelect={handleChipSelect}
-                />
-              </div>
+
             </div>
             <div className="order-1 lg:order-2 flex-col items-center lg:items-start gap-4">
               <UserInfo />
               <div className="hidden lg:flex">
-                <BetChips
+                {/* <BetChips
                   setOpenBetModal={setOpenBetModal}
                   selectedChip={selectedChip}
                   onChipSelect={handleChipSelect}
+                /> */}
+                <BetButtons
+                  gameType={gameType}
+                  probabilities={rouletteProbData?.GetRouletteTableProbabilities.Probabilities}
                 />
               </div>
             </div>

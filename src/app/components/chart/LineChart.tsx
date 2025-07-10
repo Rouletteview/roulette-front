@@ -264,7 +264,7 @@ const LineChart: React.FC<ChartProps> = ({
             backdropFilter: 'blur(4px)',
           }}
         >
-          <div style={{ color: 'rgba(141, 52, 249, 1)', fontWeight: 'bold', marginBottom: '8px' }}>Resultados</div>
+          <div style={{ color: 'rgba(141, 52, 249, 1)', fontWeight: 'bold', marginBottom: '8px' }}>Resultado</div>
           {tooltipData.series.map((series) => (
             <div key={series.id} style={{ margin: '6px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ color: series.color, fontSize: '11px', fontWeight: '500', flex: 1 }}>
