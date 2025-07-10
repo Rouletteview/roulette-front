@@ -260,20 +260,6 @@ const ChartSection = () => {
 
   }
 
-  console.log({
-    TableId: chartData.TableId || "",
-    GameType: chartData.GameType,
-    StartDate: chartData.StartDate,
-    EndDate: chartData.EndDate
-  })
-
-  // const queryVariables = {
-  //   TableId: chartData.TableId || "",
-  //   GameType: chartData.GameType,
-  //   StartDate: chartData.StartDate,
-  //   EndDate: chartData.EndDate
-  // }
-
   const { data: rouletteProbData, loading: chartLoading, error: errorProbabilities } = useQuery(GET_ROULETTE_TABLES_PROBABILITIES, {
     variables: {
       request: {
@@ -286,7 +272,10 @@ const ChartSection = () => {
   });
 
 
-  console.log(rouletteProbData?.GetRouletteTableProbabilities.Probabilities)
+ 
+
+
+  // console.log(rouletteProbData?.GetRouletteTableProbabilities.Probabilities)
 
   console.log(errorProbabilities)
   const { data: chartNumbersData } = useQuery(GET_LAST_ROULETTE_TABLE_NUMBERS, {
