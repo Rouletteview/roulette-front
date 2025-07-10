@@ -1,6 +1,7 @@
 
 
 import React, { useState } from 'react'
+import { useCountdownStore } from '../../../stores/countdownStore';
 
 interface BetButtonsProps {
     gameType: string
@@ -235,10 +236,10 @@ const StraightUpButtons = ({ probabilities }: { probabilities: Array<{ number: n
     )
 }
 
-const VoisinDuZeroButtons = ({ voisinDuZeroPercentage }: { voisinDuZeroPercentage: number }) => {
+const VoisinsDuZeroButtons = ({ voisinsDuZeroPercentage }: { voisinsDuZeroPercentage: number }) => {
     return (
 
-        <button className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Vecinos del cero ({voisinDuZeroPercentage}%)</button>
+        <button className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Vecinos del cero ({voisinsDuZeroPercentage}%)</button>
 
     )
 }
@@ -263,6 +264,8 @@ const OrphelinsButtons = ({ orphelinsPercentage }: { orphelinsPercentage: number
 
 
 const BetModal = ({ isOpen, onClose, children }: { isOpen: boolean, onClose: () => void, children: React.ReactNode }) => {
+    const { countdown } = useCountdownStore();
+
     if (!isOpen) return null;
 
     return (
@@ -271,12 +274,9 @@ const BetModal = ({ isOpen, onClose, children }: { isOpen: boolean, onClose: () 
                 <div className="flex flex-col justify-between items-center mb-4">
                     <h1 className="text-white text-[18px] font-bold underline">Selecciona el número y luego apuesta</h1>
                     <h2 className="text-white text-sm font-bold">Puedes seleccionar más de 1 número</h2>
-                    {/* <button
-                        onClick={onClose}
-                        className="text-white hover:text-gray-300 text-2xl"
-                    >
-                        ×
-                    </button> */}
+                    <div className="bg-black/30 text-white text-base px-3 py-1 rounded mt-2">
+                        <span>00</span><span> : </span><span>00</span><span> : </span><span>{countdown}s</span>
+                    </div>
                 </div>
                 <div className="space-y-4 w-full flex justify-center items-center max-w-[120px] mx-auto">
                     {children}
@@ -327,8 +327,8 @@ const BetButtons = ({ gameType, probabilities }: BetButtonsProps) => {
         column3Percentage: getProbabilityByTag('ThirdColumn')
     });
 
-    const getVoisinDuZeroProbabilities = () => ({
-        voisinDuZeroPercentage: getProbabilityByTag('VoisinDuZero')
+    const getVoisinsDuZeroProbabilities = () => ({
+        voisinsDuZeroPercentage: getProbabilityByTag('VoisinsDuZero')
     })
 
     const getTiersDuCylindreProbabilities = () => ({
@@ -363,8 +363,8 @@ const BetButtons = ({ gameType, probabilities }: BetButtonsProps) => {
                 return <DozenButtons {...getDozenProbabilities()} />;
             case 'Column':
                 return <ColumnButtons {...getColumnProbabilities()} />;
-            case 'VoisinDuZero':
-                return <VoisinDuZeroButtons {...getVoisinDuZeroProbabilities()} />;
+            case 'VoisinsDuZero':
+                return <VoisinsDuZeroButtons {...getVoisinsDuZeroProbabilities()} />;
             case 'TiersDuCylindre':
                 return <TiersDuCylindreButtons {...getTiersDuCylindreProbabilities()} />;
             case 'PlayZero':

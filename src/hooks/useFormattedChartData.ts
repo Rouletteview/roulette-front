@@ -16,7 +16,7 @@ export type GameType =
   | 'OddEven'
   | 'RedBlack'
   | 'StraightUp'
-  | 'VoisinDuZero'
+  | 'VoisinsDuZero'
   | 'Orphelins'
   | 'TiersDuCylindre'
   | 'PlayZero'

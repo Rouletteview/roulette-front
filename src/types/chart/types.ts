@@ -11,7 +11,7 @@ export const selectChartZoneTypes = [
   { zone: 'Dozen', label: 'Docena' },
   { zone: 'Column', label: 'Columna' },
   { zone: 'StraightUp', label: 'Pleno' },
-  { zone: 'VoisinDuZero', label: 'Vecinos del Cero' },
+  { zone: 'VoisinsDuZero', label: 'Vecinos del Cero' },
   { zone: 'Orphelins', label: 'Huérfanos' },
   { zone: 'TiersDuCylindre', label: 'Tercio' },
   { zone: 'PlayZero', label: 'Juego del Cero' },
