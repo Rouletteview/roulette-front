@@ -264,7 +264,7 @@ const AreaChart: React.FC<ChartProps> = ({
             backdropFilter: 'blur(4px)',
           }}
         >
-          <div style={{ color: 'rgba(38, 166, 154, 1)', fontWeight: 'bold', marginBottom: '8px' }}>Probabilidades</div>
+          <div style={{ color: 'rgba(38, 166, 154, 1)', fontWeight: 'bold', marginBottom: '8px' }}>Resultado</div>
           {tooltipData.series.map((series) => (
             <div key={series.id} style={{ margin: '6px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ color: series.color, fontSize: '11px', fontWeight: '500', flex: 1 }}>
@@ -272,7 +272,7 @@ const AreaChart: React.FC<ChartProps> = ({
                 {series.tag ? ` (${translateRouletteTag(series.tag)})` : ''}
               </div>
               <div style={{ fontSize: '14px', color: 'white', fontWeight: 'bold', marginLeft: '8px' }}>
-                {Math.round(100 * series.value) / 100}%
+                {Math.round(100 * series.value) / 100}
               </div>
             </div>
           ))}

@@ -7,9 +7,14 @@ import LineChart from "../../app/components/chart/LineChart";
 export const selectChartZoneTypes = [
   { zone: 'RedAndBlack', label: 'Rojo y negro' },
   { zone: 'OddAndEven', label: 'Par e Impar' },
-  { zone: 'HighAndLow', label: 'Alta y Baja' },
+  { zone: 'HighAndLow', label: 'Bajo y Alto' },
   { zone: 'Dozen', label: 'Docena' },
   { zone: 'Column', label: 'Columna' },
+  { zone: 'StraightUp', label: 'Pleno' },
+  { zone: 'VoisinDuZero', label: 'Vecinos del Cero' },
+  { zone: 'Orphelins', label: 'Huérfanos' },
+  { zone: 'TiersDuCylindre', label: 'Tercio' },
+  { zone: 'PlayZero', label: 'Juego del Cero' },
 ]
 
 export const selectChartTypes = [
