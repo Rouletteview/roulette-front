@@ -9,31 +9,36 @@ import {
   ISeriesApi,
 } from 'lightweight-charts';
 import { MultiSeriesData } from '../../../types/chart/types';
-import { translateRouletteTag } from '../../../utils/formatters/rouletterNumbers';
+import { translateRouletteTag, getYAxisTicks } from '../../../utils/formatters/rouletterNumbers';
 
 type ChartProps = {
   data: MultiSeriesData[];
   height?: number;
   width?: number;
   loading?: boolean;
+  gameType?: string;
 };
 
 const HistogramChart: React.FC<ChartProps> = ({
   data,
   height = 400,
   width = 0,
-  loading = false
+  loading = false,
+  gameType
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const [tooltipData, setTooltipData] = useState<{
     time: string;
-    series: { id: string; value: number; color: string; tag?: string }[];
+    series: { id: string; value: number; color: string; tag?: string; originalValue?: number }[];
   } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
+
+    // Obtener los ticks posibles para el eje Y
+    const yTicks = getYAxisTicks(gameType);
 
     const chart = createChart(chartContainerRef.current, {
       width: width || chartContainerRef.current.clientWidth,
@@ -105,6 +110,21 @@ const HistogramChart: React.FC<ChartProps> = ({
       chart.timeScale().fitContent();
     }
 
+    // Agregar líneas divisorias horizontales en los valores de los tags
+    if (seriesMap.size > 0 && yTicks.length > 0) {
+      const firstSeries = Array.from(seriesMap.values())[0];
+      yTicks.forEach(tick => {
+        firstSeries.createPriceLine({
+          price: tick.value,
+          color: '#D9A425',
+          lineWidth: 2,
+          lineStyle: 2, // dashed
+          axisLabelVisible: true,
+          title: tick.label,
+        });
+      });
+    }
+
     chart.subscribeCrosshairMove((param: MouseEventParams) => {
       if (
         param.point === undefined ||
@@ -120,7 +140,7 @@ const HistogramChart: React.FC<ChartProps> = ({
       }
 
       const time = param.time as number;
-      const seriesData: { id: string; value: number; color: string; tag?: string }[] = [];
+      const seriesData: { id: string; value: number; color: string; tag?: string; originalValue?: number }[] = [];
 
       // Recopilar datos de todas las series en el tiempo actual
       data.forEach((series) => {
@@ -132,7 +152,9 @@ const HistogramChart: React.FC<ChartProps> = ({
             value: (dataAtTime as any).value,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             color: (dataAtTime as any).color || 'rgba(32, 178, 108, 1)',
-            tag: (dataAtTime as { tag?: string })?.tag
+            tag: (dataAtTime as { tag?: string })?.tag,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            originalValue: (dataAtTime as any).originalValue
           });
         }
       });
@@ -187,7 +209,7 @@ const HistogramChart: React.FC<ChartProps> = ({
       chart.remove();
       resizeObserver.disconnect();
     };
-  }, [data, height, width]);
+  }, [data, height, width, gameType]);
 
   return (
     <div style={{ position: 'relative', width: '100%' }}>
@@ -242,7 +264,7 @@ const HistogramChart: React.FC<ChartProps> = ({
                 {series.tag ? translateRouletteTag(series.tag) : series.id}
               </div>
               <div style={{ fontSize: '14px', color: 'white', fontWeight: 'bold', marginLeft: '8px' }}>
-                {Math.round(100 * series.value) / 100}
+                {series.originalValue !== undefined ? Math.round(100 * series.originalValue) / 100 : Math.round(100 * series.value) / 100}
               </div>
             </div>
           ))}

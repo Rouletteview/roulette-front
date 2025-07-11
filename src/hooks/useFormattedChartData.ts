@@ -2,6 +2,7 @@
 import { useMemo } from "react";
 import { UTCTimestamp } from "lightweight-charts";
 import { chartTypes } from "../types/types";
+import { convertTagToNumber } from "../utils/formatters/rouletterNumbers";
 
 type RawEntry = {
   Date: string;
@@ -12,9 +13,9 @@ type RawEntry = {
 export type GameType =
   | 'Column'
   | 'Dozen'
-  | 'HighLow'
-  | 'OddEven'
-  | 'RedBlack'
+  | 'HighAndLow'
+  | 'OddAndEven'
+  | 'RedAndBlack'
   | 'StraightUp'
   | 'VoisinsDuZero'
   | 'Orphelins'
@@ -30,10 +31,12 @@ type MultiSeries = {
 
 export const useFormattedChartData = ({
   data,
-  chartType
+  chartType,
+  gameType
 }: {
   data: RawEntry[];
   chartType: chartTypes;
+  gameType?: GameType;
 }): MultiSeries[] => {
 
 
@@ -50,23 +53,23 @@ export const useFormattedChartData = ({
       case 'Candlestick':
         return [{
           id: 'Candlestick',
-          data: formatCandleChart(grouped) as { time: UTCTimestamp; open: number; high: number; low: number; close: number }[]
+          data: formatCandleChart(grouped, gameType) as { time: UTCTimestamp; open: number; high: number; low: number; close: number }[]
         }];
       case 'Area':
       case 'Lineal':
-        return formatMultipleLines(grouped).map(series => ({
+        return formatMultipleLines(grouped, gameType).map(series => ({
           ...series,
           data: series.data as { time: UTCTimestamp; value: number; color?: string }[]
         }));
       case 'VerticalColumn':
-        return formatMultipleHistograms(grouped).map(series => ({
+        return formatMultipleHistograms(grouped, gameType).map(series => ({
           ...series,
           data: series.data as { time: UTCTimestamp; value: number; color: string }[]
         }));
       default:
         return [];
     }
-  }, [data, chartType]);
+  }, [data, chartType, gameType]);
 
   return formatted;
 };
@@ -89,9 +92,9 @@ const groupByDate = (data: RawEntry[]): GroupedData[] => {
 };
 
 
-const formatMultipleLines = (grouped: GroupedData[]): MultiSeries[] => {
+const formatMultipleLines = (grouped: GroupedData[], gameType?: GameType): MultiSeries[] => {
 
-  const data: { time: UTCTimestamp; value: number; tag?: string }[] = [];
+  const data: { time: UTCTimestamp; value: number; tag?: string; originalValue?: number }[] = [];
 
   grouped.forEach(({ date, entries }) => {
 
@@ -105,20 +108,22 @@ const formatMultipleLines = (grouped: GroupedData[]): MultiSeries[] => {
 
     sortedEntries.forEach(({ Number, Tag }, index) => {
       const time = (baseTime + index) as UTCTimestamp;
-      data.push({ time, value: Number, tag: Tag });
+      // Convertir el tag a número para graficar
+      const tagNumber = convertTagToNumber(Tag, gameType);
+      data.push({ time, value: tagNumber, tag: Tag, originalValue: Number });
     });
   });
 
 
   data.sort((a, b) => a.time - b.time);
 
-  return [{ id: 'Números', data }];
+  return [{ id: 'Tags', data }];
 };
 
 
-const formatMultipleHistograms = (grouped: GroupedData[]): MultiSeries[] => {
+const formatMultipleHistograms = (grouped: GroupedData[], gameType?: GameType): MultiSeries[] => {
 
-  const data: { time: UTCTimestamp; value: number; color: string; tag?: string }[] = [];
+  const data: { time: UTCTimestamp; value: number; color: string; tag?: string; originalValue?: number }[] = [];
   let lastValue = 0;
 
   grouped.forEach(({ date, entries }) => {
@@ -133,20 +138,22 @@ const formatMultipleHistograms = (grouped: GroupedData[]): MultiSeries[] => {
 
     sortedEntries.forEach(({ Number, Tag }, index) => {
       const time = (baseTime + index) as UTCTimestamp;
-      const color = Number >= lastValue ? 'rgba(32, 178, 108, 1)' : 'rgba(255, 82, 82, 1)';
-      lastValue = Number;
-      data.push({ time, value: Number, color, tag: Tag });
+      // Convertir el tag a número para graficar
+      const tagNumber = convertTagToNumber(Tag, gameType);
+      const color = tagNumber >= lastValue ? 'rgba(32, 178, 108, 1)' : 'rgba(255, 82, 82, 1)';
+      lastValue = tagNumber;
+      data.push({ time, value: tagNumber, color, tag: Tag, originalValue: Number });
     });
   });
 
 
   data.sort((a, b) => a.time - b.time);
 
-  return [{ id: 'Números', data }];
+  return [{ id: 'Tags', data }];
 };
 
 
-const formatCandleChart = (grouped: GroupedData[]) => {
+const formatCandleChart = (grouped: GroupedData[], gameType?: GameType) => {
 
   const allEntries = grouped.flatMap(g => g.entries);
   const map = new Map<string, RawEntry[]>();
@@ -158,29 +165,36 @@ const formatCandleChart = (grouped: GroupedData[]) => {
     map.get(key)!.push(entry);
   });
 
-
   let prevClose: number | undefined = undefined;
   let prevCloseTag: string | undefined = undefined;
+  let prevCloseOriginal: number | undefined = undefined;
+  let prevCloseOriginalTag: string | undefined = undefined;
+  console.log('prevCloseOriginalTag', prevCloseOriginalTag);
   const candles = Array.from(map.entries()).sort((a, b) => {
-
     const dateA = new Date(a[1][0].Date).getTime();
     const dateB = new Date(b[1][0].Date).getTime();
     return dateA - dateB;
   }).map(([_, entries]) => {
-
     const sorted = entries.sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
-    const values = sorted.map(e => e.Number).filter(val => val !== undefined && !isNaN(val));
+    // Convertir tags a números para graficar
+    const values = sorted.map(e => convertTagToNumber(e.Tag, gameType)).filter(val => val !== undefined && !isNaN(val));
+    const originalValues = sorted.map(e => e.Number).filter(val => val !== undefined && !isNaN(val));
     const tags = sorted.map(e => e.Tag);
     const time = Math.floor(new Date(sorted[0].Date).getTime() / 1000) as UTCTimestamp;
     const close = values[values.length - 1];
     const closeTag = tags[tags.length - 1];
+    const closeOriginal = originalValues[originalValues.length - 1];
     const open = prevClose !== undefined ? prevClose : close;
     const openTag = prevCloseTag !== undefined ? prevCloseTag : closeTag;
+    const openOriginal = prevCloseOriginal !== undefined ? prevCloseOriginal : closeOriginal;
     const high = Math.max(open, ...values);
     const low = Math.min(open, ...values);
+    const highOriginal = Math.max(openOriginal, ...originalValues);
+    const lowOriginal = Math.min(openOriginal, ...originalValues);
     prevClose = close;
     prevCloseTag = closeTag;
-
+    prevCloseOriginal = closeOriginal;
+    prevCloseOriginalTag = closeTag;
     return {
       time,
       open,
@@ -188,10 +202,13 @@ const formatCandleChart = (grouped: GroupedData[]) => {
       high,
       low,
       openTag,
-      closeTag
+      closeTag,
+      openOriginal,
+      closeOriginal,
+      highOriginal,
+      lowOriginal,
     };
   });
-
 
   return candles.sort((a, b) => a.time - b.time);
 };

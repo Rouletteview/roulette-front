@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { UTCTimestamp } from 'lightweight-charts';
+import { convertTagToNumber } from '../../../../utils/formatters/rouletterNumbers';
 
 type RouletteProbability = {
   Date: string;
@@ -12,7 +13,7 @@ type AreaPoint = {
   value: number;
 };
 
-export function useAreaChartData(data?: RouletteProbability[]) {
+export function useAreaChartData(data?: RouletteProbability[], gameType?: string) {
   return useMemo(() => {
     if (!data || data.length === 0) return [];
 
@@ -30,12 +31,15 @@ export function useAreaChartData(data?: RouletteProbability[]) {
         continue;
       }
 
+      // Convertir el tag a número para graficar
+      const tagNumber = convertTagToNumber(item.Tag, gameType);
+
       points.push({
         time: timestamp,
-        value: Math.round(item.Value),
+        value: tagNumber,
       });
     }
 
     return points.sort((a, b) => a.time - b.time);
-  }, [data]);
+  }, [data, gameType]);
 }
