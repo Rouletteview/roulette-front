@@ -23,6 +23,7 @@ import { UTCTimestamp } from "lightweight-charts";
 import { GET_LAST_ROULETTE_TABLE_NUMBERS } from "../../graphql/query/getLastRouletteTableNumbers";
 import { useRouletteNumbers } from "../../utils/formatters/rouletterNumbers";
 import BetButtons from "../components/bet/BetButtons";
+import Update from "../components/Update";
 
 const ChartPlaceholder = () => (
   <div className="flex items-center justify-center w-full h-[620px] bg-[#0d1b2a]">
@@ -555,12 +556,12 @@ const ChartSection = () => {
                   </Suspense>
 
 
-                  {/* <Update
+                  <Update
                     selectedType={selectedType}
                     gameType={gameType}
                     selectedTable={selectedTable}
                     loading={chartLoading}
-                  /> */}
+                  />
                 </div>
                 <div className="w-full flex flex-col lg:flex-row justify-between items-center gap-6 mt-4">
                   <div className="block lg:hidden w-full">
@@ -660,11 +661,11 @@ const ChartSection = () => {
 
               <div className="absolute bottom-4 right-4 left-4 flex justify-end pointer-events-none">
                 <div className="pointer-events-auto">
-                  {/* <Update
+                  <Update
                     selectedType={selectedType}
                     gameType={gameType}
                     selectedTable={selectedTable}
-                  /> */}
+                  />
                 </div>
               </div>
             </>

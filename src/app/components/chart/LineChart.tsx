@@ -7,6 +7,7 @@ import {
   LineSeries,
   MouseEventParams,
   ISeriesApi,
+  UTCTimestamp,
 } from 'lightweight-charts';
 import { MultiSeriesData } from '../../../types/chart/types';
 import { translateRouletteTag, getYAxisTicks } from '../../../utils/formatters/rouletterNumbers';
@@ -49,10 +50,11 @@ const LineChart: React.FC<ChartProps> = ({
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
-    // Obtener los ticks posibles para el eje Y
+
     const yTicks = getYAxisTicks(gameType);
 
     const chart = createChart(chartContainerRef.current, {
+
       width: width || chartContainerRef.current.clientWidth,
       height,
       layout: {
@@ -100,6 +102,7 @@ const LineChart: React.FC<ChartProps> = ({
           bottom: 0.25,
         },
         borderColor: 'rgba(255,255,255,0.1)',
+        ticksVisible: false
       },
     });
 
@@ -113,6 +116,9 @@ const LineChart: React.FC<ChartProps> = ({
         const lineSeries = chart.addSeries(LineSeries, {
           color: seriesColors[index % seriesColors.length],
           lineWidth: 2,
+          lastValueVisible: false,
+          priceLineVisible: false,
+
         });
 
         const validData = series.data
@@ -128,20 +134,29 @@ const LineChart: React.FC<ChartProps> = ({
     });
 
     if (seriesMap.size > 0) {
-      chart.timeScale().fitContent();
+ 
+      const now = Math.floor(Date.now() / 1000);
+      const thirtyMinutesAgo = now - (30 * 60); 
+
+      chart.timeScale().setVisibleRange({
+        from: thirtyMinutesAgo as UTCTimestamp,
+        to: now as UTCTimestamp,
+      });
     }
 
-    // Agregar líneas divisorias horizontales en los valores de los tags
+
     if (seriesMap.size > 0 && yTicks.length > 0) {
       const firstSeries = Array.from(seriesMap.values())[0];
       yTicks.forEach(tick => {
         firstSeries.createPriceLine({
           price: tick.value,
-          color: '#D9A425',
+          color: tick.color,
           lineWidth: 2,
-          lineStyle: 2, // dashed
+          lineStyle: 1,
           axisLabelVisible: true,
           title: tick.label,
+
+
         });
       });
     }

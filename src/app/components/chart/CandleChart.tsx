@@ -46,7 +46,7 @@ const CandleChart: React.FC<ChartProps> = ({
 
     // Obtener los ticks posibles para el eje Y
     const yTicks = getYAxisTicks(gameType);
-   
+
     const chart = createChart(chartContainerRef.current, {
       width: width || chartContainerRef.current.clientWidth,
       height: height || 400,
@@ -107,6 +107,8 @@ const CandleChart: React.FC<ChartProps> = ({
       borderVisible: false,
       wickUpColor: 'rgba(38, 166, 154, 1)',
       wickDownColor: '#ef5350',
+      lastValueVisible: false,
+      priceLineVisible: false,
     });
 
     if (!data || !Array.isArray(data)) {
@@ -171,18 +173,24 @@ const CandleChart: React.FC<ChartProps> = ({
 
     if (validData.length > 0) {
       series.setData(validData.map(stripCandle));
-      chart.timeScale().fitContent();
 
-      // Crear las líneas de precio DESPUÉS de cargar los datos
+     
+      const now = Math.floor(Date.now() / 1000);
+      const thirtyMinutesAgo = now - (30 * 60);
+
+      chart.timeScale().setVisibleRange({
+        from: thirtyMinutesAgo as UTCTimestamp,
+        to: now as UTCTimestamp,
+      });
+
+
       if (yTicks.length > 0) {
-        console.log('Creating price lines for yTicks:', yTicks);
         yTicks.forEach(tick => {
-          console.log('Creating price line for:', tick);
           series.createPriceLine({
             price: tick.value,
-            color: '#D9A425',
+            color: tick.color,
             lineWidth: 2,
-            lineStyle: 2, // dashed
+            lineStyle: 1,
             axisLabelVisible: true,
             title: tick.label,
           });

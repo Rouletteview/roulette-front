@@ -61,8 +61,15 @@ export const translateRouletteTag = (tag: string): string => {
         'Column2': '2a Columna',
         'Column3': '3a Columna',
 
+        'VoisinsDuZero': 'Vecinos del Cero',
+        'Orphelins': 'Huerfanos',
+        'TiersDuCylindre': 'Tercios',
+        'PlayZero': 'Juego del Cero',
+        'Other': 'Otros',
+
         '0': '0',
         '00': '00',
+
 
         'default': tag
     };
@@ -70,22 +77,20 @@ export const translateRouletteTag = (tag: string): string => {
     return translations[tag] || translations['default'];
 };
 
-// Función para convertir tags a números para graficar
+
 export const convertTagToNumber = (tag: string, gameType?: string): number => {
-    // Mapeo para RedAndBlack
-    // Ejemplo: Red -> 1, Black -> 0, Green/Zero -> 2
+
     if (gameType === 'RedAndBlack' || !gameType) {
         const redBlackMap: Record<string, number> = {
-            'Red': 1,
-            'Black': 0,
-            'Green': 2,
-            'Zero': 2
+            'Red': 2,
+            'Black': 1,
+            'Green': 0,
+            'Zero': 0
         };
         return redBlackMap[tag] ?? 0;
     }
 
-    // Mapeo para OddAndEven
-    // Ejemplo: Odd -> 1, Even -> 0
+
     if (gameType === 'OddAndEven') {
         const oddEvenMap: Record<string, number> = {
             'Odd': 1,
@@ -94,8 +99,7 @@ export const convertTagToNumber = (tag: string, gameType?: string): number => {
         return oddEvenMap[tag] ?? 0;
     }
 
-    // Mapeo para HighAndLow
-    // Ejemplo: High -> 1, Low -> 0
+
     if (gameType === 'HighAndLow') {
         const highLowMap: Record<string, number> = {
             'High': 1,
@@ -104,71 +108,78 @@ export const convertTagToNumber = (tag: string, gameType?: string): number => {
         return highLowMap[tag] ?? 0;
     }
 
-    // Mapeo para Dozen
-    // Ejemplo: FirstDozen -> 1, SecondDozen -> 2, ThirdDozen -> 3
+
+
     if (gameType === 'Dozen') {
         const dozenMap: Record<string, number> = {
             'FirstDozen': 1,
             'SecondDozen': 2,
             'ThirdDozen': 3,
-            'Dozen1': 1,
-            'Dozen2': 2,
-            'Dozen3': 3
         };
         return dozenMap[tag] ?? 0;
     }
 
-    // Mapeo para Column
-    // Ejemplo: FirstColumn -> 1, SecondColumn -> 2, ThirdColumn -> 3
+
     if (gameType === 'Column') {
         const columnMap: Record<string, number> = {
             'FirstColumn': 1,
             'SecondColumn': 2,
             'ThirdColumn': 3,
-            'Column1': 1,
-            'Column2': 2,
-            'Column3': 3
         };
         return columnMap[tag] ?? 0;
     }
 
-    // Mapeo para StraightUp (números directos)
-    // Ejemplo: "15" -> 15, "0" -> 0
+
     if (gameType === 'StraightUp') {
         const num = parseInt(tag);
-        return isNaN(num) ? 0 : num;
+        if (isNaN(num)) return 0;
+
+ 
+        if (num >= 1 && num <= 12) return 1;
+        if (num >= 13 && num <= 24) return 2;
+        if (num >= 25 && num <= 36) return 3;
+        return 0; 
     }
 
-    // Mapeo para VoisinsDuZero (números directos)
     if (gameType === 'VoisinsDuZero') {
-        const num = parseInt(tag);
-        return isNaN(num) ? 0 : num;
+      const voisinsDuZeroMap: Record<string, number> = {
+        'VoisinsDuZero': 1,
+        'Other': 2
+      };
+      return voisinsDuZeroMap[tag] ?? 0;
+     
     }
 
-    // Mapeo para Orphelins (números directos)
+
     if (gameType === 'Orphelins') {
-        const num = parseInt(tag);
-        return isNaN(num) ? 0 : num;
+       const orphelinsMap: Record<string, number> = {
+        'Orphelins': 1,
+        'Other': 2
+       };
+       return orphelinsMap[tag] ?? 0;
     }
 
-    // Mapeo para TiersDuCylindre (números directos)
     if (gameType === 'TiersDuCylindre') {
-        const num = parseInt(tag);
-        return isNaN(num) ? 0 : num;
+        const tiersDuCylindreMap: Record<string, number> = {
+            'TiersDuCylindre': 1,
+            'Other': 2
+        };
+        return tiersDuCylindreMap[tag] ?? 0;
     }
 
-    // Mapeo para PlayZero (números directos)
     if (gameType === 'PlayZero') {
-        const num = parseInt(tag);
-        return isNaN(num) ? 0 : num;
+       const playZeroMap: Record<string, number> = {
+        'PlayZero': 1,
+        'Other': 2
+       };
+       return playZeroMap[tag] ?? 0;
     }
 
-    // Por defecto, intentar convertir a número o retornar 0
     const num = parseInt(tag);
     return isNaN(num) ? 0 : num;
 };
 
-// Función inversa: de número a tag
+
 export const numberToTag = (value: number, gameType?: string): string => {
     if (gameType === 'RedAndBlack') {
         if (value === 1) return 'Red';
@@ -193,49 +204,103 @@ export const numberToTag = (value: number, gameType?: string): string => {
         if (value === 2) return 'SecondColumn';
         if (value === 3) return 'ThirdColumn';
     }
-    // Para los demás, solo muestra el número
+
+    if (gameType === 'StraightUp') {
+        return value.toString();
+    }
+
+    if (gameType === 'Orphelins') {
+        return value.toString();
+    }
+
+    if (gameType === 'TiersDuCylindre') {
+        return value.toString();
+    }
+
+    if (gameType === 'PlayZero') {
+        return value.toString();
+    }
+
+ 
+
+
     return value.toString();
 };
 
-// Devuelve los valores posibles y sus tags traducidos para el eje Y
-export const getYAxisTicks = (gameType?: string): { value: number, label: string }[] => {
+
+export const getYAxisTicks = (gameType?: string): { value: number, label: string, color: string }[] => {
     if (gameType === 'RedAndBlack') {
         return [
-            { value: 0, label: translateRouletteTag('Black') },
-            { value: 1, label: translateRouletteTag('Red') },
-            { value: 2, label: translateRouletteTag('Green') },
+            { value: 1, label: translateRouletteTag('Black'), color: '#FFFFFF' },
+            { value: 2, label: translateRouletteTag('Red'), color: '#FF0000' },
+            { value: 0, label: translateRouletteTag('Green'), color: '#00FF00' },
         ];
     }
     if (gameType === 'OddAndEven') {
         return [
-            { value: 0, label: translateRouletteTag('Even') },
-            { value: 1, label: translateRouletteTag('Odd') },
+            { value: 0, label: translateRouletteTag('Even'), color: '#FFFFFF' },
+            { value: 1, label: translateRouletteTag('Odd'), color: '#FF0000' },
         ];
     }
     if (gameType === 'HighAndLow') {
         return [
-            { value: 0, label: translateRouletteTag('Low') },
-            { value: 1, label: translateRouletteTag('High') },
+            { value: 0, label: translateRouletteTag('Low'), color: '#FFFFFF' },
+            { value: 1, label: translateRouletteTag('High'), color: '#FF0000' },
         ];
     }
     if (gameType === 'Dozen') {
         return [
-            { value: 1, label: translateRouletteTag('FirstDozen') },
-            { value: 2, label: translateRouletteTag('SecondDozen') },
-            { value: 3, label: translateRouletteTag('ThirdDozen') },
+            { value: 1, label: translateRouletteTag('FirstDozen'), color: '#FFF' },
+            { value: 2, label: translateRouletteTag('SecondDozen'), color: '#FFF' },
+            { value: 3, label: translateRouletteTag('ThirdDozen'), color: '#FFF' },
         ];
     }
     if (gameType === 'Column') {
         return [
-            { value: 1, label: translateRouletteTag('FirstColumn') },
-            { value: 2, label: translateRouletteTag('SecondColumn') },
-            { value: 3, label: translateRouletteTag('ThirdColumn') },
+            { value: 1, label: translateRouletteTag('FirstColumn'), color: '#FFFFFF' },
+            { value: 2, label: translateRouletteTag('SecondColumn'), color: '#FFFFFF' },
+            { value: 3, label: translateRouletteTag('ThirdColumn'), color: '#FFFFFF' },
         ];
     }
-    // Para los demás, devolver un fallback básico en lugar de array vacío
+    if (gameType === 'StraightUp') {
+        return [
+            { value: 1, label: '1-12', color: '#FFFFFF' },
+            { value: 2, label: '14-24', color: '#FFFFFF' },
+            { value: 3, label: '25-36', color: '#FFFFFF' },
+        ];
+    }
+
+    if (gameType === 'VoisinsDuZero') {
+        return [
+            { value: 1, label: 'Vecinos del Cero', color: '#FFFFFF' },
+            { value: 2, label: 'Otros', color: '#FFFFFF' },
+        ];
+    }
+
+    if (gameType === 'Orphelins') {
+        return [
+            { value: 1, label: 'Huerfanos', color: '#FFFFFF' },
+            { value: 2, label: 'Otros', color: '#FFFFFF' },
+        ];
+    }
+
+    if (gameType === 'TiersDuCylindre') {
+        return [
+            { value: 1, label: 'Tercios', color: '#FFFFFF' },
+            { value: 2, label: 'Otros', color: '#FFFFFF' },
+        ];
+    }
+
+    if (gameType === 'PlayZero') {
+        return [
+            { value: 1, label: 'Juego del Cero', color: '#FFFFFF' },
+            { value: 2, label: 'Otros', color: '#FFFFFF' },
+        ];
+    }
+
     return [
-        { value: 0, label: '0' },
-        { value: 1, label: '1' },
-        { value: 2, label: '2' },
+        { value: 0, label: '0', color: '#000000' },
+        { value: 1, label: '1', color: '#000000' },
+        { value: 2, label: '2', color: '#000000' },
     ];
 };
