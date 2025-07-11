@@ -3,18 +3,28 @@ import zoomOut from "../../assets/icon/zoom-out.svg";
 
 interface ControlsProps {
   setIsChartFullscreen: (isFullscreen: boolean) => void;
+  onZoomIn?: () => void;
+  onZoomOut?: () => void;
 }
 
-const Controls = ({ setIsChartFullscreen }: ControlsProps) => {
+const Controls = ({ setIsChartFullscreen, onZoomIn, onZoomOut }: ControlsProps) => {
   return (
     <div className="flex gap-3.5 justify-end lg:justify-start items-center w-full mb-4 relative">
-      <button className="cursor-pointer w-6 h-auto">
+      <button
+        className="cursor-pointer w-6 h-auto"
+        onClick={onZoomIn}
+        disabled={!onZoomIn}
+      >
         <img src={zoomIn} alt="Zoom In" />
       </button>
-      <button className="cursor-pointer w-6 h-auto">
+      <button
+        className="cursor-pointer w-6 h-auto"
+        onClick={onZoomOut}
+        disabled={!onZoomOut}
+      >
         <img src={zoomOut} alt="Zoom Out" />
       </button>
-      {/* Botón de maximizar solo en móvil, visualmente mejorado */}
+
       <button
         type="button"
         className="ml-2 lg:hidden bg-[#D9A425] text-white p-1 rounded-full shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 flex items-center justify-center"
