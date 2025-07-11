@@ -1,6 +1,5 @@
 import UserInfo from "../components/UserInfo";
 import Controls from "../components/Controls";
-import Update from "../components/Update";
 import NumbersDisplay from "../components/NumbersDisplay";
 import { Suspense, useState, useEffect, useRef } from "react";
 import LoadingOverlay from "../../components/LoadingOverlay";
@@ -272,7 +271,7 @@ const ChartSection = () => {
   });
 
 
- 
+
 
 
   // console.log(rouletteProbData?.GetRouletteTableProbabilities.Probabilities)
@@ -292,7 +291,8 @@ const ChartSection = () => {
 
   const chartFormattedData = useFormattedChartData({
     data: rouletteProbData?.GetRouletteTableProbabilities.Results || [],
-    chartType: selectedType ? chartTypes[selectedType as keyof typeof chartTypes] : chartTypes.Candlestick
+    chartType: selectedType ? chartTypes[selectedType as keyof typeof chartTypes] : chartTypes.Candlestick,
+    gameType: gameType || undefined
   });
 
 
@@ -509,6 +509,7 @@ const ChartSection = () => {
                                     width={chartContainerWidth || 320}
                                     height={620}
                                     loading={chartLoading}
+                                    gameType={gameType}
                                   />
                                 );
                               })()
@@ -527,6 +528,7 @@ const ChartSection = () => {
                               width={chartContainerWidth || 320}
                               height={620}
                               loading={chartLoading}
+                              gameType={gameType}
                             />
                           )}
                           {selectedType === 'Lineal' && (
@@ -535,6 +537,7 @@ const ChartSection = () => {
                               width={chartContainerWidth || 320}
                               height={620}
                               loading={chartLoading}
+                              gameType={gameType}
                             />
                           )}
                           {selectedType === 'VerticalColumn' && (
@@ -543,6 +546,7 @@ const ChartSection = () => {
                               width={chartContainerWidth || 320}
                               height={620}
                               loading={chartLoading}
+                              gameType={gameType}
                             />
                           )}
                         </div>
@@ -551,12 +555,12 @@ const ChartSection = () => {
                   </Suspense>
 
 
-                  <Update
+                  {/* <Update
                     selectedType={selectedType}
                     gameType={gameType}
                     selectedTable={selectedTable}
                     loading={chartLoading}
-                  />
+                  /> */}
                 </div>
                 <div className="w-full flex flex-col lg:flex-row justify-between items-center gap-6 mt-4">
                   <div className="block lg:hidden w-full">
@@ -615,6 +619,7 @@ const ChartSection = () => {
                     width={1000}
                     height={620}
                     loading={chartLoading}
+                    gameType={gameType}
                   />
                 ) : (
                   <div className="flex items-center justify-center w-full h-[620px] bg-[#0d1b2a]">
@@ -631,6 +636,7 @@ const ChartSection = () => {
                   width={1000}
                   height={620}
                   loading={chartLoading}
+                  gameType={gameType}
                 />
               )}
               {selectedType === 'Lineal' && (
@@ -639,6 +645,7 @@ const ChartSection = () => {
                   width={1000}
                   height={620}
                   loading={chartLoading}
+                  gameType={gameType}
                 />
               )}
               {selectedType === 'VerticalColumn' && (
@@ -647,16 +654,17 @@ const ChartSection = () => {
                   width={1000}
                   height={620}
                   loading={chartLoading}
+                  gameType={gameType}
                 />
               )}
 
               <div className="absolute bottom-4 right-4 left-4 flex justify-end pointer-events-none">
                 <div className="pointer-events-auto">
-                  <Update
+                  {/* <Update
                     selectedType={selectedType}
                     gameType={gameType}
                     selectedTable={selectedTable}
-                  />
+                  /> */}
                 </div>
               </div>
             </>

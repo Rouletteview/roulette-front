@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { UTCTimestamp } from 'lightweight-charts';
+import { convertTagToNumber } from '../../../../utils/formatters/rouletterNumbers';
 
 type Tag = 'FirstColumn' | 'SecondColumn' | 'ThirdColumn';
 
@@ -24,7 +25,7 @@ interface CandleData {
   close: number;
 }
 
-export function useCandleData(data?: RawProbability[]) {
+export function useCandleData(data?: RawProbability[], gameType?: string) {
   return useMemo(() => {
     if (!data || data.length === 0) return [];
 
@@ -38,9 +39,10 @@ export function useCandleData(data?: RawProbability[]) {
 
     // Transformar a formato de velas
     const candleData: CandleData[] = Object.entries(grouped).map(([date, tags]) => {
-      const first = tags.FirstColumn ?? 0;
-      const second = tags.SecondColumn ?? 0;
-      const third = tags.ThirdColumn ?? 0;
+      // Convertir tags a números para graficar
+      const first = convertTagToNumber(tags.FirstColumn?.toString() || '', gameType);
+      const second = convertTagToNumber(tags.SecondColumn?.toString() || '', gameType);
+      const third = convertTagToNumber(tags.ThirdColumn?.toString() || '', gameType);
 
       return {
         time: Math.floor(new Date(date).getTime() / 1000) as UTCTimestamp,
@@ -52,5 +54,5 @@ export function useCandleData(data?: RawProbability[]) {
     });
 
     return candleData.sort((a, b) => a.time - b.time);
-  }, [data]);
+  }, [data, gameType]);
 }

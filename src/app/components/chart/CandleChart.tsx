@@ -3,31 +3,26 @@ import {
   createChart,
   ColorType,
   IChartApi,
-  CandlestickData,
   CandlestickSeries,
   MouseEventParams,
-  Time,
   UTCTimestamp,
 } from 'lightweight-charts';
-import { translateRouletteTag } from '../../../utils/formatters/rouletterNumbers';
-
-type CustomCandlestickData = CandlestickData<Time> & {
-  openTag?: string;
-  closeTag?: string;
-};
+import { translateRouletteTag, getYAxisTicks } from '../../../utils/formatters/rouletterNumbers';
 
 type ChartProps = {
   data: { time: UTCTimestamp; open: number; high: number; low: number; close: number; openTag?: string; closeTag?: string }[];
   height?: number;
   width?: number;
   loading?: boolean;
+  gameType?: string;
 };
 
 const CandleChart: React.FC<ChartProps> = ({
   data,
   height = 400,
   width = 0,
-  loading = false
+  loading = false,
+  gameType
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -49,6 +44,9 @@ const CandleChart: React.FC<ChartProps> = ({
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
+    // Obtener los ticks posibles para el eje Y
+    const yTicks = getYAxisTicks(gameType);
+   
     const chart = createChart(chartContainerRef.current, {
       width: width || chartContainerRef.current.clientWidth,
       height: height || 400,
@@ -102,6 +100,7 @@ const CandleChart: React.FC<ChartProps> = ({
 
     chartRef.current = chart;
 
+    // Usar addSeries(CandlestickSeries, ...) para máxima compatibilidad
     const series = chart.addSeries(CandlestickSeries, {
       upColor: 'rgba(38, 166, 154, 1)',
       downColor: '#ef5350',
@@ -115,33 +114,81 @@ const CandleChart: React.FC<ChartProps> = ({
       return;
     }
 
-    const validData = data
-      .filter(item =>
-        item &&
-        typeof item.time === 'number' &&
-        !isNaN(item.time) &&
-        !isNaN(Number(item.open)) &&
-        !isNaN(Number(item.high)) &&
-        !isNaN(Number(item.low)) &&
-        !isNaN(Number(item.close))
-      )
-      .map(item => ({
-        time: item.time,
-        open: Number(item.open),
-        high: Number(item.high),
-        low: Number(item.low),
-        close: Number(item.close),
-      }))
-      .sort((a, b) => Number(a.time) - Number(b.time));
+    // Agregar tres velas reales (en 0, 1 y 2) al inicio del set de datos
+    const tagValues = yTicks.map(t => t.value);
+    const tagLabels = yTicks.map(t => t.label);
+    const baseTime = (data.length > 0 ? data[0].time : 0) - 100000;
+    const forcedCandles = tagValues.map((val, i) => ({
+      time: (baseTime - i) as UTCTimestamp,
+      open: val,
+      high: val,
+      low: val,
+      close: val,
+      openTag: tagLabels[i],
+      closeTag: tagLabels[i],
+      openOriginal: val,
+      highOriginal: val,
+      lowOriginal: val,
+      closeOriginal: val,
+    }));
 
+    // Solo pasar las propiedades válidas a setData
+    const stripCandle = (candle: unknown) => {
+      if (
+        typeof candle === 'object' &&
+        candle !== null &&
+        'time' in candle &&
+        'open' in candle &&
+        'high' in candle &&
+        'low' in candle &&
+        'close' in candle
+      ) {
+        return {
+          time: (candle as { time: UTCTimestamp }).time,
+          open: (candle as { open: number }).open,
+          high: (candle as { high: number }).high,
+          low: (candle as { low: number }).low,
+          close: (candle as { close: number }).close,
+        };
+      }
+      throw new Error('Invalid candle data');
+    };
+
+    const validData = [
+      ...forcedCandles,
+      ...data
+        .filter(item =>
+          item &&
+          typeof item.time === 'number' &&
+          !isNaN(item.time) &&
+          !isNaN(Number(item.open)) &&
+          !isNaN(Number(item.high)) &&
+          !isNaN(Number(item.low)) &&
+          !isNaN(Number(item.close))
+        )
+        .map(item => ({ ...item }))
+    ].sort((a, b) => Number(a.time) - Number(b.time));
 
     if (validData.length > 0) {
-      series.setData(validData);
+      series.setData(validData.map(stripCandle));
       chart.timeScale().fitContent();
-    } else {
-      console.log('CandleChart: No valid data after filtering');
-    }
 
+      // Crear las líneas de precio DESPUÉS de cargar los datos
+      if (yTicks.length > 0) {
+        console.log('Creating price lines for yTicks:', yTicks);
+        yTicks.forEach(tick => {
+          console.log('Creating price line for:', tick);
+          series.createPriceLine({
+            price: tick.value,
+            color: '#D9A425',
+            lineWidth: 2,
+            lineStyle: 2, // dashed
+            axisLabelVisible: true,
+            title: tick.label,
+          });
+        });
+      }
+    }
 
     chart.subscribeCrosshairMove((param: MouseEventParams) => {
       if (
@@ -158,14 +205,12 @@ const CandleChart: React.FC<ChartProps> = ({
       }
 
       const time = param.time as number;
-      const candleData = data.find(d => d.time === time) as CustomCandlestickData | undefined;
+      const candleData = data.find(d => d.time === time);
 
-      if (candleData && 'close' in candleData) {
+      if (candleData && typeof candleData === 'object' && 'close' in candleData && candleData.close !== null) {
         const timestamp = typeof time === 'number' ? time : Number(time);
         const date = new Date(timestamp * 1000);
         const isUp = candleData.close >= candleData.open;
-        const customData = candleData
-        console.log('customData', customData)
         setTooltipData({
           time: date.toLocaleString('es-ES', {
             day: '2-digit',
@@ -174,14 +219,14 @@ const CandleChart: React.FC<ChartProps> = ({
             minute: '2-digit',
             hour12: true
           }),
-          price: candleData.close,
+          price: 'closeOriginal' in candleData && typeof candleData.closeOriginal === 'number' ? candleData.closeOriginal : candleData.close,
           isUp,
-          open: candleData.open,
-          close: candleData.close,
-          high: candleData.high,
-          low: candleData.low,
-          openTag: customData.openTag,
-          closeTag: customData.closeTag,
+          open: 'openOriginal' in candleData && typeof candleData.openOriginal === 'number' ? candleData.openOriginal : candleData.open,
+          close: 'closeOriginal' in candleData && typeof candleData.closeOriginal === 'number' ? candleData.closeOriginal : candleData.close,
+          high: 'highOriginal' in candleData && typeof candleData.highOriginal === 'number' ? candleData.highOriginal : candleData.high,
+          low: 'lowOriginal' in candleData && typeof candleData.lowOriginal === 'number' ? candleData.lowOriginal : candleData.low,
+          openTag: candleData.openTag,
+          closeTag: candleData.closeTag,
         });
 
         const toolTipWidth = 120;
@@ -220,7 +265,7 @@ const CandleChart: React.FC<ChartProps> = ({
       chart.remove();
       resizeObserver.disconnect();
     };
-  }, [data, height, width]);
+  }, [data, height, width, gameType]);
 
 
   return (

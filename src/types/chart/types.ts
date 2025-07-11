@@ -38,5 +38,5 @@ export type ChartType = keyof typeof chartTypes;
 
 export type MultiSeriesData = {
   id: string;
-  data: { time: UTCTimestamp; value: number; color?: string }[] | { time: UTCTimestamp; open: number; high: number; low: number; close: number }[];
+  data: { time: UTCTimestamp; value: number; color?: string; originalValue?: number }[] | { time: UTCTimestamp; open: number; high: number; low: number; close: number }[];
 };

@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 import { UTCTimestamp } from 'lightweight-charts';
+import { convertTagToNumber } from '../../../../utils/formatters/rouletterNumbers';
+
 
 type RouletteProbability = {
   Date: string;
@@ -13,7 +15,7 @@ type HistogramPoint = {
   color: string;
 };
 
-export function useHistogramChartData(data?: RouletteProbability[]) {
+export function useHistogramChartData(data?: RouletteProbability[], gameType?: string) {
   return useMemo(() => {
     if (!data || data.length === 0) return [];
 
@@ -31,6 +33,9 @@ export function useHistogramChartData(data?: RouletteProbability[]) {
         continue;
       }
 
+      // Convertir el tag a número para graficar
+      const tagNumber = convertTagToNumber(item.Tag, gameType);
+
       // Determinar color basado en el Tag o el valor
       let color = '#2962FF'; // Color por defecto
       if (item.Tag === 'Red') {
@@ -39,7 +44,7 @@ export function useHistogramChartData(data?: RouletteProbability[]) {
         color = '#000000';
       } else if (item.Tag === 'Green' || item.Tag === 'Zero') {
         color = '#00FF00';
-      } else if (item.Value >= 50) {
+      } else if (tagNumber >= 50) {
         color = '#0f0';
       } else {
         color = '#f00';
@@ -47,11 +52,11 @@ export function useHistogramChartData(data?: RouletteProbability[]) {
 
       points.push({
         time: timestamp,
-        value: Math.round(item.Value),
+        value: tagNumber,
         color,
       });
     }
 
     return points.sort((a, b) => a.time - b.time);
-  }, [data]);
+  }, [data, gameType]);
 }
