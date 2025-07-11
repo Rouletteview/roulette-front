@@ -18,6 +18,7 @@ type ChartProps = {
   width?: number;
   loading?: boolean;
   gameType?: string;
+  onChartReady?: (chart: IChartApi) => void;
 };
 
 const HistogramChart: React.FC<ChartProps> = ({
@@ -25,7 +26,8 @@ const HistogramChart: React.FC<ChartProps> = ({
   height = 400,
   width = 0,
   loading = false,
-  gameType
+  gameType,
+  onChartReady
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -83,6 +85,11 @@ const HistogramChart: React.FC<ChartProps> = ({
     });
 
     chartRef.current = chart;
+    
+    // Notificar que el chart está listo
+    if (onChartReady) {
+      onChartReady(chart);
+    }
 
 
     const seriesMap = new Map<string, ISeriesApi<'Histogram'>>();

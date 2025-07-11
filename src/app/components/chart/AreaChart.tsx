@@ -18,6 +18,7 @@ type ChartProps = {
   width?: number;
   loading?: boolean;
   gameType?: string;
+  onChartReady?: (chart: IChartApi) => void;
 };
 
 const AreaChart: React.FC<ChartProps> = ({
@@ -25,7 +26,8 @@ const AreaChart: React.FC<ChartProps> = ({
   height = 400,
   width = 0,
   loading = false,
-  gameType
+  gameType,
+  onChartReady
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -48,7 +50,7 @@ const AreaChart: React.FC<ChartProps> = ({
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
-    
+
     const yTicks = getYAxisTicks(gameType);
 
     const chart = createChart(chartContainerRef.current, {
@@ -104,7 +106,12 @@ const AreaChart: React.FC<ChartProps> = ({
 
     chartRef.current = chart;
 
-  
+    // Notificar que el chart está listo
+    if (onChartReady) {
+      onChartReady(chart);
+    }
+
+
     const seriesMap = new Map<string, ISeriesApi<'Area'>>();
 
     data.forEach((series, index) => {
@@ -130,11 +137,11 @@ const AreaChart: React.FC<ChartProps> = ({
       }
     });
 
-  
+
     if (seriesMap.size > 0) {
- 
+
       const now = Math.floor(Date.now() / 1000);
-      const thirtyMinutesAgo = now - (30 * 60); 
+      const thirtyMinutesAgo = now - (30 * 60);
 
       chart.timeScale().setVisibleRange({
         from: thirtyMinutesAgo as UTCTimestamp,
@@ -142,7 +149,7 @@ const AreaChart: React.FC<ChartProps> = ({
       });
     }
 
-  
+
     if (seriesMap.size > 0 && yTicks.length > 0) {
       const firstSeries = Array.from(seriesMap.values())[0];
       yTicks.forEach(tick => {
@@ -150,10 +157,10 @@ const AreaChart: React.FC<ChartProps> = ({
           price: tick.value,
           color: tick.color,
           lineWidth: 2,
-          lineStyle: 1, 
+          lineStyle: 1,
           axisLabelVisible: true,
           title: tick.label,
-          
+
         });
       });
     }
