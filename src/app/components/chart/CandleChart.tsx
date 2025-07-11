@@ -15,6 +15,7 @@ type ChartProps = {
   width?: number;
   loading?: boolean;
   gameType?: string;
+  onChartReady?: (chart: IChartApi) => void;
 };
 
 const CandleChart: React.FC<ChartProps> = ({
@@ -22,7 +23,8 @@ const CandleChart: React.FC<ChartProps> = ({
   height = 400,
   width = 0,
   loading = false,
-  gameType
+  gameType,
+  onChartReady
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -99,6 +101,11 @@ const CandleChart: React.FC<ChartProps> = ({
     });
 
     chartRef.current = chart;
+    
+    // Notificar que el chart está listo
+    if (onChartReady) {
+      onChartReady(chart);
+    }
 
     // Usar addSeries(CandlestickSeries, ...) para máxima compatibilidad
     const series = chart.addSeries(CandlestickSeries, {

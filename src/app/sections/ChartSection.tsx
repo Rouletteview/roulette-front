@@ -165,6 +165,10 @@ const ChartSection = () => {
   const limit = 10;
   const [chartContainerRef, chartContainerWidth] = useContainerWidth();
 
+ 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const chartRefs = useRef<{ [key: string]: any }>({});
+
 
 
   useEffect(() => {
@@ -275,7 +279,7 @@ const ChartSection = () => {
 
 
 
-  // console.log(rouletteProbData?.GetRouletteTableProbabilities.Probabilities)
+ 
 
   console.log(errorProbabilities)
   const { data: chartNumbersData } = useQuery(GET_LAST_ROULETTE_TABLE_NUMBERS, {
@@ -349,6 +353,47 @@ const ChartSection = () => {
   //   setOpenBetModal(true);
   //   setConfirmationModalOpen(false);
   // };
+
+ 
+  const handleZoomIn = () => {
+    const currentChart = chartRefs.current[selectedType];
+    if (currentChart && currentChart.timeScale) {
+      const timeScale = currentChart.timeScale();
+      const visibleRange = timeScale.getVisibleRange();
+      if (visibleRange) {
+        const timeDiff = visibleRange.to - visibleRange.from;
+        const newTimeDiff = timeDiff * 0.5; 
+        const center = (visibleRange.from + visibleRange.to) / 2;
+        timeScale.setVisibleRange({
+          from: center - newTimeDiff / 2,
+          to: center + newTimeDiff / 2,
+        });
+      }
+    }
+  };
+
+  const handleZoomOut = () => {
+    const currentChart = chartRefs.current[selectedType];
+    if (currentChart && currentChart.timeScale) {
+      const timeScale = currentChart.timeScale();
+      const visibleRange = timeScale.getVisibleRange();
+      if (visibleRange) {
+        const timeDiff = visibleRange.to - visibleRange.from;
+        const newTimeDiff = timeDiff * 2; 
+        const center = (visibleRange.from + visibleRange.to) / 2;
+        timeScale.setVisibleRange({
+          from: center - newTimeDiff / 2,
+          to: center + newTimeDiff / 2,
+        });
+      }
+    }
+  };
+
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleChartReady = (chart: any) => {
+    chartRefs.current[selectedType] = chart;
+  };
 
 
   const handleMarketSearch = (query: string) => {
@@ -468,7 +513,11 @@ const ChartSection = () => {
                   className="relative flex-1 bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full max-w-full overflow-x-hidden"
                 >
 
-                  <Controls setIsChartFullscreen={setIsChartFullscreen} />
+                  <Controls
+                    setIsChartFullscreen={setIsChartFullscreen}
+                    onZoomIn={handleZoomIn}
+                    onZoomOut={handleZoomOut}
+                  />
 
                   {/* <BetModal
                     showModal={openBetModal}
@@ -511,6 +560,7 @@ const ChartSection = () => {
                                     height={620}
                                     loading={chartLoading}
                                     gameType={gameType}
+                                    onChartReady={handleChartReady}
                                   />
                                 );
                               })()
@@ -530,6 +580,7 @@ const ChartSection = () => {
                               height={620}
                               loading={chartLoading}
                               gameType={gameType}
+                              onChartReady={handleChartReady}
                             />
                           )}
                           {selectedType === 'Lineal' && (
@@ -539,6 +590,7 @@ const ChartSection = () => {
                               height={620}
                               loading={chartLoading}
                               gameType={gameType}
+                              onChartReady={handleChartReady}
                             />
                           )}
                           {selectedType === 'VerticalColumn' && (
@@ -548,6 +600,7 @@ const ChartSection = () => {
                               height={620}
                               loading={chartLoading}
                               gameType={gameType}
+                              onChartReady={handleChartReady}
                             />
                           )}
                         </div>
@@ -621,6 +674,7 @@ const ChartSection = () => {
                     height={620}
                     loading={chartLoading}
                     gameType={gameType}
+                    onChartReady={handleChartReady}
                   />
                 ) : (
                   <div className="flex items-center justify-center w-full h-[620px] bg-[#0d1b2a]">
@@ -638,6 +692,7 @@ const ChartSection = () => {
                   height={620}
                   loading={chartLoading}
                   gameType={gameType}
+                  onChartReady={handleChartReady}
                 />
               )}
               {selectedType === 'Lineal' && (
@@ -647,6 +702,7 @@ const ChartSection = () => {
                   height={620}
                   loading={chartLoading}
                   gameType={gameType}
+                  onChartReady={handleChartReady}
                 />
               )}
               {selectedType === 'VerticalColumn' && (
@@ -656,6 +712,7 @@ const ChartSection = () => {
                   height={620}
                   loading={chartLoading}
                   gameType={gameType}
+                  onChartReady={handleChartReady}
                 />
               )}
 

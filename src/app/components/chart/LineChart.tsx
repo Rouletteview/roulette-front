@@ -18,6 +18,7 @@ type ChartProps = {
   width?: number;
   loading?: boolean;
   gameType?: string;
+  onChartReady?: (chart: IChartApi) => void;
 };
 
 const LineChart: React.FC<ChartProps> = ({
@@ -25,7 +26,8 @@ const LineChart: React.FC<ChartProps> = ({
   height = 400,
   width = 0,
   loading = false,
-  gameType
+  gameType,
+  onChartReady
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -108,6 +110,11 @@ const LineChart: React.FC<ChartProps> = ({
 
     chartRef.current = chart;
 
+    // Notificar que el chart está listo
+    if (onChartReady) {
+      onChartReady(chart);
+    }
+
 
     const seriesMap = new Map<string, ISeriesApi<'Line'>>();
 
@@ -134,9 +141,9 @@ const LineChart: React.FC<ChartProps> = ({
     });
 
     if (seriesMap.size > 0) {
- 
+
       const now = Math.floor(Date.now() / 1000);
-      const thirtyMinutesAgo = now - (30 * 60); 
+      const thirtyMinutesAgo = now - (30 * 60);
 
       chart.timeScale().setVisibleRange({
         from: thirtyMinutesAgo as UTCTimestamp,
