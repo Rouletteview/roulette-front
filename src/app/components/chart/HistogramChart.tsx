@@ -7,6 +7,7 @@ import {
   HistogramData,
   MouseEventParams,
   ISeriesApi,
+  UTCTimestamp,
 } from 'lightweight-charts';
 import { MultiSeriesData } from '../../../types/chart/types';
 import { translateRouletteTag, getYAxisTicks } from '../../../utils/formatters/rouletterNumbers';
@@ -91,6 +92,8 @@ const HistogramChart: React.FC<ChartProps> = ({
       if ('value' in series.data[0] && 'color' in series.data[0]) {
         const histogramSeries = chart.addSeries(HistogramSeries, {
           color: 'rgba(32, 178, 108, 1)',
+          lastValueVisible: false,
+          priceLineVisible: false,
         });
 
         const validData = series.data
@@ -106,19 +109,28 @@ const HistogramChart: React.FC<ChartProps> = ({
       }
     });
 
+
     if (seriesMap.size > 0) {
-      chart.timeScale().fitContent();
+ 
+      const now = Math.floor(Date.now() / 1000);
+      const thirtyMinutesAgo = now - (30 * 60); 
+
+      chart.timeScale().setVisibleRange({
+        from: thirtyMinutesAgo as UTCTimestamp,
+        to: now as UTCTimestamp,
+      });
     }
 
-    // Agregar líneas divisorias horizontales en los valores de los tags
+
+  
     if (seriesMap.size > 0 && yTicks.length > 0) {
       const firstSeries = Array.from(seriesMap.values())[0];
       yTicks.forEach(tick => {
         firstSeries.createPriceLine({
           price: tick.value,
-          color: '#D9A425',
+          color: tick.color,
           lineWidth: 2,
-          lineStyle: 2, // dashed
+          lineStyle: 1, 
           axisLabelVisible: true,
           title: tick.label,
         });
