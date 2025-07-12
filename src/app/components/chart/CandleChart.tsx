@@ -8,6 +8,7 @@ import {
   UTCTimestamp,
 } from 'lightweight-charts';
 import { translateRouletteTag, getYAxisTicks } from '../../../utils/formatters/rouletterNumbers';
+import { useChartPosition } from '../../../hooks/useChartPosition';
 
 type ChartProps = {
   data: { time: UTCTimestamp; open: number; high: number; low: number; close: number; openTag?: string; closeTag?: string }[];
@@ -30,6 +31,13 @@ const CandleChart: React.FC<ChartProps> = ({
   const chartRef = useRef<IChartApi | null>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
 
+  // Get chart type and table from URL or props
+  const urlParams = new URLSearchParams(window.location.search);
+  const chartType = urlParams.get('chartType') || 'Candlestick';
+  const selectedTable = urlParams.get('table') || '';
+
+  const { setChartRef, getInitialRange } = useChartPosition(chartType, gameType || '', selectedTable);
+
   const [tooltipData, setTooltipData] = useState<{
     time: string;
     price: number;
@@ -49,6 +57,8 @@ const CandleChart: React.FC<ChartProps> = ({
     // Obtener los ticks posibles para el eje Y
     const yTicks = getYAxisTicks(gameType);
 
+    const initialRange = getInitialRange();
+    
     const chart = createChart(chartContainerRef.current, {
       width: width || chartContainerRef.current.clientWidth,
       height: height || 400,
@@ -101,7 +111,8 @@ const CandleChart: React.FC<ChartProps> = ({
     });
 
     chartRef.current = chart;
-    
+    setChartRef(chart);
+
     // Notificar que el chart está listo
     if (onChartReady) {
       onChartReady(chart);
@@ -181,16 +192,6 @@ const CandleChart: React.FC<ChartProps> = ({
     if (validData.length > 0) {
       series.setData(validData.map(stripCandle));
 
-     
-      const now = Math.floor(Date.now() / 1000);
-      const thirtyMinutesAgo = now - (30 * 60);
-
-      chart.timeScale().setVisibleRange({
-        from: thirtyMinutesAgo as UTCTimestamp,
-        to: now as UTCTimestamp,
-      });
-
-
       if (yTicks.length > 0) {
         yTicks.forEach(tick => {
           series.createPriceLine({
@@ -203,6 +204,9 @@ const CandleChart: React.FC<ChartProps> = ({
           });
         });
       }
+      
+      // Set the initial visible range
+      chart.timeScale().setVisibleRange(initialRange);
     }
 
     chart.subscribeCrosshairMove((param: MouseEventParams) => {
