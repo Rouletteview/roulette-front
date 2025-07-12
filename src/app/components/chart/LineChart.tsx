@@ -7,10 +7,10 @@ import {
   LineSeries,
   MouseEventParams,
   ISeriesApi,
-  UTCTimestamp,
 } from 'lightweight-charts';
 import { MultiSeriesData } from '../../../types/chart/types';
 import { translateRouletteTag, getYAxisTicks } from '../../../utils/formatters/rouletterNumbers';
+import { useChartPosition } from '../../../hooks/useChartPosition';
 
 type ChartProps = {
   data: MultiSeriesData[];
@@ -38,6 +38,13 @@ const LineChart: React.FC<ChartProps> = ({
   } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
 
+  // Get chart type and table from URL or props
+  const urlParams = new URLSearchParams(window.location.search);
+  const chartType = urlParams.get('chartType') || 'Lineal';
+  const selectedTable = urlParams.get('table') || '';
+
+  const { setChartRef, getInitialRange } = useChartPosition(chartType, gameType || '', selectedTable);
+
 
 
   const seriesColors = [
@@ -54,6 +61,7 @@ const LineChart: React.FC<ChartProps> = ({
 
 
     const yTicks = getYAxisTicks(gameType);
+    const initialRange = getInitialRange();
 
     const chart = createChart(chartContainerRef.current, {
 
@@ -109,6 +117,7 @@ const LineChart: React.FC<ChartProps> = ({
     });
 
     chartRef.current = chart;
+    setChartRef(chart);
 
     // Notificar que el chart está listo
     if (onChartReady) {
@@ -141,14 +150,8 @@ const LineChart: React.FC<ChartProps> = ({
     });
 
     if (seriesMap.size > 0) {
-
-      const now = Math.floor(Date.now() / 1000);
-      const thirtyMinutesAgo = now - (30 * 60);
-
-      chart.timeScale().setVisibleRange({
-        from: thirtyMinutesAgo as UTCTimestamp,
-        to: now as UTCTimestamp,
-      });
+      // Set the initial visible range
+      chart.timeScale().setVisibleRange(initialRange);
     }
 
 

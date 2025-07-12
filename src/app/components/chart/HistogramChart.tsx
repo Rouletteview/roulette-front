@@ -7,10 +7,10 @@ import {
   HistogramData,
   MouseEventParams,
   ISeriesApi,
-  UTCTimestamp,
 } from 'lightweight-charts';
 import { MultiSeriesData } from '../../../types/chart/types';
 import { translateRouletteTag, getYAxisTicks } from '../../../utils/formatters/rouletterNumbers';
+import { useChartPosition } from '../../../hooks/useChartPosition';
 
 type ChartProps = {
   data: MultiSeriesData[];
@@ -37,11 +37,19 @@ const HistogramChart: React.FC<ChartProps> = ({
   } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
 
+  // Get chart type and table from URL or props
+  const urlParams = new URLSearchParams(window.location.search);
+  const chartType = urlParams.get('chartType') || 'VerticalColumn';
+  const selectedTable = urlParams.get('table') || '';
+
+  const { setChartRef, getInitialRange } = useChartPosition(chartType, gameType || '', selectedTable);
+
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
     // Obtener los ticks posibles para el eje Y
     const yTicks = getYAxisTicks(gameType);
+    const initialRange = getInitialRange();
 
     const chart = createChart(chartContainerRef.current, {
       width: width || chartContainerRef.current.clientWidth,
@@ -85,7 +93,8 @@ const HistogramChart: React.FC<ChartProps> = ({
     });
 
     chartRef.current = chart;
-    
+    setChartRef(chart);
+
     // Notificar que el chart está listo
     if (onChartReady) {
       onChartReady(chart);
@@ -118,18 +127,12 @@ const HistogramChart: React.FC<ChartProps> = ({
 
 
     if (seriesMap.size > 0) {
- 
-      const now = Math.floor(Date.now() / 1000);
-      const thirtyMinutesAgo = now - (30 * 60); 
-
-      chart.timeScale().setVisibleRange({
-        from: thirtyMinutesAgo as UTCTimestamp,
-        to: now as UTCTimestamp,
-      });
+      // Set the initial visible range
+      chart.timeScale().setVisibleRange(initialRange);
     }
 
 
-  
+
     if (seriesMap.size > 0 && yTicks.length > 0) {
       const firstSeries = Array.from(seriesMap.values())[0];
       yTicks.forEach(tick => {
@@ -137,7 +140,7 @@ const HistogramChart: React.FC<ChartProps> = ({
           price: tick.value,
           color: tick.color,
           lineWidth: 2,
-          lineStyle: 1, 
+          lineStyle: 1,
           axisLabelVisible: true,
           title: tick.label,
         });

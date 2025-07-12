@@ -50,6 +50,10 @@ const Update = ({ selectedType, gameType, selectedTable, loading }: UpdateProps)
         y: window.scrollY
       };
       sessionStorage.setItem('scrollPosition', JSON.stringify(scrollPosition));
+      
+   
+      window.dispatchEvent(new CustomEvent('saveChartPosition'));
+      
       window.location.reload();
     }
 
