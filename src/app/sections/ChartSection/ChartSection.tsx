@@ -11,7 +11,7 @@ import NumbersDisplay from '../../components/NumbersDisplay';
 import UserInfo from '../../components/UserInfo';
 import Update from '../../components/Update';
 import { FullscreenChartModal } from './components/FullscreenChartModal';
-import BetSection from '../BetSection';
+import BetSection from '../BetSection/index';
 
 
 // import BetModal from '../../components/BetModal';

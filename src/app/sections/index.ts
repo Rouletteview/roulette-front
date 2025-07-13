@@ -1,2 +1,2 @@
 export * from './ChartSection/ChartSection';
-export * from './BetSection';
+export * from './BetSection/index';
