@@ -112,9 +112,9 @@ export const convertTagToNumber = (tag: string, gameType?: string): number => {
 
     if (gameType === 'Dozen') {
         const dozenMap: Record<string, number> = {
-            'FirstDozen': 1,
-            'SecondDozen': 2,
-            'ThirdDozen': 3,
+            'Dozen1': 1,
+            'Dozen2': 2,
+            'Dozen3': 3,
         };
         return dozenMap[tag] ?? 0;
     }
@@ -122,9 +122,9 @@ export const convertTagToNumber = (tag: string, gameType?: string): number => {
 
     if (gameType === 'Column') {
         const columnMap: Record<string, number> = {
-            'FirstColumn': 1,
-            'SecondColumn': 2,
-            'ThirdColumn': 3,
+            'Column1': 1,
+            'Column2': 2,
+            'Column3': 3,
         };
         return columnMap[tag] ?? 0;
     }

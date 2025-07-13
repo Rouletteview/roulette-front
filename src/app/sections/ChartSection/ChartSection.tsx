@@ -9,13 +9,16 @@ import { ChartRenderer } from './components/ChartRenderer';
 import Controls from '../../components/Controls';
 import NumbersDisplay from '../../components/NumbersDisplay';
 import UserInfo from '../../components/UserInfo';
-import BetButtons from '../../components/bet/BetButtons';
 import Update from '../../components/Update';
 import { FullscreenChartModal } from './components/FullscreenChartModal';
+import BetSection from '../BetSection/BetSection';
+// import BetModal from '../../components/BetModal';
 
 function useContainerWidth() {
     const ref = useRef<HTMLDivElement>(null);
     const [width, setWidth] = useState(0);
+
+
 
     useEffect(() => {
         function updateWidth() {
@@ -84,9 +87,12 @@ const ChartSection: React.FC = () => {
     const onZoomIn = () => handleZoomIn(state.selectedType);
     const onZoomOut = () => handleZoomOut(state.selectedType);
 
+
+
     return (
+
         <section className="bg-[#121418F2] py-6 lg:pt-10 lg:pb-6 px-6 lg:px-24">
-           
+            {/* <BetModal open={isOpen} onClose={() => setIsOpen(false)} /> */}
             <div className="flex justify-end w-full">
                 <div className="bg-[#121418F2] border-2 border-black px-6 py-2 rounded-2xl lg:hidden block mb-2">
                     <h1 className="text-white text-[12px] font-medium">
@@ -168,7 +174,7 @@ const ChartSection: React.FC = () => {
 
                                 <div className="w-full flex flex-col lg:flex-row justify-between items-center gap-6 mt-4">
                                     <div className="block lg:hidden w-full">
-                                        <BetButtons
+                                        <BetSection
                                             gameType={state.gameType}
                                             probabilities={probabilities}
                                         />
@@ -184,7 +190,7 @@ const ChartSection: React.FC = () => {
                         <div className="order-1 lg:order-2 flex-col items-center lg:items-start gap-4">
                             <UserInfo />
                             <div className="hidden lg:flex">
-                                <BetButtons
+                                <BetSection
                                     gameType={state.gameType}
                                     probabilities={probabilities}
                                 />
@@ -194,7 +200,7 @@ const ChartSection: React.FC = () => {
                 </div>
             </section>
 
-      
+
             <FullscreenChartModal
                 isOpen={state.isChartFullscreen}
                 onClose={() => setFullscreen(false)}
@@ -222,6 +228,8 @@ const ChartSection: React.FC = () => {
                     </div>
                 </div>
             </FullscreenChartModal>
+
+
         </section>
     );
 };
