@@ -11,10 +11,11 @@ import NumbersDisplay from '../../components/NumbersDisplay';
 import UserInfo from '../../components/UserInfo';
 import Update from '../../components/Update';
 import { FullscreenChartModal } from './components/FullscreenChartModal';
-import BetSection from '../BetSection/index';
+import BetSection from '../BetSection';
 
 
-// import BetModal from '../../components/BetModal';
+
+
 
 function useContainerWidth() {
     const ref = useRef<HTMLDivElement>(null);
