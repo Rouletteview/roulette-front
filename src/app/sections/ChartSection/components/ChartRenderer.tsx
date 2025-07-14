@@ -83,7 +83,8 @@ export const ChartRenderer: React.FC<ChartRendererProps> = ({
                                 low: number;
                                 close: number;
                                 openTag?: string;
-                                closeTag?: string
+                                closeTag?: string;
+                                isRedAndBlack?: boolean;
                             }[]}
                         />
                     );

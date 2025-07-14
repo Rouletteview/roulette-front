@@ -23,7 +23,6 @@ interface Props {
     amount: number;
     gameType: string;
     betValue: string;
-
 }
 
 const chips = [

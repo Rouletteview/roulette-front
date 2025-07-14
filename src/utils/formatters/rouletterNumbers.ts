@@ -228,14 +228,14 @@ export const numberToTag = (value: number, gameType?: string): string => {
 };
 
 
-export const getYAxisTicks = (gameType?: string): { value: number, label: string, color: string }[] => {
-    if (gameType === 'RedAndBlack') {
-        return [
-            { value: 1, label: translateRouletteTag('Black'), color: '#FFFFFF' },
-            { value: 2, label: translateRouletteTag('Red'), color: '#FF0000' },
-            { value: 0, label: 'Cero', color: '#00FF00' },
-        ];
-    }
+export const getYAxisTicks = (gameType?: string): { value: number, label: string, color: string }[] | null => {
+    // if (gameType === 'RedAndBlack') {
+    //     return [
+    //         { value: 1, label: translateRouletteTag('Black'), color: '#FFFFFF' },
+    //         { value: 2, label: translateRouletteTag('Red'), color: '#FF0000' },
+    //         { value: 0, label: 'Cero', color: '#00FF00' },
+    //     ];
+    // }
     if (gameType === 'OddAndEven') {
         return [
             { value: 0, label: translateRouletteTag('Even'), color: '#FFFFFF' },
@@ -299,9 +299,5 @@ export const getYAxisTicks = (gameType?: string): { value: number, label: string
         ];
     }
 
-    return [
-        { value: 0, label: '0', color: '#000000' },
-        { value: 1, label: '1', color: '#000000' },
-        { value: 2, label: '2', color: '#000000' },
-    ];
+ return []
 };

@@ -11,7 +11,7 @@ import { translateRouletteTag, getYAxisTicks } from '../../../utils/formatters/r
 import { useChartPosition } from '../../../hooks/useChartPosition';
 
 type ChartProps = {
-  data: { time: UTCTimestamp; open: number; high: number; low: number; close: number; openTag?: string; closeTag?: string }[];
+  data: { time: UTCTimestamp; open: number; high: number; low: number; close: number; openTag?: string; closeTag?: string; isRedAndBlack?: boolean }[];
   height?: number;
   width?: number;
   loading?: boolean;
@@ -118,16 +118,57 @@ const CandleChart: React.FC<ChartProps> = ({
       onChartReady(chart);
     }
 
-    // Usar addSeries(CandlestickSeries, ...) para máxima compatibilidad
-    const series = chart.addSeries(CandlestickSeries, {
-      upColor: 'rgba(38, 166, 154, 1)',
-      downColor: '#ef5350',
-      borderVisible: false,
-      wickUpColor: 'rgba(38, 166, 154, 1)',
-      wickDownColor: '#ef5350',
-      lastValueVisible: false,
-      priceLineVisible: false,
-    });
+    // Crear series de velas con colores personalizados para RedAndBlack
+    const isRedAndBlack = gameType === 'RedAndBlack';
+    
+    let redSeries: any = null;
+    let blackSeries: any = null;
+    let greenSeries: any = null;
+    let defaultSeries: any = null;
+
+    if (isRedAndBlack) {
+      // Crear series separadas para cada color
+      redSeries = chart.addSeries(CandlestickSeries, {
+        upColor: '#FF0000',
+        downColor: '#FF0000',
+        borderVisible: false,
+        wickUpColor: '#FF0000',
+        wickDownColor: '#FF0000',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+
+      blackSeries = chart.addSeries(CandlestickSeries, {
+        upColor: '#000000',
+        downColor: '#000000',
+        borderVisible: false,
+        wickUpColor: '#000000',
+        wickDownColor: '#000000',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+
+      greenSeries = chart.addSeries(CandlestickSeries, {
+        upColor: '#00FF00',
+        downColor: '#00FF00',
+        borderVisible: false,
+        wickUpColor: '#00FF00',
+        wickDownColor: '#00FF00',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+    } else {
+      // Serie por defecto para otros tipos de juego
+      defaultSeries = chart.addSeries(CandlestickSeries, {
+        upColor: 'rgba(38, 166, 154, 1)',
+        downColor: '#ef5350',
+        borderVisible: false,
+        wickUpColor: 'rgba(38, 166, 154, 1)',
+        wickDownColor: '#ef5350',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+    }
 
     if (!data || !Array.isArray(data)) {
       console.log('CandleChart: No valid data');
@@ -190,19 +231,58 @@ const CandleChart: React.FC<ChartProps> = ({
     ].sort((a, b) => Number(a.time) - Number(b.time));
 
     if (validData.length > 0) {
-      series.setData(validData.map(stripCandle));
+      if (isRedAndBlack) {
+        // Separar los datos por color para RedAndBlack
+        const redData: any[] = [];
+        const blackData: any[] = [];
+        const greenData: any[] = [];
 
-      if (yTicks.length > 0) {
-        yTicks.forEach(tick => {
-          series.createPriceLine({
-            price: tick.value,
-            color: tick.color,
-            lineWidth: 2,
-            lineStyle: 1,
-            axisLabelVisible: true,
-            title: tick.label,
-          });
+        validData.forEach(candle => {
+          const strippedCandle = stripCandle(candle);
+          if (candle.closeTag === 'Red') {
+            redData.push(strippedCandle);
+          } else if (candle.closeTag === 'Black') {
+            blackData.push(strippedCandle);
+          } else if (candle.closeTag === 'Green' || candle.closeTag === 'Zero') {
+            greenData.push(strippedCandle);
+          }
         });
+
+        // Establecer datos en las series correspondientes
+        if (redData.length > 0) redSeries.setData(redData);
+        if (blackData.length > 0) blackSeries.setData(blackData);
+        if (greenData.length > 0) greenSeries.setData(greenData);
+
+        // Crear líneas de precio en la primera serie disponible
+        const firstSeries = redSeries || blackSeries || greenSeries;
+        if (firstSeries && yTicks.length > 0) {
+          yTicks.forEach(tick => {
+            firstSeries.createPriceLine({
+              price: tick.value,
+              color: tick.color,
+              lineWidth: 2,
+              lineStyle: 1,
+              axisLabelVisible: true,
+              title: tick.label,
+            });
+          });
+        }
+      } else {
+        // Para otros tipos de juego, usar la serie por defecto
+        defaultSeries.setData(validData.map(stripCandle));
+
+        if (yTicks.length > 0) {
+          yTicks.forEach(tick => {
+            defaultSeries.createPriceLine({
+              price: tick.value,
+              color: tick.color,
+              lineWidth: 2,
+              lineStyle: 1,
+              axisLabelVisible: true,
+              title: tick.label,
+            });
+          });
+        }
       }
       
       // Set the initial visible range

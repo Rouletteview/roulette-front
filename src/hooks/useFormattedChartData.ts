@@ -26,7 +26,7 @@ export type GameType =
 type GroupedData = { date: string; entries: RawEntry[] };
 type MultiSeries = {
   id: string;
-  data: { time: UTCTimestamp; value: number; color?: string }[] | { time: UTCTimestamp; open: number; high: number; low: number; close: number }[];
+  data: { time: UTCTimestamp; value: number; color?: string }[] | { time: UTCTimestamp; open: number; high: number; low: number; close: number; isRedAndBlack?: boolean }[];
 };
 
 export const useFormattedChartData = ({
@@ -53,7 +53,7 @@ export const useFormattedChartData = ({
       case 'Candlestick':
         return [{
           id: 'Candlestick',
-          data: formatCandleChart(grouped, gameType) as { time: UTCTimestamp; open: number; high: number; low: number; close: number }[]
+          data: formatCandleChart(grouped, gameType) as { time: UTCTimestamp; open: number; high: number; low: number; close: number; isRedAndBlack?: boolean }[]
         }];
       case 'Area':
       case 'Lineal':
@@ -176,8 +176,8 @@ const formatCandleChart = (grouped: GroupedData[], gameType?: GameType) => {
     return dateA - dateB;
   }).map(([_, entries]) => {
     const sorted = entries.sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
-    // Convertir tags a números para graficar
-    const values = sorted.map(e => convertTagToNumber(e.Tag, gameType)).filter(val => val !== undefined && !isNaN(val));
+
+    const values = sorted.map(e => e.Number).filter(val => val !== undefined && !isNaN(val));
     const originalValues = sorted.map(e => e.Number).filter(val => val !== undefined && !isNaN(val));
     const tags = sorted.map(e => e.Tag);
     const time = Math.floor(new Date(sorted[0].Date).getTime() / 1000) as UTCTimestamp;
@@ -195,6 +195,9 @@ const formatCandleChart = (grouped: GroupedData[], gameType?: GameType) => {
     prevCloseTag = closeTag;
     prevCloseOriginal = closeOriginal;
     prevCloseOriginalTag = closeTag;
+
+    const isRedAndBlack = gameType === 'RedAndBlack';
+
     return {
       time,
       open,
@@ -207,6 +210,7 @@ const formatCandleChart = (grouped: GroupedData[], gameType?: GameType) => {
       closeOriginal,
       highOriginal,
       lowOriginal,
+      isRedAndBlack,
     };
   });
 
