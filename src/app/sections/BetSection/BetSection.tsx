@@ -45,11 +45,11 @@ const BetSection: React.FC<Props> = ({ gameType, probabilities }) => {
   const { setBetResult } = useBetStatusStore();
 
   useEffect(() => {
-    if (countdown === 30 && betIdFromStorage && betData && betData.GetBet) {
+    if (countdown === 29 && betIdFromStorage && betData && betData.GetBet) {
       const status = betData.GetBet.status;
       const value = betData.GetBet.value;
 
-      console.log('Status de la apuesta:', status);
+     
       if (status === 'Won') {
         setBetResult({ status: 'Won', value});
       } else if (status === 'Lost') {

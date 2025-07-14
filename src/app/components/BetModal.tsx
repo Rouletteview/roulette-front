@@ -7,6 +7,7 @@ import chip5 from '../../assets/poker-chips/chip-5.png';
 import chip6 from '../../assets/poker-chips/chip-6.png';
 import { useBetData } from '../sections/BetSection/hooks/useBetData';
 import { showSuccessToast } from './Toast';
+import { translateRouletteTag } from '../../utils/formatters/rouletterNumbers';
 // import chip7 from '../../assets/poker-chips/chip-7.png';
 // import chip8 from '../../assets/poker-chips/chip-8.png';
 
@@ -79,11 +80,11 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip, setSelectedChi
         }
     };
     return (
-        <div onClick={handleBackdropClick} className="fixed inset-0 z-50 flex items-center justify-center bg-[#000000CC] bg-opacity-60">
+        <div onClick={handleBackdropClick} className="fixed inset-0 z-50 flex items-center justify-center bg-[#000000CC] bg-opacity-60 mx-4">
             <div onClick={handleModalClick} className="relative bg-white rounded-3xl shadow-xl w-full max-w-2xl p-8">
 
                 <button
-                    className="absolute top-6 right-6 text-3xl text-[#D9A425] font-bold focus:outline-none cursor-pointer"
+                    className="absolute top-2 md:top-6 right-2 md:right-6 text-3xl text-[#D9A425] font-bold focus:outline-none cursor-pointer"
                     onClick={onClose}
                     aria-label="Cerrar"
                 >
@@ -91,20 +92,20 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip, setSelectedChi
                 </button>
 
                 <h2 className="text-2xl lg:text-3xl font-semibold text-center text-[#181A20] mb-8">
-                    Elige la ficha y la cantidad a apostar
+                    Elige la ficha y la cantidad a apostar por <span className="text-[#D9A425]">{translateRouletteTag(betValue)}</span>
                 </h2>
 
-                <div className="flex justify-center gap-4 mb-8">
+                <div className="grid lg:grid-cols-8 grid-cols-4 justify-center gap-4 mb-8">
                     {chips.map((chip) => (
                         <div
                             key={chip.value}
-                            className={`flex flex-col items-center `}
+                            className={`flex flex-col  items-center w-16 h-16`}
                         >
                             <button
                                 key={chip.value}
                                 disabled={!!selectedChip && selectedChip !== chip.value}
                                 onClick={() => handleChipClick(chip.value)}
-                                className={`relative w-10 lg:w-16 hover:scale-125 h-auto transition-all cursor-pointer rounded-full disabled:opacity-50 disabled:cursor-not-allowed`}
+                                className={`relative w-16 hover:scale-125 h-auto transition-all cursor-pointer rounded-full disabled:opacity-50 disabled:cursor-not-allowed`}
                             >
                                 <img src={chip.img} alt="chip-button" className="w-full" />
                                 <span className="absolute inset-0 flex items-center justify-center text-white text-sm lg:text-base font-semibold pointer-events-none">

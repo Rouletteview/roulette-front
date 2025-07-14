@@ -158,7 +158,7 @@ const ChartSection: React.FC = () => {
                             <div className="flex flex-col w-full">
                                 <div
                                     ref={chartContainerRef}
-                                    className="relative flex-1 bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full max-w-full overflow-x-hidden"
+                                    className=" bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full max-w-full overflow-x-hidden"
                                 >
                                     <Controls
                                         setIsChartFullscreen={setFullscreen}
@@ -219,6 +219,7 @@ const ChartSection: React.FC = () => {
                                 />
                             </div>
                         </div>
+
                     </div>
                 </div>
             </section>
