@@ -5,6 +5,7 @@ import { useCountdownStore } from '../../../stores/countdownStore';
 
 interface BetButtonsProps {
     gameType: string
+    handleToggle: (tag: string) => void
     probabilities: Array<{
         Tag: string
         Value: number
@@ -171,54 +172,54 @@ const numbers = [
     }
 ]
 
-const HighLowButtons = ({ lowPercentage, highPercentage }: { lowPercentage: number, highPercentage: number }) => {
+const HighLowButtons = ({ lowPercentage, highPercentage, handleToggle }: { lowPercentage: number, highPercentage: number, handleToggle: (tag: string) => void }) => {
     return (
         <div className="flex flex-col gap-6 w-full">
-            <button className="bg-[#0D7FFC41] hover:bg-[#0D7FFC41]/80 w-full text-white  text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Bajo 1-18 ({lowPercentage}%)</button>
-            <button className="bg-[#85FFE099] hover:bg-[#85FFE099]/80 w-full text-white text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer">Alto 19-36 ({highPercentage}%)</button>
+            <button onClick={() => handleToggle('Low')} className="bg-[#0D7FFC41] hover:bg-[#0D7FFC41]/80 w-full text-white  text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Bajo 1-18 ({lowPercentage}%)</button>
+            <button onClick={() => handleToggle('High')} className="bg-[#85FFE099] hover:bg-[#85FFE099]/80 w-full text-white text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer">Alto 19-36 ({highPercentage}%)</button>
         </div>
     )
 };
 
-const RedBlackButtons = ({ redPercentage, blackPercentage }: { redPercentage: number, blackPercentage: number }) => {
+const RedBlackButtons = ({ redPercentage, blackPercentage, handleToggle }: { redPercentage: number, blackPercentage: number, handleToggle: (tag: string) => void }) => {
     return (
         <div className="flex flex-col gap-6 w-full">
-            <button className="bg-[#FF0000] hover:bg-[#FF0000]/80 w-full text-white  text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Rojo ({redPercentage}%)</button>
-            <button className="bg-[#000000] hover:bg-[#000000]/80 w-full text-white text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer">Negro ({blackPercentage}%)</button>
+            <button onClick={() => handleToggle('Red')} className="bg-[#FF0000] hover:bg-[#FF0000]/80 w-full text-white  text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Rojo ({redPercentage}%)</button>
+            <button onClick={() => handleToggle('Black')} className="bg-[#000000] hover:bg-[#000000]/80 w-full text-white text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer">Negro ({blackPercentage}%)</button>
         </div>
     )
 }
 
-const EvenOddButtons = ({ evenPercentage, oddPercentage }: { evenPercentage: number, oddPercentage: number }) => {
+const EvenOddButtons = ({ evenPercentage, oddPercentage, handleToggle }: { evenPercentage: number, oddPercentage: number, handleToggle: (tag: string) => void }) => {
     return (
         <div className="flex flex-col gap-6 w-full">
-            <button className="bg-[#0D7FFC41] hover:bg-[#0D7FFC41]/80 w-full text-white  text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Par ({evenPercentage}%)</button>
-            <button className="bg-[#85FFE099] hover:bg-[#85FFE099]/80 w-full text-white text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer">Impar ({oddPercentage}%)</button>
+            <button onClick={() => handleToggle('Even')} className="bg-[#0D7FFC41] hover:bg-[#0D7FFC41]/80 w-full text-white  text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Par ({evenPercentage}%)</button>
+            <button onClick={() => handleToggle('Odd')} className="bg-[#85FFE099] hover:bg-[#85FFE099]/80 w-full text-white text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer">Impar ({oddPercentage}%)</button>
         </div>
     )
 }
 
-const DozenButtons = ({ dozen1Percentage, dozen2Percentage, dozen3Percentage }: { dozen1Percentage: number, dozen2Percentage: number, dozen3Percentage: number }) => {
+const DozenButtons = ({ dozen1Percentage, dozen2Percentage, dozen3Percentage, handleToggle }: { dozen1Percentage: number, dozen2Percentage: number, dozen3Percentage: number, handleToggle: (tag: string) => void }) => {
     return (
         <div className="flex flex-col gap-6 w-full">
-            <button className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Docena 1 - 12 ({dozen1Percentage}%)</button>
-            <button className="bg-[#0D7FFC41] hover:bg-[#0D7FFC41]/80 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer">Docena 13 - 24 ({dozen2Percentage}%)</button>
-            <button className="bg-[#85FFE099] hover:bg-[#85FFE099]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Docena 25 - 36 ({dozen3Percentage}%)</button>
+            <button onClick={() => handleToggle('FirstDozen')} className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Docena 1 - 12 ({dozen1Percentage}%)</button>
+            <button onClick={() => handleToggle('SecondDozen')} className="bg-[#0D7FFC41] hover:bg-[#0D7FFC41]/80 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer">Docena 13 - 24 ({dozen2Percentage}%)</button>
+            <button onClick={() => handleToggle('ThirdDozen')} className="bg-[#85FFE099] hover:bg-[#85FFE099]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Docena 25 - 36 ({dozen3Percentage}%)</button>
         </div>
     )
 }
 
-const ColumnButtons = ({ column1Percentage, column2Percentage, column3Percentage }: { column1Percentage: number, column2Percentage: number, column3Percentage: number }) => {
+const ColumnButtons = ({ column1Percentage, column2Percentage, column3Percentage, handleToggle }: { column1Percentage: number, column2Percentage: number, column3Percentage: number, handleToggle: (tag: string) => void }) => {
     return (
         <div className="flex flex-col gap-6 w-full">
-            <button className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Columna 1 ({column1Percentage}%)</button>
-            <button className="bg-[#0D7FFC41] hover:bg-[#0D7FFC41]/80 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer">Columna 2 ({column2Percentage}%)</button>
-            <button className="bg-[#85FFE099] hover:bg-[#85FFE099]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Columna 3 ({column3Percentage}%)</button>
+            <button onClick={() => handleToggle('FirstColumn')} className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Columna 1 ({column1Percentage}%)</button>
+            <button onClick={() => handleToggle('SecondColumn')} className="bg-[#0D7FFC41] hover:bg-[#0D7FFC41]/80 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer">Columna 2 ({column2Percentage}%)</button>
+            <button onClick={() => handleToggle('ThirdColumn')} className="bg-[#85FFE099] hover:bg-[#85FFE099]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Columna 3 ({column3Percentage}%)</button>
         </div>
     )
 }
 
-const StraightUpButtons = ({ probabilities }: { probabilities: Array<{ number: number, straightUpPercentage: number }> }) => {
+const StraightUpButtons = ({ probabilities, handleToggle }: { probabilities: Array<{ number: number, straightUpPercentage: number }>, handleToggle: (tag: string) => void }) => {
     return (
         <div className="grid grid-cols-3 gap-1 w-full justify-center items-center">
             {probabilities.map(item => {
@@ -227,7 +228,7 @@ const StraightUpButtons = ({ probabilities }: { probabilities: Array<{ number: n
                     <div key={item.number} className="">
                         <div className="flex flex-col items-center justify-center">
                             <p className="text-xs text-white" key={item.number}>{item.straightUpPercentage}%</p>
-                            <button key={item.number} className={`cursor-pointer w-8 h-8 lg:w-7 lg:h-7 rounded-full border-3 flex items-center justify-center font-medium text-white text-[10px] md:text-xs ${colorClasses[numberData?.color || 'black']}`}>{item.number} </button>
+                            <button onClick={() => handleToggle(String(item.number))} key={item.number} className={`cursor-pointer w-8 h-8 lg:w-7 lg:h-7 rounded-full border-3 flex items-center justify-center font-medium text-white text-[10px] md:text-xs ${colorClasses[numberData?.color || 'black']}`}>{item.number} </button>
                         </div>
                     </div>
                 );
@@ -236,29 +237,27 @@ const StraightUpButtons = ({ probabilities }: { probabilities: Array<{ number: n
     )
 }
 
-const VoisinsDuZeroButtons = ({ voisinsDuZeroPercentage }: { voisinsDuZeroPercentage: number }) => {
+const VoisinsDuZeroButtons = ({ voisinsDuZeroPercentage, handleToggle }: { voisinsDuZeroPercentage: number, handleToggle: (tag: string) => void }) => {
     return (
-
-        <button className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Vecinos del cero ({voisinsDuZeroPercentage}%)</button>
-
+        <button onClick={() => handleToggle('VoisinsDuZero')} className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Vecinos del cero ({voisinsDuZeroPercentage}%)</button>
     )
 }
 
-const TiersDuCylindreButtons = ({ tiersDuCylindrePercentage }: { tiersDuCylindrePercentage: number }) => {
+const TiersDuCylindreButtons = ({ tiersDuCylindrePercentage, handleToggle }: { tiersDuCylindrePercentage: number, handleToggle: (tag: string) => void }) => {
     return (
-        <button className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Tercio ({tiersDuCylindrePercentage}%)</button>
+        <button onClick={() => handleToggle('TiersDuCylindre')} className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Tercio ({tiersDuCylindrePercentage}%)</button>
     )
 }
 
-const PlayZeroButtons = ({ playZeroPercentage }: { playZeroPercentage: number }) => {
+const PlayZeroButtons = ({ playZeroPercentage, handleToggle }: { playZeroPercentage: number, handleToggle: (tag: string) => void }) => {
     return (
-        <button className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Juego del cero ({playZeroPercentage}%)</button>
+        <button onClick={() => handleToggle('PlayZero')} className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Juego del cero ({playZeroPercentage}%)</button>
     )
 }
 
-const OrphelinsButtons = ({ orphelinsPercentage }: { orphelinsPercentage: number }) => {
+const OrphelinsButtons = ({ orphelinsPercentage, handleToggle }: { orphelinsPercentage: number, handleToggle: (tag: string) => void }) => {
     return (
-        <button className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Huérfanos ({orphelinsPercentage}%)</button>
+        <button onClick={() => handleToggle('Orphelins')} className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Huérfanos ({orphelinsPercentage}%)</button>
     )
 }
 
@@ -291,7 +290,7 @@ const BetModal = ({ isOpen, onClose, children }: { isOpen: boolean, onClose: () 
     );
 };
 
-const BetButtons = ({ gameType, probabilities }: BetButtonsProps) => {
+const BetButtons = ({ gameType, probabilities, handleToggle }: BetButtonsProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const getProbabilityByTag = (tag: string): number => {
@@ -299,6 +298,8 @@ const BetButtons = ({ gameType, probabilities }: BetButtonsProps) => {
         const prob = probabilities.find(p => p.Tag === tag);
         return prob ? Math.round(prob.Value * 100) : 0;
     };
+
+
 
     const getHighLowProbabilities = () => ({
         lowPercentage: getProbabilityByTag('Low'),
@@ -354,23 +355,23 @@ const BetButtons = ({ gameType, probabilities }: BetButtonsProps) => {
     const renderButtons = () => {
         switch (gameType) {
             case 'HighAndLow':
-                return <HighLowButtons {...getHighLowProbabilities()} />;
+                return <HighLowButtons {...getHighLowProbabilities()} handleToggle={handleToggle} />;
             case 'RedAndBlack':
-                return <RedBlackButtons {...getRedBlackProbabilities()} />;
+                return <RedBlackButtons {...getRedBlackProbabilities()} handleToggle={handleToggle} />;
             case 'OddAndEven':
-                return <EvenOddButtons {...getEvenOddProbabilities()} />;
+                return <EvenOddButtons {...getEvenOddProbabilities()} handleToggle={handleToggle} />;
             case 'Dozen':
-                return <DozenButtons {...getDozenProbabilities()} />;
+                return <DozenButtons {...getDozenProbabilities()} handleToggle={handleToggle} />;
             case 'Column':
-                return <ColumnButtons {...getColumnProbabilities()} />;
+                return <ColumnButtons {...getColumnProbabilities()} handleToggle={handleToggle} />;
             case 'VoisinsDuZero':
-                return <VoisinsDuZeroButtons {...getVoisinsDuZeroProbabilities()} />;
+                return <VoisinsDuZeroButtons {...getVoisinsDuZeroProbabilities()} handleToggle={handleToggle} />;
             case 'TiersDuCylindre':
-                return <TiersDuCylindreButtons {...getTiersDuCylindreProbabilities()} />;
+                return <TiersDuCylindreButtons {...getTiersDuCylindreProbabilities()} handleToggle={handleToggle} />;
             case 'PlayZero':
-                return <PlayZeroButtons {...getPlayZeroProbabilities()} />;
+                return <PlayZeroButtons {...getPlayZeroProbabilities()} handleToggle={handleToggle} />;
             case 'Orphelins':
-                return <OrphelinsButtons {...getOrphelinsProbabilities()} />;
+                return <OrphelinsButtons {...getOrphelinsProbabilities()} handleToggle={handleToggle} />;
             default:
                 return null;
         }
@@ -382,7 +383,7 @@ const BetButtons = ({ gameType, probabilities }: BetButtonsProps) => {
                 <>
 
                     <div className="hidden lg:block">
-                        <StraightUpButtons probabilities={getStraightUpProbabilities()} />
+                        <StraightUpButtons probabilities={getStraightUpProbabilities()} handleToggle={handleToggle} />
                     </div>
 
 
@@ -398,7 +399,7 @@ const BetButtons = ({ gameType, probabilities }: BetButtonsProps) => {
                             isOpen={isModalOpen}
                             onClose={() => setIsModalOpen(false)}
                         >
-                            <StraightUpButtons probabilities={getStraightUpProbabilities()} />
+                            <StraightUpButtons probabilities={getStraightUpProbabilities()} handleToggle={handleToggle} />
                         </BetModal>
                     </div>
                 </>

@@ -11,7 +11,11 @@ import NumbersDisplay from '../../components/NumbersDisplay';
 import UserInfo from '../../components/UserInfo';
 import Update from '../../components/Update';
 import { FullscreenChartModal } from './components/FullscreenChartModal';
-import BetSection from '../BetSection';
+import BetSection from '../BetSection/BetSection';
+import { useBetStatusStore } from '../../../stores/betStatusStore';
+import LostBet from '../../components/bet/LostBet';
+import SuccessBet from '../../components/bet/SuccessBet';
+import PlacedBet from '../../components/bet/PlacedBet';
 
 
 
@@ -40,6 +44,10 @@ function useContainerWidth() {
 const ChartSection: React.FC = () => {
 
     useQueryParamsCleanup();
+
+    const { betResult } = useBetStatusStore();
+
+    console.log(betResult);
 
 
     const {
@@ -95,6 +103,7 @@ const ChartSection: React.FC = () => {
     return (
 
         <section className="bg-[#121418F2] py-6 lg:pt-10 lg:pb-6 px-6 lg:px-24">
+
             {/* <BetModal open={isOpen} onClose={() => setIsOpen(false)} /> */}
             <div className="flex justify-end w-full">
                 <div className="bg-[#121418F2] border-2 border-black px-6 py-2 rounded-2xl lg:hidden block mb-2">
@@ -156,6 +165,16 @@ const ChartSection: React.FC = () => {
                                         onZoomIn={onZoomIn}
                                         onZoomOut={onZoomOut}
                                     />
+                                    <div className='absolute top-28 left-1/2  z-50'>
+                                        {betResult?.status === 'Won' ? (
+                                            <SuccessBet value={betResult.value || ''} />
+                                        ) : betResult?.status === 'Lost' ? (
+                                            <LostBet value={betResult.value || ''} />
+                                        ) : betResult?.status === 'Placed' ? (
+                                            <PlacedBet value={betResult.value || ''} />
+                                        ) : null}
+                                    </div>
+
 
                                     <ChartRenderer
                                         selectedType={state.selectedType}
@@ -180,6 +199,7 @@ const ChartSection: React.FC = () => {
                                         <BetSection
                                             gameType={state.gameType}
                                             probabilities={probabilities}
+
                                         />
                                     </div>
                                     <NumbersDisplay

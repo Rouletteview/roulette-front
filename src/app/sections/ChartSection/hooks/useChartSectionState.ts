@@ -28,7 +28,7 @@ export const useChartSectionState = () => {
         isChartFullscreen: false,
     });
 
-    
+
     useEffect(() => {
         const timer = setTimeout(() => {
             setState(prev => ({ ...prev, debouncedSearch: prev.marketSearch }));
@@ -36,7 +36,7 @@ export const useChartSectionState = () => {
         return () => clearTimeout(timer);
     }, [state.marketSearch]);
 
- 
+
     useEffect(() => {
         const wasFullscreen = sessionStorage.getItem('chartFullscreen') === 'true';
         if (wasFullscreen) {
@@ -48,7 +48,7 @@ export const useChartSectionState = () => {
         sessionStorage.setItem('chartFullscreen', state.isChartFullscreen ? 'true' : 'false');
     }, [state.isChartFullscreen]);
 
-   
+
     useEffect(() => {
         const chartType = searchParams.get('chartType') as ChartType;
         const chartZone = searchParams.get('chartZone') as GameType;

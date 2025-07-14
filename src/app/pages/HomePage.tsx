@@ -3,7 +3,7 @@ import WelcomeModal from "../components/Modal/welcome-modal/WelcomeModal"
 
 // import RouletteTable from "../components/RouletteTable"
 import AppLayout from "../layouts/AppLayout"
-import ChartSection from "../sections/ChartSection"
+import ChartSection from "../sections/ChartSection/ChartSection"
 // import HorizontalHistogramChart from "../components/chart/HorizontalHistogramChart"
 
 
