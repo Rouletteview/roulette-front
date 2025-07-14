@@ -58,7 +58,7 @@ const CandleChart: React.FC<ChartProps> = ({
     const yTicks = getYAxisTicks(gameType);
 
     const initialRange = getInitialRange();
-    
+
     const chart = createChart(chartContainerRef.current, {
       width: width || chartContainerRef.current.clientWidth,
       height: height || 400,
@@ -112,7 +112,7 @@ const CandleChart: React.FC<ChartProps> = ({
 
     chartRef.current = chart;
     setChartRef(chart);
-
+    
     // Notificar que el chart está listo
     if (onChartReady) {
       onChartReady(chart);
