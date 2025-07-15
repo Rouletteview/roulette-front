@@ -155,7 +155,7 @@ const LineChart: React.FC<ChartProps> = ({
     }
 
 
-    if (seriesMap.size > 0 && yTicks.length > 0) {
+    if (seriesMap.size > 0 && yTicks && yTicks.length > 0) {
       const firstSeries = Array.from(seriesMap.values())[0];
       yTicks.forEach(tick => {
         firstSeries.createPriceLine({

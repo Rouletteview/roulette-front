@@ -6,7 +6,7 @@ import chip4 from '../../assets/poker-chips/chip-4.png';
 import chip5 from '../../assets/poker-chips/chip-5.png';
 import chip6 from '../../assets/poker-chips/chip-6.png';
 import { useBetData } from '../sections/BetSection/hooks/useBetData';
-import { showSuccessToast } from './Toast';
+import { showErrorToast, showPlacedToast } from './Toast';
 import { translateRouletteTag } from '../../utils/formatters/rouletterNumbers';
 // import chip7 from '../../assets/poker-chips/chip-7.png';
 // import chip8 from '../../assets/poker-chips/chip-8.png';
@@ -36,7 +36,7 @@ const chips = [
     { value: '100', color: 'bg-purple-700', border: 'border-white', img: chip6 },
 ];
 
-const BetModal: React.FC<Props> = ({ open, onClose, selectedChip, setSelectedChip, setCounter, counter, selectedTable, amount, gameType, betValue, setBetId }: Props) => {
+const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelectedChip, setCounter, counter, selectedTable, amount, gameType, betValue, setBetId }: Props) => {
     const { createBet, createBetError } = useBetData({
         rouletteTableId: selectedTable,
         amount: amount,
@@ -44,18 +44,30 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip, setSelectedChi
         value: betValue || ""
     });
 
+    console.log('selectedChip', selectedChip);
+
     if (!open) return null;
 
     const handleBet = async () => {
         try {
             const response = await createBet();
             localStorage.setItem('betId', response.data.CreateBet.id);
-            showSuccessToast('¡Apuesta realizada con éxito!');
+            showPlacedToast(translateRouletteTag(betValue));
             setBetId(response.data.CreateBet.id);
             onClose();
         } catch (error) {
             console.log(error);
             console.log(createBetError);
+
+            // Mostrar mensaje de error específico
+            let errorMessage = 'Error al realizar la apuesta';
+            if (createBetError?.message) {
+                errorMessage = createBetError.message;
+            } else if (error instanceof Error) {
+                errorMessage = error.message;
+            }
+
+            showErrorToast(errorMessage);
         }
     }
 
@@ -121,7 +133,7 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip, setSelectedChi
                     <button onClick={() => setCounter(counter + 1)} className="w-12 h-12 rounded-full bg-gray-200 text-3xl text-black flex items-center justify-center font-bold cursor-pointer hover:bg-gray-300">+</button>
                 </div>
 
-                <button onClick={handleBet} disabled={counter === 0} className="w-full py-4 rounded-xl bg-[#D9A425] text-white text-xl font-semibold shadow-md mt-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#D9A425]/80 cursor-pointer">
+                <button onClick={handleBet} disabled={counter === 0 && selectedChip === ""} className="w-full py-4 rounded-xl bg-[#D9A425] text-white text-xl font-semibold shadow-md mt-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#D9A425]/80 cursor-pointer">
                     Apostar
                 </button>
             </div>

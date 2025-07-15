@@ -31,7 +31,7 @@ const CandleChart: React.FC<ChartProps> = ({
   const chartRef = useRef<IChartApi | null>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
 
-  // Get chart type and table from URL or props
+ 
   const urlParams = new URLSearchParams(window.location.search);
   const chartType = urlParams.get('chartType') || 'Candlestick';
   const selectedTable = urlParams.get('table') || '';
@@ -54,7 +54,7 @@ const CandleChart: React.FC<ChartProps> = ({
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
-    // Obtener los ticks posibles para el eje Y
+  
     const yTicks = getYAxisTicks(gameType);
 
     const initialRange = getInitialRange();
@@ -112,18 +112,22 @@ const CandleChart: React.FC<ChartProps> = ({
 
     chartRef.current = chart;
     setChartRef(chart);
-    
-    // Notificar que el chart está listo
+
+  
     if (onChartReady) {
       onChartReady(chart);
     }
 
     // Crear series de velas con colores personalizados para RedAndBlack
     const isRedAndBlack = gameType === 'RedAndBlack';
-    
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let redSeries: any = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let blackSeries: any = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let greenSeries: any = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let defaultSeries: any = null;
 
     if (isRedAndBlack) {
@@ -158,7 +162,7 @@ const CandleChart: React.FC<ChartProps> = ({
         priceLineVisible: false,
       });
     } else {
-      // Serie por defecto para otros tipos de juego
+      
       defaultSeries = chart.addSeries(CandlestickSeries, {
         upColor: 'rgba(38, 166, 154, 1)',
         downColor: '#ef5350',
@@ -175,9 +179,9 @@ const CandleChart: React.FC<ChartProps> = ({
       return;
     }
 
-    // Agregar tres velas reales (en 0, 1 y 2) al inicio del set de datos
-    const tagValues = yTicks.map(t => t.value);
-    const tagLabels = yTicks.map(t => t.label);
+   
+    const tagValues = yTicks?.map(t => t.value) || [];
+    const tagLabels = yTicks?.map(t => t.label) || [];
     const baseTime = (data.length > 0 ? data[0].time : 0) - 100000;
     const forcedCandles = tagValues.map((val, i) => ({
       time: (baseTime - i) as UTCTimestamp,
@@ -193,7 +197,7 @@ const CandleChart: React.FC<ChartProps> = ({
       closeOriginal: val,
     }));
 
-    // Solo pasar las propiedades válidas a setData
+   
     const stripCandle = (candle: unknown) => {
       if (
         typeof candle === 'object' &&
@@ -232,9 +236,12 @@ const CandleChart: React.FC<ChartProps> = ({
 
     if (validData.length > 0) {
       if (isRedAndBlack) {
-        // Separar los datos por color para RedAndBlack
+      
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const redData: any[] = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const blackData: any[] = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const greenData: any[] = [];
 
         validData.forEach(candle => {
@@ -255,7 +262,7 @@ const CandleChart: React.FC<ChartProps> = ({
 
         // Crear líneas de precio en la primera serie disponible
         const firstSeries = redSeries || blackSeries || greenSeries;
-        if (firstSeries && yTicks.length > 0) {
+        if (firstSeries && yTicks && yTicks.length > 0) {
           yTicks.forEach(tick => {
             firstSeries.createPriceLine({
               price: tick.value,
@@ -268,10 +275,10 @@ const CandleChart: React.FC<ChartProps> = ({
           });
         }
       } else {
-        // Para otros tipos de juego, usar la serie por defecto
+      
         defaultSeries.setData(validData.map(stripCandle));
 
-        if (yTicks.length > 0) {
+        if (yTicks && yTicks.length > 0) {
           yTicks.forEach(tick => {
             defaultSeries.createPriceLine({
               price: tick.value,
@@ -284,8 +291,7 @@ const CandleChart: React.FC<ChartProps> = ({
           });
         }
       }
-      
-      // Set the initial visible range
+
       chart.timeScale().setVisibleRange(initialRange);
     }
 

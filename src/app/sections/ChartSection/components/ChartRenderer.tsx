@@ -111,7 +111,7 @@ export const ChartRenderer: React.FC<ChartRendererProps> = ({
     return (
         <Suspense fallback={<LoadingOverlay />}>
             <div className="lg:cursor-default cursor-pointer relative group w-full max-w-full overflow-x-hidden">
-                <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-all duration-200 lg:hidden pointer-events-none z-10 rounded-lg" />
+                <div className=" inset-0 bg-black/0 hover:bg-black/10 transition-all duration-200 lg:hidden pointer-events-none z-10 rounded-lg" />
                 {renderChart()}
             </div>
         </Suspense>
