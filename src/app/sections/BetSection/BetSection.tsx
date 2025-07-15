@@ -52,11 +52,11 @@ const BetSection: React.FC<Props> = ({ gameType, probabilities }) => {
 
       if (status === 'Won') {
         setBetResult({ status: 'Won', value });
-        showWinToast(value);
+        showWinToast(value, `win-${betIdFromStorage}`);
       } else if (status === 'Lost') {
         console.log('Perdiste la apuesta.');
         setBetResult({ status: 'Lost', value });
-        showLoseToast(value);
+        showLoseToast(value, `lose-${betIdFromStorage}`);
       } else if (status === 'Placed') {
         setBetResult({ status: 'Placed', value });
         showInfoToast('Apuesta en proceso...');
