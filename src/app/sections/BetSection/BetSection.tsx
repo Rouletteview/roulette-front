@@ -46,23 +46,21 @@ const BetSection: React.FC<Props> = ({ gameType, probabilities }) => {
   const { setBetResult } = useBetStatusStore();
 
   useEffect(() => {
-    if (countdown === 30 && betIdFromStorage && betData && betData.GetBet) {
+    if (countdown === 29 && betIdFromStorage && betData && betData.GetBet) {
       const status = betData.GetBet.status;
       const value = betData.GetBet.value;
 
       if (status === 'Won') {
         setBetResult({ status: 'Won', value });
-        showWinToast(value);
+        showWinToast(value, `win-${betIdFromStorage}`);
       } else if (status === 'Lost') {
-        console.log('Perdiste la apuesta.');
         setBetResult({ status: 'Lost', value });
-        showLoseToast(value);
+        showLoseToast(value, `lose-${betIdFromStorage}`);
       } else if (status === 'Placed') {
         setBetResult({ status: 'Placed', value });
-        showInfoToast('Apuesta en proceso...');
+        showInfoToast('Apuesta en proceso...', `placed-${betIdFromStorage}`);
       } else {
-        console.log('No hay resultado para la apuesta.');
-        showInfoToast('Resultado pendiente');
+        showInfoToast('Resultado pendiente', `pending-${betIdFromStorage}`);
       }
       if (status !== 'Placed') {
         localStorage.removeItem('betId');

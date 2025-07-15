@@ -31,7 +31,7 @@ const CandleChart: React.FC<ChartProps> = ({
   const chartRef = useRef<IChartApi | null>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
 
- 
+
   const urlParams = new URLSearchParams(window.location.search);
   const chartType = urlParams.get('chartType') || 'Candlestick';
   const selectedTable = urlParams.get('table') || '';
@@ -54,7 +54,7 @@ const CandleChart: React.FC<ChartProps> = ({
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
-  
+
     const yTicks = getYAxisTicks(gameType);
 
     const initialRange = getInitialRange();
@@ -113,7 +113,7 @@ const CandleChart: React.FC<ChartProps> = ({
     chartRef.current = chart;
     setChartRef(chart);
 
-  
+
     if (onChartReady) {
       onChartReady(chart);
     }
@@ -162,7 +162,7 @@ const CandleChart: React.FC<ChartProps> = ({
         priceLineVisible: false,
       });
     } else {
-      
+
       defaultSeries = chart.addSeries(CandlestickSeries, {
         upColor: 'rgba(38, 166, 154, 1)',
         downColor: '#ef5350',
@@ -179,7 +179,7 @@ const CandleChart: React.FC<ChartProps> = ({
       return;
     }
 
-   
+
     const tagValues = yTicks?.map(t => t.value) || [];
     const tagLabels = yTicks?.map(t => t.label) || [];
     const baseTime = (data.length > 0 ? data[0].time : 0) - 100000;
@@ -197,7 +197,7 @@ const CandleChart: React.FC<ChartProps> = ({
       closeOriginal: val,
     }));
 
-   
+
     const stripCandle = (candle: unknown) => {
       if (
         typeof candle === 'object' &&
@@ -236,7 +236,7 @@ const CandleChart: React.FC<ChartProps> = ({
 
     if (validData.length > 0) {
       if (isRedAndBlack) {
-      
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const redData: any[] = [];
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -255,14 +255,15 @@ const CandleChart: React.FC<ChartProps> = ({
           }
         });
 
-        // Establecer datos en las series correspondientes
+
         if (redData.length > 0) redSeries.setData(redData);
         if (blackData.length > 0) blackSeries.setData(blackData);
         if (greenData.length > 0) greenSeries.setData(greenData);
 
-        // Crear líneas de precio en la primera serie disponible
+
         const firstSeries = redSeries || blackSeries || greenSeries;
-        if (firstSeries && yTicks && yTicks.length > 0) {
+        // Solo crear price lines si el tipo de gráfico NO es Candlestick
+        if (firstSeries && yTicks && yTicks.length > 0 && chartType !== 'Candlestick') {
           yTicks.forEach(tick => {
             firstSeries.createPriceLine({
               price: tick.value,
@@ -275,10 +276,11 @@ const CandleChart: React.FC<ChartProps> = ({
           });
         }
       } else {
-      
+
         defaultSeries.setData(validData.map(stripCandle));
 
-        if (yTicks && yTicks.length > 0) {
+        // Solo crear price lines si el tipo de gráfico NO es Candlestick
+        if (yTicks && yTicks.length > 0 && chartType !== 'Candlestick') {
           yTicks.forEach(tick => {
             defaultSeries.createPriceLine({
               price: tick.value,

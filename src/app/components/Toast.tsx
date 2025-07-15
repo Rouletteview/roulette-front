@@ -1,8 +1,9 @@
 import { Toaster, toast } from 'react-hot-toast';
 import { translateRouletteTag } from '../../utils/formatters/rouletterNumbers';
 
-export const showSuccessToast = (message: string) => {
+export const showSuccessToast = (message: string, id?: string) => {
     toast.success(message, {
+        id: id,
         style: {
             background: '#D9A425',
             color: '#fff',
@@ -23,6 +24,7 @@ export const showSuccessToast = (message: string) => {
 
 export const showErrorToast = (message: string) => {
     toast.error(message, {
+      
         style: {
             background: '#FF0000',
             color: '#fff',
@@ -41,8 +43,9 @@ export const showErrorToast = (message: string) => {
     });
 };
 
-export const showWinToast = (value: string) => {
+export const showWinToast = (value: string, id?: string) => {
     toast.success(`¡Ganaste! ${translateRouletteTag(value)}`, {
+        id: id,
         style: {
             background: '#20B26C',
             color: '#fff',
@@ -61,8 +64,9 @@ export const showWinToast = (value: string) => {
     });
 };
 
-export const showLoseToast = (value: string) => {
+export const showLoseToast = (value: string, id?: string) => {
     toast.error(`Perdiste. ${translateRouletteTag(value)}`, {
+        id: id,
         style: {
             background: '#FF0000',
             color: '#fff',
@@ -81,8 +85,9 @@ export const showLoseToast = (value: string) => {
     });
 };
 
-export const showPlacedToast = (value: string) => {
+export const showPlacedToast = (value: string, id?: string) => {
     toast.success(`Apuesta colocada: ${translateRouletteTag(value)}`, {
+        id: id,
         style: {
             background: '#D9A425',
             color: '#fff',
@@ -101,8 +106,9 @@ export const showPlacedToast = (value: string) => {
     });
 };
 
-export const showInfoToast = (message: string) => {
+export const showInfoToast = (message: string, id?: string) => {
     toast(message, {
+        id: id,
         style: {
             background: '#2962FF',
             color: '#fff',

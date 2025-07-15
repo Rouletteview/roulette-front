@@ -228,32 +228,33 @@ export const numberToTag = (value: number, gameType?: string): string => {
 };
 
 
-export const getYAxisTicks = (gameType?: string): { value: number, label: string, color: string }[] | null => {
-    // if (gameType === 'RedAndBlack') {
-    //     return [
-    //         { value: 1, label: translateRouletteTag('Black'), color: '#FFFFFF' },
-    //         { value: 2, label: translateRouletteTag('Red'), color: '#FF0000' },
-    //         { value: 0, label: 'Cero', color: '#00FF00' },
-    //     ];
-    // }
+export const getYAxisTicks = (gameType?: string): { value: number, label: string, color: string, lineWidth?: number, lineStyle?: number, lineHeight?: number }[] | null => {
+    if (gameType === 'RedAndBlack') {
+        return [
+            { value: 1, label: translateRouletteTag('Black'), color: '#FFFFFF' },
+            { value: 2, label: translateRouletteTag('Red'), color: '#FF0000' },
+            { value: 0, label: 'Cero', color: '#00FF00' },
+        ];
+    }
     if (gameType === 'OddAndEven') {
         return [
-            { value: 0, label: translateRouletteTag('Even'), color: '#FFFFFF' },
-            // { value: 0.50, label: '', color: '#FF0000' },
-            { value: 1, label: translateRouletteTag('Odd'), color: '#FF0000' },
+            { value: 1, label: translateRouletteTag('Even'), color: '#FF0000', lineWidth: 2, lineStyle: 1 },
+            { value: 0.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },
+            { value: 0, label: translateRouletteTag('Odd'), color: '#FF0000', lineWidth: 2, lineStyle: 1 },
         ];
     }
     if (gameType === 'HighAndLow') {
         return [
-            { value: 0, label: translateRouletteTag('Low'), color: '#FFFFFF' },
-            { value: 1, label: translateRouletteTag('High'), color: '#FF0000' },
+            { value: 0, label: translateRouletteTag('Low'), color: '#FF0000', lineWidth: 2, lineStyle: 1 },
+            { value: 0.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },
+            { value: 1, label: translateRouletteTag('High'), color: '#FF0000', lineWidth: 2, lineStyle: 1 },
         ];
     }
     if (gameType === 'Dozen') {
         return [
             { value: 1, label: translateRouletteTag('FirstDozen'), color: '#FFF' },
-            { value: 2, label: translateRouletteTag('SecondDozen'), color: '#FFF' },
-            { value: 3, label: translateRouletteTag('ThirdDozen'), color: '#FFF' },
+            { value: 13, label: translateRouletteTag('SecondDozen'), color: '#FFF' },
+            { value: 25, label: translateRouletteTag('ThirdDozen'), color: '#FFF' },
         ];
     }
     if (gameType === 'Column') {
@@ -266,36 +267,40 @@ export const getYAxisTicks = (gameType?: string): { value: number, label: string
     if (gameType === 'StraightUp') {
         return [
             { value: 1, label: '1-12', color: '#FFFFFF' },
-            { value: 2, label: '14-24', color: '#FFFFFF' },
-            { value: 3, label: '25-36', color: '#FFFFFF' },
+            { value: 13, label: '13-24', color: '#FFFFFF' },
+            { value: 25, label: '25-36', color: '#FFFFFF' },
         ];
     }
 
     if (gameType === 'VoisinsDuZero') {
         return [
-            { value: 1, label: 'Vecinos del Cero', color: '#FFFFFF' },
-            { value: 2, label: 'Otros', color: '#FFFFFF' },
+            { value: 1, label: 'Vecinos del Cero', color: '#FF0000', lineWidth: 2, lineStyle: 1 },
+            { value: 1.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },
+            { value: 2, label: 'Otros', color: '#FF0000', lineWidth: 2, lineStyle: 1 },
         ];
     }
 
     if (gameType === 'Orphelins') {
         return [
-            { value: 1, label: 'Huerfanos', color: '#FFFFFF' },
-            { value: 2, label: 'Otros', color: '#FFFFFF' },
+            { value: 1, label: 'Huerfanos', color: '#FF0000', lineWidth: 2, lineStyle: 1 },
+            { value: 1.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },
+            { value: 2, label: 'Otros', color: '#FF0000', lineWidth: 2, lineStyle: 1 },
         ];
     }
 
     if (gameType === 'TiersDuCylindre') {
         return [
-            { value: 1, label: 'Tercios', color: '#FFFFFF' },
-            { value: 2, label: 'Otros', color: '#FFFFFF' },
+            { value: 1, label: 'Tercios', color: '#FF0000', lineWidth: 2, lineStyle: 1 },
+            { value: 1.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },
+            { value: 2, label: 'Otros', color: '#FF0000', lineWidth: 2, lineStyle: 1 },
         ];
     }
 
     if (gameType === 'PlayZero') {
         return [
-            { value: 1, label: 'Juego del Cero', color: '#FFFFFF' },
-            { value: 2, label: 'Otros', color: '#FFFFFF' },
+            { value: 1, label: 'Juego del Cero', color: '#FF0000', lineWidth: 2, lineStyle: 1 },
+            { value: 1.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },
+            { value: 2, label: 'Otros', color: '#FF0000', lineWidth: 2, lineStyle: 1 },
         ];
     }
 

@@ -7,6 +7,8 @@ import {
   LineSeries,
   MouseEventParams,
   ISeriesApi,
+  LineWidth,
+  LineStyle,
 } from 'lightweight-charts';
 import { MultiSeriesData } from '../../../types/chart/types';
 import { translateRouletteTag, getYAxisTicks } from '../../../utils/formatters/rouletterNumbers';
@@ -38,7 +40,7 @@ const LineChart: React.FC<ChartProps> = ({
   } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
 
-  // Get chart type and table from URL or props
+ 
   const urlParams = new URLSearchParams(window.location.search);
   const chartType = urlParams.get('chartType') || 'Lineal';
   const selectedTable = urlParams.get('table') || '';
@@ -119,7 +121,7 @@ const LineChart: React.FC<ChartProps> = ({
     chartRef.current = chart;
     setChartRef(chart);
 
-    // Notificar que el chart está listo
+ 
     if (onChartReady) {
       onChartReady(chart);
     }
@@ -150,7 +152,7 @@ const LineChart: React.FC<ChartProps> = ({
     });
 
     if (seriesMap.size > 0) {
-      // Set the initial visible range
+     
       chart.timeScale().setVisibleRange(initialRange);
     }
 
@@ -161,8 +163,8 @@ const LineChart: React.FC<ChartProps> = ({
         firstSeries.createPriceLine({
           price: tick.value,
           color: tick.color,
-          lineWidth: 2,
-          lineStyle: 1,
+          lineWidth: tick.lineWidth as LineWidth || 2,
+          lineStyle: tick.lineStyle as LineStyle || 1,
           axisLabelVisible: true,
           title: tick.label,
 

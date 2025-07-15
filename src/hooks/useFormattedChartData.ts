@@ -93,11 +93,9 @@ const groupByDate = (data: RawEntry[]): GroupedData[] => {
 
 
 const formatMultipleLines = (grouped: GroupedData[], gameType?: GameType): MultiSeries[] => {
-
   const data: { time: UTCTimestamp; value: number; tag?: string; originalValue?: number }[] = [];
 
   grouped.forEach(({ date, entries }) => {
-
     const sortedEntries = entries.sort((a, b) => {
       const dateA = new Date(a.Date).getTime();
       const dateB = new Date(b.Date).getTime();
@@ -108,12 +106,11 @@ const formatMultipleLines = (grouped: GroupedData[], gameType?: GameType): Multi
 
     sortedEntries.forEach(({ Number, Tag }, index) => {
       const time = (baseTime + index) as UTCTimestamp;
-      // Convertir el tag a número para graficar
-      const tagNumber = convertTagToNumber(Tag, gameType);
-      data.push({ time, value: tagNumber, tag: Tag, originalValue: Number });
+    
+      const value = (gameType === 'StraightUp' || gameType === 'Dozen') ? Number : convertTagToNumber(Tag, gameType);
+      data.push({ time, value, tag: Tag, originalValue: Number });
     });
   });
-
 
   data.sort((a, b) => a.time - b.time);
 
@@ -122,12 +119,10 @@ const formatMultipleLines = (grouped: GroupedData[], gameType?: GameType): Multi
 
 
 const formatMultipleHistograms = (grouped: GroupedData[], gameType?: GameType): MultiSeries[] => {
-
   const data: { time: UTCTimestamp; value: number; color: string; tag?: string; originalValue?: number }[] = [];
-  let lastValue = 0;
+  let lastValue: number | null = null;
 
   grouped.forEach(({ date, entries }) => {
-
     const sortedEntries = entries.sort((a, b) => {
       const dateA = new Date(a.Date).getTime();
       const dateB = new Date(b.Date).getTime();
@@ -138,14 +133,28 @@ const formatMultipleHistograms = (grouped: GroupedData[], gameType?: GameType): 
 
     sortedEntries.forEach(({ Number, Tag }, index) => {
       const time = (baseTime + index) as UTCTimestamp;
-      // Convertir el tag a número para graficar
-      const tagNumber = convertTagToNumber(Tag, gameType);
-      const color = tagNumber >= lastValue ? 'rgba(32, 178, 108, 1)' : 'rgba(255, 82, 82, 1)';
-      lastValue = tagNumber;
-      data.push({ time, value: tagNumber, color, tag: Tag, originalValue: Number });
+    
+      const value = (gameType === 'StraightUp' || gameType === 'Dozen') ? Number : convertTagToNumber(Tag, gameType);
+      let color = 'rgba(32, 178, 108, 1)';
+      if (gameType === 'RedAndBlack') {
+        if (Tag === 'Red') {
+          color = '#FF0000';
+        } else if (Tag === 'Black') {
+          color = '#000000';
+        } else if (Tag === 'Green' || Tag === 'Zero') {
+          color = '#00FF00';
+        }
+      } else {
+        if (lastValue === null) {
+          color = 'rgba(32, 178, 108, 1)'; 
+        } else {
+          color = value >= lastValue ? '#00FF00' : '#FF0000'; 
+        }
+      }
+      lastValue = value;
+      data.push({ time, value, color, tag: Tag, originalValue: Number });
     });
   });
-
 
   data.sort((a, b) => a.time - b.time);
 
