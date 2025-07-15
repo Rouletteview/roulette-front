@@ -106,8 +106,9 @@ export const showPlacedToast = (value: string, id?: string) => {
     });
 };
 
-export const showInfoToast = (message: string) => {
+export const showInfoToast = (message: string, id?: string) => {
     toast(message, {
+        id: id,
         style: {
             background: '#2962FF',
             color: '#fff',

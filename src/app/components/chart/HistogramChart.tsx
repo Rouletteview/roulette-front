@@ -37,7 +37,7 @@ const HistogramChart: React.FC<ChartProps> = ({
   } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
 
-  // Get chart type and table from URL or props
+
   const urlParams = new URLSearchParams(window.location.search);
   const chartType = urlParams.get('chartType') || 'VerticalColumn';
   const selectedTable = urlParams.get('table') || '';
@@ -47,7 +47,7 @@ const HistogramChart: React.FC<ChartProps> = ({
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
-    // Obtener los ticks posibles para el eje Y
+   
     const yTicks = getYAxisTicks(gameType);
     const initialRange = getInitialRange();
 
@@ -95,7 +95,7 @@ const HistogramChart: React.FC<ChartProps> = ({
     chartRef.current = chart;
     setChartRef(chart);
 
-    // Notificar que el chart está listo
+  
     if (onChartReady) {
       onChartReady(chart);
     }
@@ -127,7 +127,7 @@ const HistogramChart: React.FC<ChartProps> = ({
 
 
     if (seriesMap.size > 0) {
-      // Set the initial visible range
+     
       chart.timeScale().setVisibleRange(initialRange);
     }
 
@@ -164,7 +164,7 @@ const HistogramChart: React.FC<ChartProps> = ({
       const time = param.time as number;
       const seriesData: { id: string; value: number; color: string; tag?: string; originalValue?: number }[] = [];
 
-      // Recopilar datos de todas las series en el tiempo actual
+    
       data.forEach((series) => {
         const dataAtTime = series.data.find(d => d.time === time);
         if (dataAtTime && 'value' in dataAtTime && 'color' in dataAtTime) {
@@ -279,10 +279,10 @@ const HistogramChart: React.FC<ChartProps> = ({
             backdropFilter: 'blur(4px)',
           }}
         >
-          <div style={{ color: 'rgba(32, 178, 108, 1)', fontWeight: 'bold', marginBottom: '8px' }}>Resultado</div>
+          <div style={{ color: 'white', fontWeight: 'bold', marginBottom: '8px' }}>Resultado</div>
           {tooltipData.series.map((series) => (
             <div key={series.id} style={{ margin: '6px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ color: series.color, fontSize: '11px', fontWeight: '500', flex: 1 }}>
+              <div style={{ color: 'white', fontSize: '11px', fontWeight: '500', flex: 1 }}>
                 {series.tag ? translateRouletteTag(series.tag) : series.id}
               </div>
               <div style={{ fontSize: '14px', color: 'white', fontWeight: 'bold', marginLeft: '8px' }}>

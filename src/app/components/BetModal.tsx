@@ -44,8 +44,6 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
         value: betValue || ""
     });
 
-    console.log('selectedChip', selectedChip);
-
     if (!open) return null;
 
     const handleBet = async () => {
@@ -59,7 +57,7 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
             console.log(error);
             console.log(createBetError);
 
-            // Mostrar mensaje de error específico
+          
             let errorMessage = 'Error al realizar la apuesta';
             if (createBetError?.message) {
                 errorMessage = createBetError.message;
