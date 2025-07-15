@@ -17,6 +17,7 @@
     "@tailwindcss/vite": "^4.0.3",
     "chart.js": "^4.5.0",
     "clsx": "^2.1.1",
+    "crypto-js": "^4.2.0",
     "flatpickr": "^4.6.13",
     "graphql": "^16.10.0",
     "lightweight-charts": "^5.0.5",
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^22.13.16",
     "@types/react": "^18.3.20",
     "@types/react-dom": "^18.3.5",
