@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { useGetBet } from '../../hooks/useGetBet';
 import { useCountdownStore } from '../../../stores/countdownStore';
 import { useBetStatusStore } from '../../../stores/betStatusStore';
+import { showWinToast, showLoseToast, showInfoToast } from '../../components/Toast';
 
 
 interface Props {
@@ -49,17 +50,19 @@ const BetSection: React.FC<Props> = ({ gameType, probabilities }) => {
       const status = betData.GetBet.status;
       const value = betData.GetBet.value;
 
-      console.log('Status de la apuesta:', status);
       if (status === 'Won') {
-        setBetResult({ status: 'Won', value});
+        setBetResult({ status: 'Won', value });
+        showWinToast(value);
       } else if (status === 'Lost') {
         console.log('Perdiste la apuesta.');
-        setBetResult({ status: 'Lost', value});
+        setBetResult({ status: 'Lost', value });
+        showLoseToast(value);
       } else if (status === 'Placed') {
-        // No limpiar betId
-        setBetResult({ status: 'Placed', value});
+        setBetResult({ status: 'Placed', value });
+        showInfoToast('Apuesta en proceso...');
       } else {
         console.log('No hay resultado para la apuesta.');
+        showInfoToast('Resultado pendiente');
       }
       if (status !== 'Placed') {
         localStorage.removeItem('betId');

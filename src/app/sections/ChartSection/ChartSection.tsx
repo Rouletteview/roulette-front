@@ -47,7 +47,7 @@ const ChartSection: React.FC = () => {
 
     const { betResult } = useBetStatusStore();
 
-    console.log(betResult);
+    console.log(betResult?.status);
 
 
     const {
@@ -158,14 +158,14 @@ const ChartSection: React.FC = () => {
                             <div className="flex flex-col w-full">
                                 <div
                                     ref={chartContainerRef}
-                                    className="relative flex-1 bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full max-w-full overflow-x-hidden"
+                                    className="relative bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full max-w-full overflow-x-hidden"
                                 >
                                     <Controls
                                         setIsChartFullscreen={setFullscreen}
                                         onZoomIn={onZoomIn}
                                         onZoomOut={onZoomOut}
                                     />
-                                    <div className='absolute top-28 left-1/2  z-50'>
+                                    <div className='absolute top-28 left-1/2  z-50 pointer-events-none'>
                                         {betResult?.status === 'Won' ? (
                                             <SuccessBet value={betResult.value || ''} />
                                         ) : betResult?.status === 'Lost' ? (
@@ -219,6 +219,7 @@ const ChartSection: React.FC = () => {
                                 />
                             </div>
                         </div>
+
                     </div>
                 </div>
             </section>
