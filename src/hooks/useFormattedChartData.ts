@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { useMemo } from "react";
 import { UTCTimestamp } from "lightweight-charts";
 import { chartTypes } from "../types/types";
@@ -178,8 +178,9 @@ const formatCandleChart = (grouped: GroupedData[], gameType?: GameType) => {
   let prevClose: number | undefined = undefined;
   let prevCloseTag: string | undefined = undefined;
   let prevCloseOriginal: number | undefined = undefined;
-  let prevCloseOriginalTag: string | undefined = undefined;
 
+  let prevCloseOriginalTag: string | undefined = undefined;
+  console.log(prevCloseOriginalTag);
   const candles = Array.from(map.entries()).sort((a, b) => a[0] - b[0]).map(([interval, entries]) => {
     const sorted = entries.sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
     const values = sorted.map(e => e.Number).filter(val => val !== undefined && !isNaN(val));
