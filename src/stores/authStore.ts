@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import CryptoJS from 'crypto-js';
+// import CryptoJS from 'crypto-js';
 
 
 type AuthState = {
@@ -17,8 +17,7 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       isAuthenticated: false,
       login: (token) => {
-        const encryptedToken = CryptoJS.AES.encrypt(token, import.meta.env.VITE_ENCRYPTION_KEY).toString();
-        set({ token: encryptedToken, isAuthenticated: true });
+        set({ token: token, isAuthenticated: true });
       },
       logout: () => {
         localStorage.removeItem('user');
@@ -27,18 +26,12 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-
       storage: {
         getItem: (name) => {
           const str = localStorage.getItem(name);
           if (!str) return null;
           try {
             const state = JSON.parse(str);
-            if (state.state && state.state.token) {
-              const bytes = CryptoJS.AES.decrypt(state.state.token, import.meta.env.VITE_ENCRYPTION_KEY);
-              const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
-              state.state.token = decryptedToken;
-            }
             return state;
           } catch {
             return null;
