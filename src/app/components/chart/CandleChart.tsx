@@ -6,6 +6,7 @@ import {
   CandlestickSeries,
   MouseEventParams,
   UTCTimestamp,
+
 } from 'lightweight-charts';
 import { translateRouletteTag, getYAxisTicks } from '../../../utils/formatters/rouletterNumbers';
 import { useChartPosition } from '../../../hooks/useChartPosition';
@@ -36,6 +37,8 @@ const CandleChart: React.FC<ChartProps> = ({
   const chartType = urlParams.get('chartType') || 'Candlestick';
   const selectedTable = urlParams.get('table') || '';
 
+  console.log('🔄 CandleChart - chartType:', chartType, 'gameType:', gameType, 'selectedTable:', selectedTable);
+
   const { setChartRef, getInitialRange } = useChartPosition(chartType, gameType || '', selectedTable);
 
   const [tooltipData, setTooltipData] = useState<{
@@ -54,10 +57,56 @@ const CandleChart: React.FC<ChartProps> = ({
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
-
     const yTicks = getYAxisTicks(gameType);
 
-    const initialRange = getInitialRange();
+    // Try to find any saved position for this gameType and selectedTable
+    const debugKey = `chartPosition_${chartType}_${gameType || ''}_${selectedTable}`;
+    let savedPosition = sessionStorage.getItem(debugKey);
+
+    console.log('📊 CandleChart - looking for position with key:', debugKey);
+    console.log('📊 CandleChart - savedPosition found:', !!savedPosition);
+
+    // If no position found with current chartType, try other chartTypes
+    if (!savedPosition) {
+      const allChartPositionKeys = Object.keys(sessionStorage).filter(key =>
+        key.startsWith('chartPosition_') &&
+        key.includes(gameType || '') &&
+        key.includes(selectedTable)
+      );
+
+      console.log('📊 CandleChart - no position found with current chartType, trying other keys:', allChartPositionKeys);
+      console.log('📊 CandleChart - all sessionStorage keys:', Object.keys(sessionStorage));
+
+      // Try to find any saved position with same gameType and selectedTable
+      for (const key of allChartPositionKeys) {
+        const position = sessionStorage.getItem(key);
+        if (position) {
+          console.log('📊 CandleChart - found position with key:', key, position);
+          savedPosition = position;
+          break;
+        }
+      }
+    }
+
+    // Create custom initial range if we found a saved position
+    let initialRange;
+    if (savedPosition) {
+      try {
+        const position = JSON.parse(savedPosition);
+        initialRange = {
+          from: position.from,
+          to: position.to,
+        };
+        console.log('📊 CandleChart - using saved position for initial range:', initialRange);
+      } catch (error) {
+        console.warn('📊 CandleChart - error parsing saved position:', error);
+        initialRange = getInitialRange();
+      }
+    } else {
+      initialRange = getInitialRange();
+    }
+
+    console.log('📊 CandleChart - final initialRange:', initialRange);
 
     const chart = createChart(chartContainerRef.current, {
       width: width || chartContainerRef.current.clientWidth,
@@ -113,12 +162,11 @@ const CandleChart: React.FC<ChartProps> = ({
     chartRef.current = chart;
     setChartRef(chart);
 
-
     if (onChartReady) {
       onChartReady(chart);
     }
 
-    // Crear series de velas con colores personalizados para RedAndBlack
+
     const isRedAndBlack = gameType === 'RedAndBlack';
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -179,25 +227,6 @@ const CandleChart: React.FC<ChartProps> = ({
       return;
     }
 
-
-    const tagValues = yTicks?.map(t => t.value) || [];
-    const tagLabels = yTicks?.map(t => t.label) || [];
-    const baseTime = (data.length > 0 ? data[0].time : 0) - 100000;
-    const forcedCandles = tagValues.map((val, i) => ({
-      time: (baseTime - i) as UTCTimestamp,
-      open: val,
-      high: val,
-      low: val,
-      close: val,
-      openTag: tagLabels[i],
-      closeTag: tagLabels[i],
-      openOriginal: val,
-      highOriginal: val,
-      lowOriginal: val,
-      closeOriginal: val,
-    }));
-
-
     const stripCandle = (candle: unknown) => {
       if (
         typeof candle === 'object' &&
@@ -220,18 +249,8 @@ const CandleChart: React.FC<ChartProps> = ({
     };
 
     const validData = [
-      ...forcedCandles,
+      // ...forcedCandles,  // ← ESTO ES EL PROBLEMA
       ...data
-        .filter(item =>
-          item &&
-          typeof item.time === 'number' &&
-          !isNaN(item.time) &&
-          !isNaN(Number(item.open)) &&
-          !isNaN(Number(item.high)) &&
-          !isNaN(Number(item.low)) &&
-          !isNaN(Number(item.close))
-        )
-        .map(item => ({ ...item }))
     ].sort((a, b) => Number(a.time) - Number(b.time));
 
     if (validData.length > 0) {
@@ -255,11 +274,11 @@ const CandleChart: React.FC<ChartProps> = ({
           }
         });
 
+        // const seriesMap = new Map<string, ISeriesApi<'Candlestick'>>();
 
         if (redData.length > 0) redSeries.setData(redData);
         if (blackData.length > 0) blackSeries.setData(blackData);
         if (greenData.length > 0) greenSeries.setData(greenData);
-
 
         const firstSeries = redSeries || blackSeries || greenSeries;
         // Solo crear price lines si el tipo de gráfico NO es Candlestick
@@ -279,7 +298,6 @@ const CandleChart: React.FC<ChartProps> = ({
 
         defaultSeries.setData(validData.map(stripCandle));
 
-        // Solo crear price lines si el tipo de gráfico NO es Candlestick
         if (yTicks && yTicks.length > 0 && chartType !== 'Candlestick') {
           yTicks.forEach(tick => {
             defaultSeries.createPriceLine({
@@ -294,6 +312,7 @@ const CandleChart: React.FC<ChartProps> = ({
         }
       }
 
+      // Set visible range after data is loaded
       chart.timeScale().setVisibleRange(initialRange);
     }
 
@@ -372,6 +391,7 @@ const CandleChart: React.FC<ChartProps> = ({
       chart.remove();
       resizeObserver.disconnect();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, height, width, gameType]);
 
 
@@ -398,7 +418,7 @@ const CandleChart: React.FC<ChartProps> = ({
           </div>
         </div>
       )}
-      <div ref={chartContainerRef} style={{ width: '100%' }} />
+      <div ref={chartContainerRef} style={{ width: '100%', overflow: 'hidden' }} />
       {tooltipData && tooltipPosition && (
         <div
           ref={tooltipRef}
@@ -422,6 +442,7 @@ const CandleChart: React.FC<ChartProps> = ({
             WebkitFontSmoothing: 'antialiased',
             MozOsxFontSmoothing: 'grayscale',
             backdropFilter: 'blur(4px)',
+
           }}
         >
           <div style={{ color: tooltipData.isUp ? 'rgba(38, 166, 154, 1)' : '#ef5350', fontWeight: 'bold', marginBottom: '8px' }}>

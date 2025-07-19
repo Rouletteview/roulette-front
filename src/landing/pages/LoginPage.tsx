@@ -24,7 +24,7 @@ const LoginPage = () => {
       <Header>
         <a
           href="/"
-          className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-white "
+          className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-white yellow-button-shadow"
         >
           Ir al inicio
         </a>

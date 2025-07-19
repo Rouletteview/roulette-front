@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client";
-import { REGISTER_MUTATION } from "../graphql/mutations/registerUser";
+import { REGISTER_MUTATION } from "../graphql/mutations/auth/registerUser";
 
 export const useRegister = () => {
   const [registerUser, { data, loading, error }] = useMutation(REGISTER_MUTATION);

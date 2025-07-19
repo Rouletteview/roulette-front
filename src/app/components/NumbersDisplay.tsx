@@ -17,6 +17,7 @@ const colorClasses = {
 
 const NumbersDisplay = ({ numbers, loading }: Props) => {
     const lastNumbers = numbers;
+    if (!loading && lastNumbers.length === 0) return null
     return (
         <ul className="flex flex-wrap gap-2 bg-black/30 p-2 rounded">
             {loading

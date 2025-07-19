@@ -12,6 +12,7 @@ import NewPasswordPage from "../landing/pages/NewPasswordPage";
 import HomePage from "../app/pages/HomePage";
 import NotFound from "../landing/pages/NotFound";
 import HistoryPage from "../app/pages/HistoryPage";
+import SubscriptionPage from '../app/pages/SubscriptionPage';
 
 const ActivateUserRedirect = () => {
   const params = new URLSearchParams(location.search);
@@ -46,6 +47,7 @@ const AppRouter = () => {
       <Route path="/recuperar-password" element={<ResetPassword />} />
       <Route path="/correo-enviado" element={<CheckEmailPasswordPage />} />
       <Route path="/resetPassword" element={<NewPasswordPage />} />
+      <Route path="/subscripcion" element={<SubscriptionPage />} />
 
       <Route path="/activateUser" element={<ActivateUserRedirect />} />
       {/* App */}

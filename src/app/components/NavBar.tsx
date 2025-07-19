@@ -16,6 +16,7 @@ const NavBar = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const logout = useAuthStore((state) => state.logout);
+    const isSubscriptionPage = location.pathname === '/subscripcion';
 
     const navLinks = [
         { name: "Inicio", path: "/home", icon: homeIcon },
@@ -35,7 +36,7 @@ const NavBar = () => {
         <nav className="px-6 py-4">
             <div className="flex justify-between items-center">
                 {/* menu desktop */}
-                <ul className="hidden lg:flex items-center space-x-6 text-white">
+                <ul className={`hidden lg:flex items-center space-x-6 ${isSubscriptionPage ? 'text-black' : 'text-white'}`}>
                     {navLinks.map((item) => (
                         <li key={item.path}>
                             <a
@@ -52,7 +53,7 @@ const NavBar = () => {
                     <li className="ml-8">
                         <button
                             onClick={handleLogout}
-                            className="bg-[#D9A425] hover:bg-[#B3831D] rounded-lg px-4 py-3 transition-all text-base cursor-pointer"
+                            className="bg-[#D9A425] hover:bg-[#B3831D] text-white rounded-lg px-4 py-3 transition-all text-base cursor-pointer yellow-button-shadow"
                         >
                             Cerrar sesión
                         </button>
@@ -112,7 +113,7 @@ const NavBar = () => {
 
                     <button
                         onClick={handleLogout}
-                        className="bg-[#D9A425] hover:bg-[#B3831D] rounded-lg px-4 py-3 transition-all text-base cursor-pointer w-full mt-4"
+                        className="bg-[#D9A425] hover:bg-[#B3831D] text-white rounded-lg px-4 py-3 transition-all text-base cursor-pointer w-full mt-4 yellow-button-shadow"
                     >
                         Cerrar sesión
                     </button>

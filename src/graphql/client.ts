@@ -2,6 +2,8 @@ import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { useAuthStore } from "../stores/authStore";
 import { onError } from "@apollo/client/link/error";
+// import { decryptToken } from "../utils/crypto";
+
 
 const httpLink = createHttpLink({
   uri: import.meta.env.VITE_GRAPHQL_URL,
@@ -9,6 +11,8 @@ const httpLink = createHttpLink({
 
 const authLink = setContext((_, { headers }) => {
   const token = useAuthStore.getState().token;
+
+
   return {
     headers: {
       ...headers,
