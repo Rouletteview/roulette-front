@@ -38,12 +38,14 @@ const AreaChart: React.FC<ChartProps> = ({
   } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
 
-  // Get chart type and table from URL or props
+
   const urlParams = new URLSearchParams(window.location.search);
   const chartType = urlParams.get('chartType') || 'Area';
   const selectedTable = urlParams.get('table') || '';
 
-  const { setChartRef, getInitialRange } = useChartPosition(chartType, gameType || '', selectedTable);
+  console.log('🔄 AreaChart - chartType:', chartType, 'gameType:', gameType, 'selectedTable:', selectedTable);
+
+  const { setChartRef, getInitialRange, restorePosition } = useChartPosition(chartType, gameType || '', selectedTable);
 
   const seriesColors = [
     { line: 'rgba(38, 166, 154, 1)', top: 'rgba(38, 166, 154, 0.28)', bottom: 'rgba(38, 166, 154, 0.05)' },
@@ -60,6 +62,8 @@ const AreaChart: React.FC<ChartProps> = ({
 
     const yTicks = getYAxisTicks(gameType);
     const initialRange = getInitialRange();
+
+    console.log('📊 AreaChart - initialRange:', initialRange);
 
     const chart = createChart(chartContainerRef.current, {
       width: width || chartContainerRef.current.clientWidth,
@@ -115,7 +119,7 @@ const AreaChart: React.FC<ChartProps> = ({
     chartRef.current = chart;
     setChartRef(chart);
 
-    // Notificar que el chart está listo
+
     if (onChartReady) {
       onChartReady(chart);
     }
@@ -148,8 +152,15 @@ const AreaChart: React.FC<ChartProps> = ({
 
 
     if (seriesMap.size > 0) {
-      // Set the initial visible range
+
       chart.timeScale().setVisibleRange(initialRange);
+
+      // Now that data is loaded, try to restore the saved position
+      // Add a small delay to ensure the chart is fully rendered
+      setTimeout(() => {
+        console.log('📊 AreaChart - attempting to restore position after data load');
+        restorePosition();
+      }, 100);
     }
 
 
@@ -168,7 +179,7 @@ const AreaChart: React.FC<ChartProps> = ({
       });
     }
 
-    // Add crosshair move handler
+
     chart.subscribeCrosshairMove((param: MouseEventParams) => {
       if (
         param.point === undefined ||

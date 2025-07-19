@@ -4,6 +4,7 @@ import Logo from "../assets/logo/logo2.svg";
 
 
 
+
 type Props = {
     children?: ReactNode
     className?: string;
@@ -11,6 +12,8 @@ type Props = {
 
 
 export const Header = ({children, className}: Props) => {
+
+   
     return (
         <header className={`py-0 px-5 md:px-[98px] absolute top-0 left-0 w-full z-40 ${className}`}>
         <nav className="flex justify-between items-center mt-6">
@@ -18,7 +21,7 @@ export const Header = ({children, className}: Props) => {
                 <img src={Logo} alt="Logo de Roulette View" className="object-cover"/>
             </a>
 
-            <div className="flex items-center gap-x-3.5 md:gap-x-7 text-white text-[12px] md:text-lg font-semibold">
+            <div className={`flex items-center gap-x-3.5 md:gap-x-7 text-white text-[12px] md:text-lg font-semibold`}>
                 {children}
             </div>
         </nav>

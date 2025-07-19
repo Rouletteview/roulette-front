@@ -124,7 +124,7 @@ const NewPasswordForm = ({ token }: Props) => {
                 <button
                     type="submit"
                     disabled={loading}
-                    className='block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-full  text-lg font-bold rounded-[10px] py-2 mt-5 mb-3 disabled:bg-[#B2B2B2]'>
+                    className='block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-full  text-lg font-bold rounded-[10px] py-2 mt-5 mb-3 disabled:bg-[#B2B2B2] yellow-button-shadow'>
                     {loading ? "Cargando..." : "Restablecer Contraseña"}
                 </button>
 

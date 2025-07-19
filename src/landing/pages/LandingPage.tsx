@@ -27,7 +27,7 @@ const LandingPage = () => {
                             </div>
                             <a
                                 href="/home"
-                                className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-sm md:text-lg"
+                                className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-sm md:text-lg yellow-button-shadow"
                             >
                                 Ir al Home
                             </a>
@@ -35,7 +35,7 @@ const LandingPage = () => {
                     ) : (
                         <>
                             <a href="/iniciar-sesion" className="border border-[#D9A425] hover:border-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-sm md:text-lg">Iniciar sesión</a>
-                            <a href="/registrarse" className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-sm md:text-lg ">Registrarse</a>
+                            <a href="/registrarse" className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-sm md:text-lg yellow-button-shadow">Registrarse</a>
                         </>
                     )}
                 </div>

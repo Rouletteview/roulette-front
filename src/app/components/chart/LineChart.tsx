@@ -40,7 +40,7 @@ const LineChart: React.FC<ChartProps> = ({
   } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
 
- 
+
   const urlParams = new URLSearchParams(window.location.search);
   const chartType = urlParams.get('chartType') || 'Lineal';
   const selectedTable = urlParams.get('table') || '';
@@ -64,6 +64,13 @@ const LineChart: React.FC<ChartProps> = ({
 
     const yTicks = getYAxisTicks(gameType);
     const initialRange = getInitialRange();
+
+    console.log('📊 LineChart - chartType:', chartType, 'gameType:', gameType, 'selectedTable:', selectedTable);
+    console.log('📊 LineChart - initialRange:', initialRange);
+
+    // Debug: Check if LineChart is saving position
+    const debugKey = `chartPosition_${chartType}_${gameType || ''}_${selectedTable}`;
+    console.log('📊 LineChart - will save position with key:', debugKey);
 
     const chart = createChart(chartContainerRef.current, {
 
@@ -121,7 +128,7 @@ const LineChart: React.FC<ChartProps> = ({
     chartRef.current = chart;
     setChartRef(chart);
 
- 
+
     if (onChartReady) {
       onChartReady(chart);
     }
@@ -152,7 +159,7 @@ const LineChart: React.FC<ChartProps> = ({
     });
 
     if (seriesMap.size > 0) {
-     
+
       chart.timeScale().setVisibleRange(initialRange);
     }
 

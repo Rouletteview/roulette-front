@@ -71,6 +71,10 @@ export const translateRouletteTag = (tag: string): string => {
         '00': '00',
 
 
+        'Daily': ' diario',
+        'Weekly': ' semanal',
+        'Monthly': ' mensual',
+        'Annual': ' anual',
         'default': tag
     };
 

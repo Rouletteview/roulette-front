@@ -27,16 +27,15 @@ const LoginForm = () => {
     });
 
     const { Login, loading } = useLogin();
-    const { refetch: getUserInfo } = useQuery(GET_USER_INFO, { skip: true });
 
+    const { refetch: getUserInfo } = useQuery(GET_USER_INFO, { skip: true });
+    console.log(getUserInfo)
     if (loading) return <LoadingOverlay />;
 
 
 
     const onSubmit = async (data: loginFormData) => {
         setErrorMessage("");
-        console.log(data.email, data.password)
-
         try {
 
             const resp = await Login({
@@ -48,10 +47,12 @@ const LoginForm = () => {
 
             const token = resp.data.Login.Token;
             login(token);
-
+            await new Promise((res) => setTimeout(res, 0));
             const userInfo = await getUserInfo();
+       
             if (userInfo.data?.GetUserInfo) {
                 const { FirstName, LastName, Email } = userInfo.data.GetUserInfo;
+
                 localStorage.setItem('user', JSON.stringify({
                     name: `${FirstName} ${LastName}`,
                     email: Email
@@ -120,7 +121,7 @@ const LoginForm = () => {
 
                 <button
                     type="submit"
-                    className='block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-full  text-lg font-bold rounded-[10px] py-2 mt-5 mb-3 disabled:bg-[#B2B2B2]'>
+                    className='block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-full  text-lg font-bold rounded-[10px] py-2 mt-5 mb-3 disabled:bg-[#B2B2B2] yellow-button-shadow'>
                     {loading ? "Cargando..." : "Iniciar sesión"}
                 </button>
                 <div className="flex justify-center gap-x-2.5 lg:text-xl">

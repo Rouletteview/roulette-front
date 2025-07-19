@@ -26,7 +26,7 @@ const RegisterPage = () => {
         <Link to="/iniciar-sesion" className="border border-[#D9A425] hover:border-[#B3831D] transition-all px-4 py-2 rounded-xl text-center hidden md:block">Iniciar sesión</Link>
         <Link
           to="/"
-          className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-white "
+          className="bg-[#D9A425] hover:bg-[#B3831D] transition-all px-4 py-2 rounded-xl text-center text-white yellow-button-shadow"
         >
           Ir al inicio
         </Link>
