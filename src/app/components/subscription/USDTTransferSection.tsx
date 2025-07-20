@@ -1,15 +1,26 @@
 import usdtQR from '../../../assets/images/usdt-qr.png'
 import usdtUpload from '../../../assets/images/usdt-upload.png'
 import { useState } from 'react'
+import { SubscriptionState } from './SubscriptionCheckoutSection'
+import { showErrorToast } from '../Toast';
 
-const USDTTransferSection = () => {
+interface Props {
+    setSubscriptionState: (state: SubscriptionState) => void;
+    subscriptionState: SubscriptionState;
+    handleCreateSubscription: () => void;
+}
+
+const USDTTransferSection = ({ setSubscriptionState, subscriptionState, handleCreateSubscription }: Props) => {
     const [uploadedImage, setUploadedImage] = useState<string | null>(null)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleFileUpload = (file: File) => {
         if (file && file.type.startsWith('image/')) {
             const reader = new FileReader()
             reader.onload = (e) => {
-                setUploadedImage(e.target?.result as string)
+                const base64String = e.target?.result as string
+                setUploadedImage(base64String)
+                setSubscriptionState({ ...subscriptionState, PhotoFile: base64String })
             }
             reader.readAsDataURL(file)
         }
@@ -32,6 +43,20 @@ const USDTTransferSection = () => {
 
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault()
+    }
+
+    const handleSubmit = async () => {
+        if (!uploadedImage) return;
+
+        setIsSubmitting(true);
+        try {
+            await handleCreateSubscription();
+        } catch (error) {
+            console.error('Error submitting:', error);
+            showErrorToast(error as string)
+        } finally {
+            setIsSubmitting(false);
+        }
     }
 
     return (
@@ -95,10 +120,18 @@ const USDTTransferSection = () => {
                 </div>
                 <div className="flex justify-center w-full mt-4 lg:mt-12">
                     <button
-                        disabled={!uploadedImage}
+                        disabled={!uploadedImage || isSubmitting}
+                        onClick={handleSubmit}
                         className="bg-[#D9A425] hover:bg-[#B3831D] disabled:opacity-50 disabled:cursor-not-allowed w-[500px] text-white font-bold rounded-lg px-4 py-3 transition-all text-base cursor-pointer yellow-button-shadow"
                     >
-                        Pago realizado
+                        {isSubmitting ? (
+                            <div className="flex items-center justify-center">
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                Procesando...
+                            </div>
+                        ) : (
+                            'Pago realizado'
+                        )}
                     </button>
                 </div>
             </div>

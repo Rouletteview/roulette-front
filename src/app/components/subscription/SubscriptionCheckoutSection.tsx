@@ -1,6 +1,12 @@
 import BankTransferSection from "./BankTransferSection";
 import USDTTransferSection from "./USDTTransferSection";
 import { translateRouletteTag } from "../../../utils/formatters/rouletterNumbers";
+import { CREATE_SUBSCRIPTION_MUTATION } from "../../../graphql/mutations/subscription/createSubscription";
+import { useMutation } from "@apollo/client";
+import { useState } from "react";
+import SuccessModal from "./SuccessModal";
+import { showErrorToast } from "../Toast";
+
 
 interface Props {
     holder: string;
@@ -13,13 +19,47 @@ interface Props {
     selectedMethod: string;
 }
 
+export interface SubscriptionState {
+    Frequency: string;
+    PaymentMethod: string;
+    Reference: string;
+    PhotoFile: File | string | null;
+}
 
-const SubscriptionCheckoutSection = ({    selectedPlan, selectedMethod }: Props) => {
+
+const SubscriptionCheckoutSection = ({ selectedPlan, selectedMethod }: Props) => {
+
+    const [subscriptionState, setSubscriptionState] = useState<SubscriptionState>({
+        Frequency: selectedPlan || '',
+        PaymentMethod: selectedMethod,
+        Reference: '00',
+        PhotoFile: null
+    })
+
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+    const [createSubscription] = useMutation(CREATE_SUBSCRIPTION_MUTATION);
 
 
+    const handleCreateSubscription = async () => {
+        const subscriptionData = {
+            Frequency: subscriptionState.Frequency,
+            PaymentMethod: subscriptionState.PaymentMethod,
+            Reference: subscriptionState.Reference
+        };
 
-    console.log(selectedPlan);
-    
+        try {
+            await createSubscription({ variables: { input: subscriptionData } });
+            setShowSuccessModal(true);
+        } catch (error) {
+            if (error instanceof Error) {
+                showErrorToast(error.message);
+            } else {
+                showErrorToast("An unknown error occurred");
+            }
+        }
+    }
+
     return (
         <>
             <section className="w-full  mx-auto text-[#121418F2] px-4 lg:px-0">
@@ -27,7 +67,15 @@ const SubscriptionCheckoutSection = ({    selectedPlan, selectedMethod }: Props)
                     Plan {translateRouletteTag(selectedPlan || '')} de <span className="text-[#D9A425]">${selectedPlan === 'Daily' ? '1.5' : selectedPlan === 'Weekly' ? '3.0' : selectedPlan === 'Monthly' ? '5.0' : '25.'}</span>
                 </h1>
                 {
-                    selectedMethod === 'Phone' ? <BankTransferSection /> : <USDTTransferSection />
+                    selectedMethod === 'Phone' ? <BankTransferSection
+                        setSubscriptionState={setSubscriptionState}
+                        subscriptionState={subscriptionState}
+                        handleCreateSubscription={handleCreateSubscription}
+                    /> : <USDTTransferSection
+                        setSubscriptionState={setSubscriptionState}
+                        subscriptionState={subscriptionState}
+                        handleCreateSubscription={handleCreateSubscription}
+                    />
                 }
 
                 {/* <button
@@ -40,6 +88,12 @@ const SubscriptionCheckoutSection = ({    selectedPlan, selectedMethod }: Props)
                     Volver
                 </button> */}
             </section>
+
+            <SuccessModal
+                isOpen={showSuccessModal}
+                onClose={() => setShowSuccessModal(false)}
+                message="Un plazo de 48 horas para darte acceso a la plataforma, podría ser antes"
+            />
         </>
     )
 }
