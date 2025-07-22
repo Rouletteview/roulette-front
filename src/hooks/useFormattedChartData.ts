@@ -94,21 +94,23 @@ const groupByDate = (data: RawEntry[]): GroupedData[] => {
 
 const formatMultipleLines = (grouped: GroupedData[], gameType?: GameType): MultiSeries[] => {
   const data: { time: UTCTimestamp; value: number; tag?: string; originalValue?: number }[] = [];
+  let lastTime: number = 0;
 
-  grouped.forEach(({ date, entries }) => {
+  grouped.forEach(({ entries }) => {
     const sortedEntries = entries.sort((a, b) => {
       const dateA = new Date(a.Date).getTime();
       const dateB = new Date(b.Date).getTime();
       return dateA - dateB;
     });
 
-    const baseTime = new Date(date).getTime() / 1000 as UTCTimestamp;
-
-    sortedEntries.forEach(({ Number, Tag }, index) => {
-      const time = (baseTime + index) as UTCTimestamp;
-
-      const value = (gameType === 'StraightUp' || gameType === 'Dozen') ? Number : convertTagToNumber(Tag, gameType);
-      data.push({ time, value, tag: Tag, originalValue: Number });
+    sortedEntries.forEach((entry) => {
+      let time = Math.floor(new Date(entry.Date).getTime() / 1000) as UTCTimestamp;
+      if (time <= lastTime) {
+        time = (lastTime + 1) as UTCTimestamp;
+      }
+      lastTime = time;
+      const value = (gameType === 'StraightUp' || gameType === 'Dozen') ? entry.Number : convertTagToNumber(entry.Tag, gameType);
+      data.push({ time, value, tag: entry.Tag, originalValue: entry.Number });
     });
   });
 
@@ -121,27 +123,29 @@ const formatMultipleLines = (grouped: GroupedData[], gameType?: GameType): Multi
 const formatMultipleHistograms = (grouped: GroupedData[], gameType?: GameType): MultiSeries[] => {
   const data: { time: UTCTimestamp; value: number; color: string; tag?: string; originalValue?: number }[] = [];
   let lastValue: number | null = null;
+  let lastTime: number = 0;
 
-  grouped.forEach(({ date, entries }) => {
+  grouped.forEach(({ entries }) => {
     const sortedEntries = entries.sort((a, b) => {
       const dateA = new Date(a.Date).getTime();
       const dateB = new Date(b.Date).getTime();
       return dateA - dateB;
     });
 
-    const baseTime = new Date(date).getTime() / 1000 as UTCTimestamp;
-
-    sortedEntries.forEach(({ Number, Tag }, index) => {
-      const time = (baseTime + index) as UTCTimestamp;
-
-      const value = (gameType === 'StraightUp' || gameType === 'Dozen') ? Number : convertTagToNumber(Tag, gameType);
+    sortedEntries.forEach((entry) => {
+      let time = Math.floor(new Date(entry.Date).getTime() / 1000) as UTCTimestamp;
+      if (time <= lastTime) {
+        time = (lastTime + 1) as UTCTimestamp;
+      }
+      lastTime = time;
+      const value = (gameType === 'StraightUp' || gameType === 'Dozen') ? entry.Number : convertTagToNumber(entry.Tag, gameType);
       let color = 'rgba(32, 178, 108, 1)';
       if (gameType === 'RedAndBlack') {
-        if (Tag === 'Red') {
+        if (entry.Tag === 'Red') {
           color = '#FF0000';
-        } else if (Tag === 'Black') {
+        } else if (entry.Tag === 'Black') {
           color = '#000000';
-        } else if (Tag === 'Green' || Tag === 'Zero') {
+        } else if (entry.Tag === 'Green' || entry.Tag === 'Zero') {
           color = '#00FF00';
         }
       } else {
@@ -152,7 +156,7 @@ const formatMultipleHistograms = (grouped: GroupedData[], gameType?: GameType): 
         }
       }
       lastValue = value;
-      data.push({ time, value, color, tag: Tag, originalValue: Number });
+      data.push({ time, value, color, tag: entry.Tag, originalValue: entry.Number });
     });
   });
 
