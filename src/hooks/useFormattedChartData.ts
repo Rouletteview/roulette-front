@@ -1,4 +1,4 @@
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useMemo } from "react";
 import { UTCTimestamp } from "lightweight-charts";
 import { chartTypes } from "../types/types";
@@ -94,23 +94,21 @@ const groupByDate = (data: RawEntry[]): GroupedData[] => {
 
 const formatMultipleLines = (grouped: GroupedData[], gameType?: GameType): MultiSeries[] => {
   const data: { time: UTCTimestamp; value: number; tag?: string; originalValue?: number }[] = [];
-  let lastTime: number = 0;
 
-  grouped.forEach(({ entries }) => {
+  grouped.forEach(({ date, entries }) => {
     const sortedEntries = entries.sort((a, b) => {
       const dateA = new Date(a.Date).getTime();
       const dateB = new Date(b.Date).getTime();
       return dateA - dateB;
     });
 
-    sortedEntries.forEach((entry) => {
-      let time = Math.floor(new Date(entry.Date).getTime() / 1000) as UTCTimestamp;
-      if (time <= lastTime) {
-        time = (lastTime + 1) as UTCTimestamp;
-      }
-      lastTime = time;
-      const value = (gameType === 'StraightUp' || gameType === 'Dozen') ? entry.Number : convertTagToNumber(entry.Tag, gameType);
-      data.push({ time, value, tag: entry.Tag, originalValue: entry.Number });
+    const baseTime = new Date(date).getTime() / 1000 as UTCTimestamp;
+
+    sortedEntries.forEach(({ Number, Tag }, index) => {
+      const time = (baseTime + index) as UTCTimestamp;
+
+      const value = (gameType === 'StraightUp' || gameType === 'Dozen') ? Number : convertTagToNumber(Tag, gameType);
+      data.push({ time, value, tag: Tag, originalValue: Number });
     });
   });
 
@@ -123,29 +121,27 @@ const formatMultipleLines = (grouped: GroupedData[], gameType?: GameType): Multi
 const formatMultipleHistograms = (grouped: GroupedData[], gameType?: GameType): MultiSeries[] => {
   const data: { time: UTCTimestamp; value: number; color: string; tag?: string; originalValue?: number }[] = [];
   let lastValue: number | null = null;
-  let lastTime: number = 0;
 
-  grouped.forEach(({ entries }) => {
+  grouped.forEach(({ date, entries }) => {
     const sortedEntries = entries.sort((a, b) => {
       const dateA = new Date(a.Date).getTime();
       const dateB = new Date(b.Date).getTime();
       return dateA - dateB;
     });
 
-    sortedEntries.forEach((entry) => {
-      let time = Math.floor(new Date(entry.Date).getTime() / 1000) as UTCTimestamp;
-      if (time <= lastTime) {
-        time = (lastTime + 1) as UTCTimestamp;
-      }
-      lastTime = time;
-      const value = (gameType === 'StraightUp' || gameType === 'Dozen') ? entry.Number : convertTagToNumber(entry.Tag, gameType);
+    const baseTime = new Date(date).getTime() / 1000 as UTCTimestamp;
+
+    sortedEntries.forEach(({ Number, Tag }, index) => {
+      const time = (baseTime + index) as UTCTimestamp;
+
+      const value = (gameType === 'StraightUp' || gameType === 'Dozen') ? Number : convertTagToNumber(Tag, gameType);
       let color = 'rgba(32, 178, 108, 1)';
       if (gameType === 'RedAndBlack') {
-        if (entry.Tag === 'Red') {
+        if (Tag === 'Red') {
           color = '#FF0000';
-        } else if (entry.Tag === 'Black') {
+        } else if (Tag === 'Black') {
           color = '#000000';
-        } else if (entry.Tag === 'Green' || entry.Tag === 'Zero') {
+        } else if (Tag === 'Green' || Tag === 'Zero') {
           color = '#00FF00';
         }
       } else {
@@ -156,7 +152,7 @@ const formatMultipleHistograms = (grouped: GroupedData[], gameType?: GameType): 
         }
       }
       lastValue = value;
-      data.push({ time, value, color, tag: entry.Tag, originalValue: entry.Number });
+      data.push({ time, value, color, tag: Tag, originalValue: Number });
     });
   });
 
@@ -182,9 +178,8 @@ const formatCandleChart = (grouped: GroupedData[], gameType?: GameType) => {
   let prevClose: number | undefined = undefined;
   let prevCloseTag: string | undefined = undefined;
   let prevCloseOriginal: number | undefined = undefined;
-
   let prevCloseOriginalTag: string | undefined = undefined;
-  console.log(prevCloseOriginalTag);
+
   const candles = Array.from(map.entries()).sort((a, b) => a[0] - b[0]).map(([interval, entries]) => {
     const sorted = entries.sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
     const values = sorted.map(e => e.Number).filter(val => val !== undefined && !isNaN(val));

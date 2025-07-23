@@ -13,16 +13,34 @@ import HomePage from "../app/pages/HomePage";
 import NotFound from "../landing/pages/NotFound";
 import HistoryPage from "../app/pages/HistoryPage";
 import SubscriptionPage from '../app/pages/SubscriptionPage';
+import { useMutation } from "@apollo/client";
+import { ACTIVATE_USER } from "../graphql/mutations/auth/activateUser";
+
 
 const ActivateUserRedirect = () => {
   const params = new URLSearchParams(location.search);
   const token = params.get("token");
   const navigate = useNavigate();
+  const [ActivateUser] = useMutation(ACTIVATE_USER)
+
+  
   useEffect(() => {
     if (token) {
-      navigate("/iniciar-sesion", {
-        state: { message: "Email confirmado con éxito", ok: true },
-      });
+      const activate = async () => {
+        try {
+          await ActivateUser({ variables: { token } });
+          navigate("/iniciar-sesion", {
+            state: { message: "Email confirmado con éxito", ok: true },
+          });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+          console.log(error);
+          navigate("/iniciar-sesion", {
+            state: { message: "Error al activar el usuario", ok: false },
+          });
+        }
+      };
+      activate();
     }
   }, [token, navigate]);
 

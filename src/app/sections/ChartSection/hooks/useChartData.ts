@@ -67,6 +67,8 @@ export const useChartData = (
         skip: !selectedTable,
     });
 
+  
+
    
     const tableOptions = tablesData?.GetRouletteTables?.Tables?.map((table: RouletteTable) => ({
         label: `${table.Name} - ${table.Provider.charAt(0).toUpperCase() + table.Provider.slice(1)}`,
