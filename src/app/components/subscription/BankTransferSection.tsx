@@ -34,7 +34,7 @@ const BankTransferSection = ({ setSubscriptionState, subscriptionState, handleCr
 
       const { referenceNumber } = data
       setSubscriptionState({ ...subscriptionState, Reference: referenceNumber })
-      handleCreateSubscription()
+       handleCreateSubscription()
     } catch (error: unknown) {
       console.error('Error al enviar el pago:', error)
 

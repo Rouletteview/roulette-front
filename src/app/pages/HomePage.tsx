@@ -15,18 +15,19 @@ import { useUserInfo } from "../../hooks/useUserInfo"
 
 const HomePage = () => {
 
-  const [startFreeSubscription, { loading }] = useMutation(START_FREE_SUBSCRIPTION_MUTATION);
-  const { data, loading: getCurrentUserSubscriptionLoading } = useQuery(GET_CURRENT_USER_SUBSCRIPTION_QUERY);
+  const [startFreeSubscription, { loading }] = useMutation(START_FREE_SUBSCRIPTION_MUTATION, {
+    refetchQueries: [{ query: GET_CURRENT_USER_SUBSCRIPTION_QUERY }],
+  });
+  const { data: subscriptionData, loading: getCurrentUserSubscriptionLoading } = useQuery(GET_CURRENT_USER_SUBSCRIPTION_QUERY);
   const { data: userData, loading: userDataLoading } = useUserInfo();
 
   const isAdmin = userData?.GetUserInfo.IsAdmin
   
 
 
-  const payments = data?.GetCurrentUserSubscription.Payments
+  const payments = subscriptionData?.GetCurrentUserSubscription.Payments
   if (loading || getCurrentUserSubscriptionLoading || userDataLoading) return <LoadingOverlay />
 
-  console.log('no se', data?.GetCurrentUserSubscription)
 
 
   const handleStartFreeSubscription = async () => {
@@ -69,7 +70,10 @@ const HomePage = () => {
             </div>
           </div>
         </HeroSection>
-        <ChartSection />
+        <ChartSection
+          subscriptionData={subscriptionData}
+          handleStartFreeSubscription={handleStartFreeSubscription}
+        />
       </AppLayout>
 
     </>

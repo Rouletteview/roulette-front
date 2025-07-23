@@ -16,6 +16,8 @@ import { useBetStatusStore } from '../../../stores/betStatusStore';
 import LostBet from '../../components/bet/LostBet';
 import SuccessBet from '../../components/bet/SuccessBet';
 import PlacedBet from '../../components/bet/PlacedBet';
+import { Query } from '../../../graphql/generated/types';
+
 
 
 
@@ -41,13 +43,21 @@ function useContainerWidth() {
     return [ref, width] as const;
 }
 
-const ChartSection: React.FC = () => {
+const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, handleStartFreeSubscription: () => void }> = ({ subscriptionData, handleStartFreeSubscription }) => {
+
+
+    const freeSubscription = subscriptionData?.GetCurrentUserSubscription?.Payments
+    console.log('freeSubscription', freeSubscription)
+
+    const endFreeDate = subscriptionData?.GetCurrentUserSubscription?.EndDate
+    console.log(endFreeDate)
 
     useQueryParamsCleanup();
 
     const { betResult } = useBetStatusStore();
 
-    console.log(betResult?.status);
+
+    const isBlocked = !subscriptionData?.GetCurrentUserSubscription;
 
 
     const {
@@ -102,16 +112,21 @@ const ChartSection: React.FC = () => {
 
     return (
 
-        <section className="bg-[#121418F2] py-6 lg:pt-10 lg:pb-6 px-6 lg:px-24">
-
+        <section className="bg-[#121418F2] py-6 lg:pt-10 lg:pb-6 px-6 lg:px-24 relative">
             {/* <BetModal open={isOpen} onClose={() => setIsOpen(false)} /> */}
-            <div className="flex justify-end w-full">
-                <div className="bg-[#121418F2] border-2 border-black px-6 py-2 rounded-2xl lg:hidden block mb-2">
-                    <h1 className="text-white text-[12px] font-medium">
-                        Tu periodo de prueba termina el: <span className="text-[#D9A425]">23/03/25</span>
-                    </h1>
+            {freeSubscription?.length === 0 && (
+                <div className="flex justify-end w-full">
+                    <div className="bg-[#121418F2] border-2 border-black px-6 py-2 rounded-2xl lg:hidden block mb-2">
+
+                        <h1 className="text-white text-[12px] font-medium">
+                            Tu periodo de prueba termina el: <span className="text-[#D9A425]">{endFreeDate ? new Date(endFreeDate).toLocaleDateString('es-VE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}</span>
+                        </h1>
+
+
+                    </div>
                 </div>
-            </div>
+
+            )}
 
             {/* header */}
             <ChartHeader
@@ -121,108 +136,115 @@ const ChartSection: React.FC = () => {
                 selectedTableLabel={state.selectedTableLabel}
             />
 
-            {/* chart controls */}
-            <section className="my-10">
-                <div className="flex flex-col gap-9 lg:gap-2">
-                    <ChartStatus
-                        selectedType={state.selectedType}
-                        gameType={state.gameType}
-                        selectedTable={state.selectedTable}
-                        selectedTableLabel={state.selectedTableLabel}
-                    />
 
-                    <ChartControls
-                        selectedType={state.selectedType}
-                        gameType={state.gameType}
-                        selectedTable={state.selectedTable}
-                        tableOptions={tableOptions}
-                        marketSearch={state.marketSearch}
-                        marketPage={state.marketPage}
-                        marketHasNextPage={marketHasNextPage}
-                        marketHasPrevPage={marketHasPrevPage}
-                        marketLoading={marketLoading}
-                        onTypeChange={handleTypeChange}
-                        onGameTypeChange={handleGameTypeChange}
-                        onTableChange={handleTableChange}
-                        onMarketSearch={handleMarketSearch}
-                        onMarketPageChange={handleMarketPageChange}
-                    />
-                </div>
-            </section>
-
-            {/* chart section */}
-            <section className="flex flex-col lg:flex-row w-full gap-4">
-                <div className="order-2 lg:order-1 w-full lg:flex-1 lg:mx-2.5 flex flex-col">
-                    <div className="flex flex-col-reverse lg:flex-row w-full gap-4">
-                        <div className="flex flex-row w-full">
-                            <div className="flex flex-col w-full">
-                                <div
-                                    ref={chartContainerRef}
-                                    className="relative bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full max-w-full overflow-x-hidden"
-                                >
-                                    <Controls
-                                        setIsChartFullscreen={setFullscreen}
-                                        onZoomIn={onZoomIn}
-                                        onZoomOut={onZoomOut}
-                                    />
-                                    <div className='absolute top-28 left-1/2  z-50 pointer-events-none'>
-                                        {betResult?.status === 'Won' ? (
-                                            <SuccessBet value={betResult.value || ''} />
-                                        ) : betResult?.status === 'Lost' ? (
-                                            <LostBet value={betResult.value || ''} />
-                                        ) : betResult?.status === 'Placed' ? (
-                                            <PlacedBet value={betResult.value || ''} />
-                                        ) : null}
-                                    </div>
-
-
-                                    <ChartRenderer
-                                        selectedType={state.selectedType}
-                                        gameType={state.gameType}
-                                        selectedTable={state.selectedTable}
-                                        chartFormattedData={chartFormattedData}
-                                        chartContainerWidth={chartContainerWidth}
-                                        chartLoading={chartLoading}
-                                        onChartReady={handleChartReady}
-                                    />
-
-                                    <Update
-                                        selectedType={state.selectedType}
-                                        gameType={state.gameType}
-                                        selectedTable={state.selectedTable}
-                                        loading={chartLoading}
-                                    />
-                                </div>
-
-                                <div className="w-full flex flex-col lg:flex-row justify-between items-center gap-6 mt-4">
-                                    <div className="block lg:hidden w-full">
-                                        <BetSection
-                                            gameType={state.gameType}
-                                            probabilities={probabilities}
-
-                                        />
-                                    </div>
-                                    <NumbersDisplay
-                                        numbers={formattedNumbers}
-                                        loading={chartLoading}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="order-1 lg:order-2 flex-col items-center lg:items-start gap-4">
-                            <UserInfo />
-                            <div className="hidden lg:flex">
-                                <BetSection
-                                    gameType={state.gameType}
-                                    probabilities={probabilities}
-                                />
-                            </div>
+            <div className="relative">
+                {isBlocked && (
+                    <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#121418CC] pointer-events-auto">
+                        <div className='max-w-[900px] w-full'>
+                            <h1 className='font-bold text-white text-[20px] md:text-[40px] text-center font-sans'>Para disfrutar de Roulettes View accede a  nuestros <a href='/subscription' className='text-[#D9A425] underline'>planes de suscripción</a> o <span onClick={handleStartFreeSubscription} className='text-[#D9A425] underline cursor-pointer'>activa tu prueba gratuita</span></h1>
                         </div>
 
                     </div>
-                </div>
-            </section>
+                )}
+                <section className="my-10">
+                    <div className="flex flex-col gap-9 lg:gap-2">
+                        <ChartStatus
+                            selectedType={state.selectedType}
+                            gameType={state.gameType}
+                            selectedTable={state.selectedTable}
+                            selectedTableLabel={state.selectedTableLabel}
+                        />
+                        <ChartControls
+                            selectedType={state.selectedType}
+                            gameType={state.gameType}
+                            selectedTable={state.selectedTable}
+                            tableOptions={tableOptions}
+                            marketSearch={state.marketSearch}
+                            marketPage={state.marketPage}
+                            marketHasNextPage={marketHasNextPage}
+                            marketHasPrevPage={marketHasPrevPage}
+                            marketLoading={marketLoading}
+                            onTypeChange={handleTypeChange}
+                            onGameTypeChange={handleGameTypeChange}
+                            onTableChange={handleTableChange}
+                            onMarketSearch={handleMarketSearch}
+                            onMarketPageChange={handleMarketPageChange}
+                            freeSubscription={freeSubscription || []}
+                            endFreeDate={endFreeDate ? new Date(endFreeDate).toLocaleDateString('es-VE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}
+                        />
+                    </div>
+                </section>
+                <section className="flex flex-col lg:flex-row w-full gap-4">
+                    <div className="order-2 lg:order-1 w-full lg:flex-1 lg:mx-2.5 flex flex-col">
+                        <div className="flex flex-col-reverse lg:flex-row w-full gap-4">
+                            <div className="flex flex-row w-full">
+                                <div className="flex flex-col w-full">
+                                    <div
+                                        ref={chartContainerRef}
+                                        className="relative bg-[#0d1b2a] p-4 flex flex-col items-center lg:items-start w-full max-w-full overflow-x-hidden"
+                                    >
+                                        <Controls
+                                            setIsChartFullscreen={setFullscreen}
+                                            onZoomIn={onZoomIn}
+                                            onZoomOut={onZoomOut}
+                                        />
+                                        <div className='absolute top-28 left-1/2  z-50 pointer-events-none'>
+                                            {betResult?.status === 'Won' ? (
+                                                <SuccessBet value={betResult.value || ''} />
+                                            ) : betResult?.status === 'Lost' ? (
+                                                <LostBet value={betResult.value || ''} />
+                                            ) : betResult?.status === 'Placed' ? (
+                                                <PlacedBet value={betResult.value || ''} />
+                                            ) : null}
+                                        </div>
+
+                                        <ChartRenderer
+                                            selectedType={state.selectedType}
+                                            gameType={state.gameType}
+                                            selectedTable={state.selectedTable}
+                                            chartFormattedData={chartFormattedData}
+                                            chartContainerWidth={chartContainerWidth}
+                                            chartLoading={chartLoading}
+                                            onChartReady={handleChartReady}
+                                        />
+
+                                        <Update
+                                            selectedType={state.selectedType}
+                                            gameType={state.gameType}
+                                            selectedTable={state.selectedTable}
+                                            loading={chartLoading}
+                                        />
+                                    </div>
+
+                                    <div className="w-full flex flex-col lg:flex-row justify-between items-center gap-6 mt-4">
+                                        <div className="block lg:hidden w-full">
+                                            <BetSection
+                                                gameType={state.gameType}
+                                                probabilities={probabilities}
+                                            />
+                                        </div>
+                                        <NumbersDisplay
+                                            numbers={formattedNumbers}
+                                            loading={chartLoading}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="order-1 lg:order-2 flex-col items-center lg:items-start gap-4">
+                                <UserInfo />
+                                <div className="hidden lg:flex">
+                                    <BetSection
+                                        gameType={state.gameType}
+                                        probabilities={probabilities}
+                                    />
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+            </div>
 
 
             <FullscreenChartModal
