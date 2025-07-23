@@ -34,7 +34,7 @@ const BankTransferSection = ({ setSubscriptionState, subscriptionState, handleCr
 
       const { referenceNumber } = data
       setSubscriptionState({ ...subscriptionState, Reference: referenceNumber })
-       handleCreateSubscription()
+      handleCreateSubscription()
     } catch (error: unknown) {
       console.error('Error al enviar el pago:', error)
 
@@ -78,22 +78,28 @@ const BankTransferSection = ({ setSubscriptionState, subscriptionState, handleCr
             <div className="flex flex-row gap-2">
               <input
                 type="text"
-                value={"+00"}
+                value={"+58"}
                 readOnly
                 className="w-20 p-2 rounded-xl border border-[#4B4B4B99] bg-[#ebebeb] text-center"
               />
               <input
-                type="text"
-                placeholder="Número de teléfono"
+                type="tel"
+                inputMode="numeric"
+                pattern="^0(2|4)(12|14|16|24|26)\d{7}$"
+                placeholder="Ej: 04141234567"
                 {...register('phone', {
                   required: 'El teléfono es requerido',
                   pattern: {
-                    value: /^\d{7,10}$/,
-                    message: 'Ingresa un número de teléfono válido'
+                    value: /^0(2|4)(12|14|16|24|26)\d{7}$/,
+                    message: 'Ingresa un número de teléfono venezolano válido (ej: 04141234567)'
                   }
                 })}
-                className={`flex-1 p-2 rounded-xl border bg-[#ebebeb] ${errors.phone ? 'border-red-500' : 'border-[#4B4B4B99]'
-                  }`}
+                className={`flex-1 p-2 rounded-xl border bg-[#ebebeb] ${errors.phone ? 'border-red-500' : 'border-[#4B4B4B99]'}`}
+                maxLength={11}
+                onInput={e => {
+                  const target = e.target as HTMLInputElement;
+                  target.value = target.value.replace(/[^0-9]/g, '');
+                }}
               />
             </div>
             {errors.phone && (
@@ -128,7 +134,9 @@ const BankTransferSection = ({ setSubscriptionState, subscriptionState, handleCr
           <div className="flex flex-col w-full lg:w-1/3">
             <label className="mb-2 text-[#121418F2] text-sm">Numero de referencia</label>
             <input
-              type="text"
+              type="tel"
+              inputMode="numeric"
+              pattern="\\d*"
               placeholder="Número de referencia"
               {...register('referenceNumber', {
                 required: 'El número de referencia es requerido',
@@ -141,9 +149,11 @@ const BankTransferSection = ({ setSubscriptionState, subscriptionState, handleCr
                   message: 'Máximo 20 caracteres'
                 }
               })}
-              onChange={(e) => setSubscriptionState({ ...subscriptionState, Reference: e.target.value })}
-              className={`w-full p-2 rounded-xl border bg-[#ebebeb] ${errors.referenceNumber ? 'border-red-500' : 'border-[#4B4B4B99]'
-                }`}
+              onInput={e => {
+                const target = e.target as HTMLInputElement;
+                target.value = target.value.replace(/[^0-9]/g, '');
+              }}
+              className={`w-full p-2 rounded-xl border bg-[#ebebeb] ${errors.referenceNumber ? 'border-red-500' : 'border-[#4B4B4B99]'}`}
             />
             {errors.referenceNumber && (
               <p className="text-red-500 text-xs mt-1">

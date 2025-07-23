@@ -65,12 +65,7 @@ const LineChart: React.FC<ChartProps> = ({
     const yTicks = getYAxisTicks(gameType);
     const initialRange = getInitialRange();
 
-    console.log('📊 LineChart - chartType:', chartType, 'gameType:', gameType, 'selectedTable:', selectedTable);
-    console.log('📊 LineChart - initialRange:', initialRange);
-
-    // Debug: Check if LineChart is saving position
-    const debugKey = `chartPosition_${chartType}_${gameType || ''}_${selectedTable}`;
-    console.log('📊 LineChart - will save position with key:', debugKey);
+ 
 
     const chart = createChart(chartContainerRef.current, {
 

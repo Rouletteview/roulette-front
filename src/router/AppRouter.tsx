@@ -47,7 +47,7 @@ const AppRouter = () => {
       <Route path="/recuperar-password" element={<ResetPassword />} />
       <Route path="/correo-enviado" element={<CheckEmailPasswordPage />} />
       <Route path="/resetPassword" element={<NewPasswordPage />} />
-      <Route path="/subscripcion" element={<SubscriptionPage />} />
+      <Route path="/subscription" element={<SubscriptionPage />} />
 
       <Route path="/activateUser" element={<ActivateUserRedirect />} />
       {/* App */}

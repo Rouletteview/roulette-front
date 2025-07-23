@@ -65,7 +65,7 @@ const USDTTransferSection = ({ setSubscriptionState, subscriptionState, handleCr
                 className={`h-[100px]  lg:h-[70px] w-[168px] p-3 text-start flex-1 border border-[#CCCCCC] rounded-2xl  flex flex-col justify-between  shadow-lg transition-all yellow-shadow`}
             >
                 <span className='text-sm text-[#CCCCCC]'>Datos</span>
-                <p className="font-semibold text-sm lg:text-lg text-[#121418F2]">Pago movil</p>
+                <p className="font-semibold text-sm lg:text-lg text-[#121418F2]">USDT</p>
             </div>
 
             <div className="flex flex-col gap-10">

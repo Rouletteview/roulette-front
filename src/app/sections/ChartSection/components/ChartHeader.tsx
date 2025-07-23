@@ -17,7 +17,8 @@ export const ChartHeader: React.FC<ChartHeaderProps> = () => {
                 Sistema de <span className="font-bold">Gráficos</span> en vivo
             </h1>
             <a
-                href=""
+                href="https://www.youtube.com/watch?v=hKoYWpw89lc"
+                target="_blank"
                 className="text-sm lg:text-[18px] text-[#D9A425] underline font-medium"
             >
                 ver video tutorial de como operar en el gráfico

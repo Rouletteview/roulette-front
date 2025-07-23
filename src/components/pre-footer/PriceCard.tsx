@@ -8,7 +8,7 @@ interface Props {
 
 const PriceCard = ({ price, subscription, subSize = '38px', priceSize = '9xl' }: Props) => {
     return (
-        <a href="" className="group w-full max-w-xs sm:max-w-sm md:max-w-none bg-gradient-to-b from-[rgba(255,255,255,0.5)] to-white rounded-4xl">
+        <a href={`/subscription?price=${price}`} className="group w-full max-w-xs sm:max-w-sm md:max-w-none bg-gradient-to-b from-[rgba(255,255,255,0.5)] to-white rounded-4xl">
             <div className="pt-5 pb-5 mx-5">
                 <h1 className={`text-[${subSize}] text-[#121418F2] font-bold drop-shadow-[0px_4px_8px_#00000066]`}>Plan <span className="text-[#D9A425]">{subscription}</span></h1>
                 <div className="flex justify-center text-[#121418F2] text-center">
