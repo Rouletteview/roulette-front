@@ -179,6 +179,8 @@ const formatCandleChart = (grouped: GroupedData[], gameType?: GameType) => {
   let prevCloseTag: string | undefined = undefined;
   let prevCloseOriginal: number | undefined = undefined;
   let prevCloseOriginalTag: string | undefined = undefined;
+  console.log(prevCloseOriginalTag)
+  
 
   const candles = Array.from(map.entries()).sort((a, b) => a[0] - b[0]).map(([interval, entries]) => {
     const sorted = entries.sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
