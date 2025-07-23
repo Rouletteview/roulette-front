@@ -26,6 +26,8 @@ const HomePage = () => {
   const payments = data?.GetCurrentUserSubscription.Payments
   if (loading || getCurrentUserSubscriptionLoading || userDataLoading) return <LoadingOverlay />
 
+  console.log('no se', data?.GetCurrentUserSubscription)
+
 
   const handleStartFreeSubscription = async () => {
     try {

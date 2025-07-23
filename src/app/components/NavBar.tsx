@@ -16,12 +16,12 @@ const NavBar = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const logout = useAuthStore((state) => state.logout);
-    const isSubscriptionPage = location.pathname === '/subscripcion';
+    const isSubscriptionPage = location.pathname === '/subscription';
 
     const navLinks = [
         { name: "Inicio", path: "/home", icon: homeIcon },
         // { name: "Probar Gráficos", path: "/graficos", icon: chartIcon },
-        { name: "Subscripción", path: "/subscripcion", icon: subIcon },
+        { name: "Subscripción", path: "/subscription", icon: subIcon },
         { name: "Historial", path: "/historial", icon: historyIcon },
         // { name: "Notificaciones", path: "/notificaciones", icon: notiIcon },
     ];

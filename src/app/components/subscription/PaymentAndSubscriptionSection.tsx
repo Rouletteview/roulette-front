@@ -2,6 +2,9 @@ import binanceIcon from '../../../assets/icon/binance-icon.svg';
 import bankIcon from '../../../assets/icon/bank-icon.svg';
 import { useUserInfo } from '../../../hooks/useUserInfo';
 import LoadingOverlay from '../../../components/LoadingOverlay';
+import { GET_CURRENT_USER_SUBSCRIPTION_QUERY } from '../../../graphql/query/subscription/getCurrentUserSubscription';
+import { useQuery } from '@apollo/client';
+
 
 interface Props {
     selectedMethod: string;
@@ -23,20 +26,25 @@ const plans = [
     { key: 'Annual', label: 'Plan Anual', price: '25' },
 ];
 
+
+
 const PaymentAndSubscriptionSection = ({ selectedMethod, setSelectedMethod, selectedPlan, setSelectedPlan, setStep }: Props) => {
     const { data: userInfo } = useUserInfo();
+    const { data: currentUserSubscription, loading: getCurrentUserSubscriptionLoading } = useQuery(GET_CURRENT_USER_SUBSCRIPTION_QUERY);
 
+    console.log('currentUserSubscription', currentUserSubscription)
 
     const country = userInfo?.GetUserInfo?.Country;
 
-    if (!country) return <LoadingOverlay />;
+    if (!country || getCurrentUserSubscriptionLoading) return <LoadingOverlay />;
 
     const filteredPaymentMethods = paymentMethods.filter(method => {
         if (method.key === 'Phone') {
-            return country === 'Venezuela';
+            return country === 'Dominican Republic';
         }
         return true;
     });
+
 
     return (
         <>
@@ -80,6 +88,7 @@ const PaymentAndSubscriptionSection = ({ selectedMethod, setSelectedMethod, sele
                 ))}
             </div>
             <div className='flex justify-center w-full mt-4' >
+                {currentUserSubscription?.GetCurrentUserSubscription? (
                 <button
                     className="bg-[#D9A425] hover:bg-[#B3831D] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-lg px-4 py-3 transition-all text-base cursor-pointer w-[300px] mx-auto mt-4 yellow-button-shadow"
                     disabled={!selectedMethod || !selectedPlan}
@@ -87,6 +96,7 @@ const PaymentAndSubscriptionSection = ({ selectedMethod, setSelectedMethod, sele
                 >
                     Continuar
                 </button>
+                ) : null}
             </div>
 
         </>
