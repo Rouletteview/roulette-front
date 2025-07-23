@@ -4,6 +4,7 @@ import HistoryIcon from '../../../components/icon/HistoryIcon';
 import { ChartType } from '../../../../types/chart/types';
 import { GameType } from '../../../../hooks/useFormattedChartData';
 import { selectChartTypes, selectChartZoneTypes } from '../../../../types/chart/types';
+import { Payment } from '../../../../graphql/generated/types';
 
 interface ChartControlsProps {
     selectedType: ChartType | '';
@@ -20,6 +21,8 @@ interface ChartControlsProps {
     onTableChange: (value: string, label?: string) => void;
     onMarketSearch: (query: string) => void;
     onMarketPageChange: (page: number) => void;
+    freeSubscription: Array<Payment>;
+    endFreeDate: string;
 }
 
 export const ChartControls: React.FC<ChartControlsProps> = ({
@@ -37,6 +40,8 @@ export const ChartControls: React.FC<ChartControlsProps> = ({
     onTableChange,
     onMarketSearch,
     onMarketPageChange,
+    freeSubscription,
+    endFreeDate,
 }) => {
     const chartTypeOptions = selectChartTypes.map(type => ({
         label: type.label,
@@ -47,6 +52,8 @@ export const ChartControls: React.FC<ChartControlsProps> = ({
         label: zone.label,
         value: zone.zone
     }));
+
+    console.log('freeSubscription', freeSubscription)
 
     return (
         <div className="flex justify-between">
@@ -96,12 +103,13 @@ export const ChartControls: React.FC<ChartControlsProps> = ({
                 </div>
             </div>
 
-           
-            <div className="bg-[#121418F2] border-2 border-black px-6 py-2 rounded-2xl hidden lg:block">
-                <h1 className="text-white text-lg font-medium">
-                    Tu periodo de prueba termina el: <span className="text-[#D9A425]">23/03/25</span>
-                </h1>
-            </div>
+            {Array.isArray(freeSubscription) && freeSubscription.length === 0 && (
+                <div className="bg-[#121418F2] border-2 border-black px-6 py-2 rounded-2xl hidden lg:block">
+                    <h1 className="text-white text-lg font-medium">
+                        Tu periodo de prueba termina el: <span className="text-[#D9A425]">{endFreeDate}</span>
+                    </h1>
+                </div>
+            )}
         </div>
     );
 }; 
