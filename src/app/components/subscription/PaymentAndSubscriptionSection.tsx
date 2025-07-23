@@ -32,8 +32,6 @@ const PaymentAndSubscriptionSection = ({ selectedMethod, setSelectedMethod, sele
     const { data: userInfo } = useUserInfo();
     const { data: currentUserSubscription, loading: getCurrentUserSubscriptionLoading } = useQuery(GET_CURRENT_USER_SUBSCRIPTION_QUERY);
   
-    console.log('currentUserSubscription', currentUserSubscription)
-
     const country = userInfo?.GetUserInfo?.Country;
 
     if (!country || getCurrentUserSubscriptionLoading) return <LoadingOverlay />;
