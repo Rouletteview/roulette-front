@@ -8,10 +8,13 @@ import { useGetBet } from '../../hooks/useGetBet';
 import { useCountdownStore } from '../../../stores/countdownStore';
 import { useBetStatusStore } from '../../../stores/betStatusStore';
 import { showWinToast, showLoseToast, showInfoToast } from '../../components/Toast';
+import StraightUpButton from "../../components/bet/StraightUpBetButton";
+import { GameType } from "../../../graphql/generated/types";
 
 
 interface Props {
   gameType: string;
+  tableId: string;
   probabilities: Array<{
     Tag: string
     Value: number
@@ -19,10 +22,11 @@ interface Props {
   }> | undefined
 }
 
-const BetSection: React.FC<Props> = ({ gameType, probabilities }) => {
+const BetSection: React.FC<Props> = ({ gameType, probabilities, tableId }) => {
 
   const [searchParams] = useSearchParams();
   const selectedTable = searchParams.get('table') || '';
+  const gameTypeParams = searchParams.get('chartZone') as GameType;
   const betValue = localStorage.getItem('betValue') || '';
 
 
@@ -92,12 +96,21 @@ const BetSection: React.FC<Props> = ({ gameType, probabilities }) => {
           </div>
         )
       }
-      <div className="w-full">
+      <div className="w-full flex flex-col items-center">
         <BetButtons
           gameType={gameType}
           probabilities={probabilities}
           handleToggle={handleToggle}
         />
+        {
+          gameTypeParams !== 'StraightUp' && (
+            <StraightUpButton
+              TableId={tableId}
+              handleToggle={handleToggle}
+            />
+          )
+        }
+
       </div>
     </>
 

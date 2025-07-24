@@ -134,9 +134,10 @@ const formatMultipleHistograms = (grouped: GroupedData[], gameType?: GameType): 
     sortedEntries.forEach(({ Number, Tag }, index) => {
       const time = (baseTime + index) as UTCTimestamp;
 
-      const value = (gameType === 'StraightUp' || gameType === 'Dozen') ? Number : convertTagToNumber(Tag, gameType);
+      let value;
       let color = 'rgba(32, 178, 108, 1)';
       if (gameType === 'RedAndBlack') {
+        value = Number;
         if (Tag === 'Red') {
           color = '#FF0000';
         } else if (Tag === 'Black') {
@@ -145,6 +146,7 @@ const formatMultipleHistograms = (grouped: GroupedData[], gameType?: GameType): 
           color = '#00FF00';
         }
       } else {
+        value = (gameType === 'StraightUp' || gameType === 'Dozen') ? Number : convertTagToNumber(Tag, gameType);
         if (lastValue === null) {
           color = 'rgba(32, 178, 108, 1)';
         } else {
@@ -169,7 +171,7 @@ const formatCandleChart = (grouped: GroupedData[], gameType?: GameType) => {
   allEntries.forEach(entry => {
     const dateObj = new Date(entry.Date);
     const timestamp = Math.floor(dateObj.getTime() / 1000);
-    // las velas estan agrupadas por 30 segundos
+
     const intervalKey = Math.floor(timestamp / 30) * 30;
     if (!map.has(intervalKey)) map.set(intervalKey, []);
     map.get(intervalKey)!.push(entry);
@@ -180,7 +182,7 @@ const formatCandleChart = (grouped: GroupedData[], gameType?: GameType) => {
   let prevCloseOriginal: number | undefined = undefined;
   let prevCloseOriginalTag: string | undefined = undefined;
   console.log(prevCloseOriginalTag)
-  
+
 
   const candles = Array.from(map.entries()).sort((a, b) => a[0] - b[0]).map(([interval, entries]) => {
     const sorted = entries.sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());

@@ -17,6 +17,7 @@ import LostBet from '../../components/bet/LostBet';
 import SuccessBet from '../../components/bet/SuccessBet';
 import PlacedBet from '../../components/bet/PlacedBet';
 import { Query } from '../../../graphql/generated/types';
+import SliderComponent from '../../components/slider/Slider';
 
 
 
@@ -47,10 +48,9 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
 
 
     const freeSubscription = subscriptionData?.GetCurrentUserSubscription?.Payments
-    console.log('freeSubscription', freeSubscription)
 
     const endFreeDate = subscriptionData?.GetCurrentUserSubscription?.EndDate
-    console.log(endFreeDate)
+
 
     useQueryParamsCleanup();
 
@@ -188,6 +188,14 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
                                             onZoomIn={onZoomIn}
                                             onZoomOut={onZoomOut}
                                         />
+                                        <div className='absolute top-28 right-28 z-50'>
+                                            <Update
+                                                selectedType={state.selectedType}
+                                                gameType={state.gameType}
+                                                selectedTable={state.selectedTable}
+                                                loading={chartLoading}
+                                            />
+                                        </div>
                                         <div className='absolute top-28 left-1/2  z-50 pointer-events-none'>
                                             {betResult?.status === 'Won' ? (
                                                 <SuccessBet value={betResult.value || ''} />
@@ -197,7 +205,6 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
                                                 <PlacedBet value={betResult.value || ''} />
                                             ) : null}
                                         </div>
-
                                         <ChartRenderer
                                             selectedType={state.selectedType}
                                             gameType={state.gameType}
@@ -208,21 +215,22 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
                                             onChartReady={handleChartReady}
                                         />
 
-                                        <Update
-                                            selectedType={state.selectedType}
-                                            gameType={state.gameType}
-                                            selectedTable={state.selectedTable}
-                                            loading={chartLoading}
-                                        />
+
                                     </div>
 
                                     <div className="w-full flex flex-col lg:flex-row justify-between items-center gap-6 mt-4">
                                         <div className="block lg:hidden w-full">
+                                            <div className='lg:hidden flex'>
+                                                <SliderComponent />
+                                            </div>
+
                                             <BetSection
+                                                tableId={state.selectedTable}
                                                 gameType={state.gameType}
                                                 probabilities={probabilities}
                                             />
                                         </div>
+
                                         <NumbersDisplay
                                             numbers={formattedNumbers}
                                             loading={chartLoading}
@@ -233,8 +241,13 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
 
                             <div className="order-1 lg:order-2 flex-col items-center lg:items-start gap-4">
                                 <UserInfo />
+                                <div className='hidden lg:flex'>
+                                    <SliderComponent />
+                                </div>
                                 <div className="hidden lg:flex">
+
                                     <BetSection
+                                        tableId={state.selectedTable}
                                         gameType={state.gameType}
                                         probabilities={probabilities}
                                     />
@@ -253,6 +266,14 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
                 chartType={state.selectedType}
                 selectedTableLabel={state.selectedTableLabel}
             >
+                <div className='absolute top-28 right-28 z-50'>
+                    <Update
+                        selectedType={state.selectedType}
+                        gameType={state.gameType}
+                        selectedTable={state.selectedTable}
+
+                    />
+                </div>
                 <ChartRenderer
                     selectedType={state.selectedType}
                     gameType={state.gameType}
@@ -264,7 +285,7 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
                     isFullscreen={true}
                 />
 
-                <div className="absolute bottom-4 right-4 left-4 flex justify-end pointer-events-none">
+                {/* <div className="absolute bottom-4 right-4 left-4 flex justify-end pointer-events-none">
                     <div className="pointer-events-auto">
                         <Update
                             selectedType={state.selectedType}
@@ -272,7 +293,7 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
                             selectedTable={state.selectedTable}
                         />
                     </div>
-                </div>
+                </div> */}
             </FullscreenChartModal>
 
 

@@ -9,6 +9,7 @@ import { ChartType } from '../../../../types/chart/types';
 import { GameType } from '../../../../hooks/useFormattedChartData';
 import { UTCTimestamp } from 'lightweight-charts';
 
+
 interface ChartRendererProps {
     selectedType: ChartType | '';
     gameType: GameType | '';

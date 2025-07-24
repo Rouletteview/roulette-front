@@ -236,8 +236,9 @@ export const getYAxisTicks = (gameType?: string): { value: number, label: string
     if (gameType === 'RedAndBlack') {
         return [
             { value: 1, label: translateRouletteTag('Black'), color: '#FFFFFF' },
+            { value: 1.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },
             { value: 2, label: translateRouletteTag('Red'), color: '#FF0000' },
-            { value: 0, label: 'Cero', color: '#00FF00' },
+            // { value: 0, label: 'Cero', color: '#00FF00' },
         ];
     }
     if (gameType === 'OddAndEven') {

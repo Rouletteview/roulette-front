@@ -37,9 +37,9 @@ const CandleChart: React.FC<ChartProps> = ({
   const chartType = urlParams.get('chartType') || 'Candlestick';
   const selectedTable = urlParams.get('table') || '';
 
-  console.log('🔄 CandleChart - chartType:', chartType, 'gameType:', gameType, 'selectedTable:', selectedTable);
 
-  const { setChartRef, getInitialRange } = useChartPosition(chartType, gameType || '', selectedTable);
+
+  const { setChartRef } = useChartPosition(chartType, gameType || '', selectedTable);
 
   const [tooltipData, setTooltipData] = useState<{
     time: string;
@@ -59,54 +59,7 @@ const CandleChart: React.FC<ChartProps> = ({
 
     const yTicks = getYAxisTicks(gameType);
 
-    // Try to find any saved position for this gameType and selectedTable
-    const debugKey = `chartPosition_${chartType}_${gameType || ''}_${selectedTable}`;
-    let savedPosition = sessionStorage.getItem(debugKey);
 
-    console.log('📊 CandleChart - looking for position with key:', debugKey);
-    console.log('📊 CandleChart - savedPosition found:', !!savedPosition);
-
-    // If no position found with current chartType, try other chartTypes
-    if (!savedPosition) {
-      const allChartPositionKeys = Object.keys(sessionStorage).filter(key =>
-        key.startsWith('chartPosition_') &&
-        key.includes(gameType || '') &&
-        key.includes(selectedTable)
-      );
-
-      console.log('📊 CandleChart - no position found with current chartType, trying other keys:', allChartPositionKeys);
-      console.log('📊 CandleChart - all sessionStorage keys:', Object.keys(sessionStorage));
-
-      // Try to find any saved position with same gameType and selectedTable
-      for (const key of allChartPositionKeys) {
-        const position = sessionStorage.getItem(key);
-        if (position) {
-          console.log('📊 CandleChart - found position with key:', key, position);
-          savedPosition = position;
-          break;
-        }
-      }
-    }
-
-    // Create custom initial range if we found a saved position
-    let initialRange;
-    if (savedPosition) {
-      try {
-        const position = JSON.parse(savedPosition);
-        initialRange = {
-          from: position.from,
-          to: position.to,
-        };
-        console.log('📊 CandleChart - using saved position for initial range:', initialRange);
-      } catch (error) {
-        console.warn('📊 CandleChart - error parsing saved position:', error);
-        initialRange = getInitialRange();
-      }
-    } else {
-      initialRange = getInitialRange();
-    }
-
-    console.log('📊 CandleChart - final initialRange:', initialRange);
 
     const chart = createChart(chartContainerRef.current, {
       width: width || chartContainerRef.current.clientWidth,
@@ -179,7 +132,7 @@ const CandleChart: React.FC<ChartProps> = ({
     let defaultSeries: any = null;
 
     if (isRedAndBlack) {
-      // Crear series separadas para cada color
+
       redSeries = chart.addSeries(CandlestickSeries, {
         upColor: '#FF0000',
         downColor: '#FF0000',
@@ -313,7 +266,7 @@ const CandleChart: React.FC<ChartProps> = ({
       }
 
       // Set visible range after data is loaded
-      chart.timeScale().setVisibleRange(initialRange);
+      // chart.timeScale().setVisibleRange(initialRange);
     }
 
     chart.subscribeCrosshairMove((param: MouseEventParams) => {

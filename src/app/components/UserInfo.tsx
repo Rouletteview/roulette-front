@@ -1,11 +1,18 @@
 import userIcon from "../../assets/icon/user-icon.svg";
+import { UserInfoResponse } from "../../graphql/generated/types";
+import { useUserInfo } from "../../hooks/useUserInfo";
 import PlusIcon from "./icon/PlusIcon";
 
 
 const UserInfo = () => {
 
+  const { data: userInfo } = useUserInfo();
+const userInfoData: UserInfoResponse = userInfo?.GetUserInfo;
+const fullName = userInfoData?.FirstName + ' ' + userInfoData?.LastName;
+
+
   const user = {
-    name: "Miguel Rojas",
+    name: fullName,
     saldoInicial: 0.0,
     saldoFinal: 0.0,
     utilidad: 0.0,

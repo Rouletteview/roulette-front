@@ -18,7 +18,7 @@ const Footer = () => {
                     <h2 className="text-[14px] md:text-2xl font-semibold">Contáctanos</h2>
                     <div className="flex gap-2">
                         <img src={MailIcon} alt="" className="md:w-[24px] h-auto" />
-                        <a href="/" className="text-[12px] md:text-lg font-normal">soporte@roulette.com</a>
+                        <a href="/" className="text-[12px] md:text-lg font-normal">contacto@roulettesview.com</a>
                     </div>
                 </div>
             </section>

@@ -17,6 +17,7 @@
     "@nivo/core": "^0.99.0",
     "@tailwindcss/vite": "^4.0.3",
     "@types/apollo-upload-client": "^18.0.0",
+    "antd": "^5.26.6",
     "apollo-upload-client": "^18.0.1",
     "chart.js": "^4.5.0",
     "clsx": "^2.1.1",
