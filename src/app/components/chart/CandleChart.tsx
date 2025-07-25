@@ -22,7 +22,7 @@ type ChartProps = {
 
 const CandleChart: React.FC<ChartProps> = ({
   data,
-  height = 400,
+  height = 550,
   width = 0,
   loading = false,
   gameType,

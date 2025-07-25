@@ -17,7 +17,7 @@ const SliderComponent = () => {
                     min={0}
                     max={500}
                     tooltip={{ open: true, placement: 'bottom', color: '#00000000', autoAdjustOverflow: false }}
-                    className="w-full"
+                    className="w-full z-[99]"
                     styles={{
                         rail: { backgroundColor: '#B7D9E2' }
                     }}

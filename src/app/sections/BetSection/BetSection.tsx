@@ -10,6 +10,7 @@ import { useBetStatusStore } from '../../../stores/betStatusStore';
 import { showWinToast, showLoseToast, showInfoToast } from '../../components/Toast';
 import StraightUpButton from "../../components/bet/StraightUpBetButton";
 import { GameType } from "../../../graphql/generated/types";
+import { chartTypes } from "../../../types/types";
 
 
 interface Props {
@@ -27,6 +28,8 @@ const BetSection: React.FC<Props> = ({ gameType, probabilities, tableId }) => {
   const [searchParams] = useSearchParams();
   const selectedTable = searchParams.get('table') || '';
   const gameTypeParams = searchParams.get('chartZone') as GameType;
+  const chartTypeParams = searchParams.get('chartType') as chartTypes;
+
   const betValue = localStorage.getItem('betValue') || '';
 
 
@@ -79,30 +82,44 @@ const BetSection: React.FC<Props> = ({ gameType, probabilities, tableId }) => {
 
       {
         state.isOpen && (
-          <div className="w-full fixed inset-0 z-50 flex items-center justify-center">
-            <BetModal
-              open={state.isOpen}
-              onClose={() => handleToggle("")}
-              selectedChip={selectedChip || ""}
-              setSelectedChip={setSelectedChip}
-              setCounter={setCounter}
-              counter={counter}
-              selectedTable={selectedTable}
-              amount={amount}
-              gameType={gameType}
-              betValue={betValue}
-              setBetId={setBetId}
-            />
-          </div>
+          <div className="
+          fixed z-[999999]
+          inset-0
+          flex items-center justify-center
+          md:inset-auto md:bottom-0 md:right-0
+          md:block md:w-auto
+        ">
+          <BetModal
+            open={state.isOpen}
+            onClose={() => handleToggle("")}
+            selectedChip={selectedChip || ""}
+            setSelectedChip={setSelectedChip}
+            setCounter={setCounter}
+            counter={counter}
+            selectedTable={selectedTable}
+            amount={amount}
+            gameType={gameType}
+            betValue={betValue}
+            setBetId={setBetId}
+          />
+        </div>
         )
       }
       <div className="w-full flex flex-col items-center">
-        <BetButtons
-          gameType={gameType}
-          probabilities={probabilities}
-          handleToggle={handleToggle}
-        />
         {
+          tableId &&
+          chartTypeParams &&
+          gameTypeParams && (
+            <BetButtons
+              gameType={gameType}
+              probabilities={probabilities}
+              handleToggle={handleToggle}
+            />
+          )
+        }
+        {
+          tableId &&
+          chartTypeParams &&
           gameTypeParams !== 'StraightUp' && (
             <StraightUpButton
               TableId={tableId}

@@ -54,7 +54,7 @@ export const ChartRenderer: React.FC<ChartRendererProps> = ({
     isFullscreen = false,
 }) => {
     const chartWidth = isFullscreen ? 1000 : (chartContainerWidth || 320);
-    const chartHeight = isFullscreen ? 620 : 500;
+    const chartHeight = isFullscreen ? 620 : 550;
 
     const renderChart = () => {
         if (!selectedType || !gameType || !selectedTable) {

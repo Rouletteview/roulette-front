@@ -189,12 +189,20 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
                                             onZoomOut={onZoomOut}
                                         />
                                         <div className='absolute top-28 right-28 z-50'>
-                                            <Update
-                                                selectedType={state.selectedType}
-                                                gameType={state.gameType}
-                                                selectedTable={state.selectedTable}
-                                                loading={chartLoading}
-                                            />
+                                            {/* {
+                                                state.selectedType &&
+                                                state.gameType &&
+                                                state.selectedTable &&
+                                                !chartLoading && (
+                                                    <Update
+                                                        selectedType={state.selectedType}
+                                                        gameType={state.gameType}
+                                                        selectedTable={state.selectedTable}
+                                                        loading={chartLoading}
+                                                    />
+                                                )
+                                            } */}
+
                                         </div>
                                         <div className='absolute top-28 left-1/2  z-50 pointer-events-none'>
                                             {betResult?.status === 'Won' ? (
@@ -218,7 +226,7 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
 
                                     </div>
 
-                                    <div className="w-full flex flex-col lg:flex-row justify-between items-center gap-6 mt-4">
+                                    <div className="w-full flex flex-col lg:flex-row justify-between items-center gap-6 mt-4 relative">
                                         <div className="block lg:hidden w-full">
                                             <div className='lg:hidden flex'>
                                                 <SliderComponent />
@@ -267,12 +275,18 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
                 selectedTableLabel={state.selectedTableLabel}
             >
                 <div className='absolute top-28 right-28 z-50'>
-                    <Update
-                        selectedType={state.selectedType}
-                        gameType={state.gameType}
-                        selectedTable={state.selectedTable}
-
-                    />
+                    {/* {
+                        state.selectedType &&
+                        state.gameType &&
+                        state.selectedTable &&
+                        !chartLoading && (
+                            <Update
+                                selectedType={state.selectedType}
+                                gameType={state.gameType}
+                                selectedTable={state.selectedTable}
+                            />
+                        )
+                    } */}
                 </div>
                 <ChartRenderer
                     selectedType={state.selectedType}
