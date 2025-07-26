@@ -47,7 +47,7 @@ const HistogramChart: React.FC<ChartProps> = ({
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
-   
+
     const yTicks = getYAxisTicks(gameType);
     const initialRange = getInitialRange();
 
@@ -95,7 +95,7 @@ const HistogramChart: React.FC<ChartProps> = ({
     chartRef.current = chart;
     setChartRef(chart);
 
-  
+
     if (onChartReady) {
       onChartReady(chart);
     }
@@ -127,13 +127,13 @@ const HistogramChart: React.FC<ChartProps> = ({
 
 
     if (seriesMap.size > 0) {
-     
+
       chart.timeScale().setVisibleRange(initialRange);
     }
 
 
 
-    if (seriesMap.size > 0 && yTicks && yTicks.length > 0) {
+    if (seriesMap.size > 0 && yTicks && yTicks.length > 0 && chartType !== 'VerticalColumn') {
       const firstSeries = Array.from(seriesMap.values())[0];
       yTicks.forEach(tick => {
         firstSeries.createPriceLine({
@@ -164,7 +164,7 @@ const HistogramChart: React.FC<ChartProps> = ({
       const time = param.time as number;
       const seriesData: { id: string; value: number; color: string; tag?: string; originalValue?: number }[] = [];
 
-    
+
       data.forEach((series) => {
         const dataAtTime = series.data.find(d => d.time === time);
         if (dataAtTime && 'value' in dataAtTime && 'color' in dataAtTime) {
@@ -173,7 +173,7 @@ const HistogramChart: React.FC<ChartProps> = ({
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             value: (dataAtTime as any).value,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            color: (dataAtTime as any).color || 'rgba(32, 178, 108, 1)',
+            color: (dataAtTime as any).color || 'white)',
             tag: (dataAtTime as { tag?: string })?.tag,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             originalValue: (dataAtTime as any).originalValue
@@ -269,7 +269,10 @@ const HistogramChart: React.FC<ChartProps> = ({
             fontSize: '12px',
             zIndex: 1000,
             pointerEvents: 'none',
-            border: `2px solid ${tooltipData.series[0]?.color || 'rgba(32, 178, 108, 1)'}`,
+            border: `2px solid ${tooltipData.series[0]?.color === '#000000'
+              ? 'white'
+              : tooltipData.series[0]?.color || 'white'
+              }`,
             borderRadius: '4px',
             background: 'rgba(0, 0, 0, 0.95)',
             color: 'white',

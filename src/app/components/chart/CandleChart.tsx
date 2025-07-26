@@ -454,8 +454,8 @@ const CandleChart: React.FC<ChartProps> = ({
           <div style={{ margin: '8px 0', fontSize: '13px' }}>
             <div>Abre: <b>{tooltipData.open}</b> {tooltipData.openTag && `(${translateRouletteTag(tooltipData.openTag)})`}</div>
             <div>Cierra: <b>{tooltipData.close}</b> {tooltipData.closeTag && `(${translateRouletteTag(tooltipData.closeTag)})`}</div>
-            <div>Máximo: <b>{tooltipData.high}</b></div>
-            <div>Mínimo: <b>{tooltipData.low}</b></div>
+            {/* <div>Máximo: <b>{tooltipData.high}</b></div>
+            <div>Mínimo: <b>{tooltipData.low}</b></div> */}
           </div>
           <div style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '10px', marginTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.2)', paddingTop: '6px' }}>
             {tooltipData.time}

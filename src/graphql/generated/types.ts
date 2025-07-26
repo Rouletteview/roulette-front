@@ -307,8 +307,7 @@ export type RegisterUserRequest = {
   BirthDate: Scalars['DateTime']['input'];
   Country: Scalars['String']['input'];
   Email: Scalars['String']['input'];
-  FirstName: Scalars['String']['input'];
-  LastName: Scalars['String']['input'];
+  Name: Scalars['String']['input'];
   Password: Scalars['String']['input'];
   PhoneNumber: Scalars['String']['input'];
 };
@@ -396,10 +395,9 @@ export type UserInfoResponse = {
   BirthDate: Scalars['DateTime']['output'];
   Country: Scalars['String']['output'];
   Email: Scalars['String']['output'];
-  FirstName: Scalars['String']['output'];
   Id: Scalars['String']['output'];
   IsAdmin: Scalars['Boolean']['output'];
-  LastName: Scalars['String']['output'];
+  Name: Scalars['String']['output'];
   PhoneNumber: Scalars['String']['output'];
 };
 

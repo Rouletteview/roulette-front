@@ -22,7 +22,7 @@ const HomePage = () => {
   const { data: userData, loading: userDataLoading } = useUserInfo();
 
   const isAdmin = userData?.GetUserInfo.IsAdmin
-  
+
 
 
   const payments = subscriptionData?.GetCurrentUserSubscription.Payments

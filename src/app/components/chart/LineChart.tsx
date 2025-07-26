@@ -50,12 +50,12 @@ const LineChart: React.FC<ChartProps> = ({
 
 
   const seriesColors = [
-    'rgba(141, 52, 249, 1)',
-    'rgba(38, 166, 154, 1)',
-    'rgba(255, 82, 82, 1)',
-    'rgba(255, 193, 7, 1)',
-    'rgba(33, 150, 243, 1)',
-    'rgba(76, 175, 80, 1)',
+    // 'rgba(141, 52, 249, 1)',
+    // 'rgba(38, 166, 154, 1)',
+    // 'rgba(255, 82, 82, 1)',
+    // 'rgba(255, 193, 7, 1)',
+    // 'rgba(33, 150, 243, 1)',
+    'rgba(217, 164, 37)',
   ];
 
   useEffect(() => {
@@ -318,7 +318,7 @@ const LineChart: React.FC<ChartProps> = ({
           <div style={{ color: 'rgba(141, 52, 249, 1)', fontWeight: 'bold', marginBottom: '8px' }}>Resultado</div>
           {tooltipData.series.map((series) => (
             <div key={series.id} style={{ margin: '6px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ color: series.color, fontSize: '11px', fontWeight: '500', flex: 1 }}>
+              <div style={{ color: 'white', fontSize: '11px', fontWeight: '500', flex: 1 }}>
                 {series.tag ? translateRouletteTag(series.tag) : series.id}
               </div>
               <div style={{ fontSize: '14px', color: 'white', fontWeight: 'bold', marginLeft: '8px' }}>

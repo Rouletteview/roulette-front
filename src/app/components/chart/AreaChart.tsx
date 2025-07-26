@@ -48,12 +48,8 @@ const AreaChart: React.FC<ChartProps> = ({
   const { setChartRef, getInitialRange, restorePosition } = useChartPosition(chartType, gameType || '', selectedTable);
 
   const seriesColors = [
-    { line: 'rgba(38, 166, 154, 1)', top: 'rgba(38, 166, 154, 0.28)', bottom: 'rgba(38, 166, 154, 0.05)' },
-    { line: 'rgba(141, 52, 249, 1)', top: 'rgba(141, 52, 249, 0.28)', bottom: 'rgba(141, 52, 249, 0.05)' },
-    { line: 'rgba(255, 82, 82, 1)', top: 'rgba(255, 82, 82, 0.28)', bottom: 'rgba(255, 82, 82, 0.05)' },
-    { line: 'rgba(255, 193, 7, 1)', top: 'rgba(255, 193, 7, 0.28)', bottom: 'rgba(255, 193, 7, 0.05)' },
-    { line: 'rgba(33, 150, 243, 1)', top: 'rgba(33, 150, 243, 0.28)', bottom: 'rgba(33, 150, 243, 0.05)' },
-    { line: 'rgba(76, 175, 80, 1)', top: 'rgba(76, 175, 80, 0.28)', bottom: 'rgba(76, 175, 80, 0.05)' },
+    { line: 'rgba(217, 164, 37)', top: 'rgba(217, 164, 37, 0.28)', bottom: 'rgba(217, 164, 37, 0.05)' },
+
   ];
 
   useEffect(() => {
@@ -154,11 +150,7 @@ const AreaChart: React.FC<ChartProps> = ({
     if (seriesMap.size > 0) {
 
       chart.timeScale().setVisibleRange(initialRange);
-
-      // Now that data is loaded, try to restore the saved position
-      // Add a small delay to ensure the chart is fully rendered
       setTimeout(() => {
-        console.log('📊 AreaChart - attempting to restore position after data load');
         restorePosition();
       }, 100);
     }
@@ -322,7 +314,7 @@ const AreaChart: React.FC<ChartProps> = ({
           <div style={{ color: 'rgba(38, 166, 154, 1)', fontWeight: 'bold', marginBottom: '8px' }}>Resultado</div>
           {tooltipData.series.map((series) => (
             <div key={series.id} style={{ margin: '6px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ color: series.color, fontSize: '11px', fontWeight: '500', flex: 1 }}>
+              <div style={{ color: 'white', fontSize: '11px', fontWeight: '500', flex: 1 }}>
                 {series.value}
                 {series.tag ? ` (${translateRouletteTag(series.tag)})` : ''}
               </div>

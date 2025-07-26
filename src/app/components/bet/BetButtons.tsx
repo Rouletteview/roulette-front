@@ -219,7 +219,7 @@ const ColumnButtons = ({ column1Percentage, column2Percentage, column3Percentage
     )
 }
 
-const StraightUpButtons = ({ probabilities, handleToggle }: { probabilities: Array<{ number: number, straightUpPercentage: number }>, handleToggle: (tag: string) => void }) => {
+export const StraightUpButtons = ({ probabilities, handleToggle }: { probabilities: Array<{ number: number, straightUpPercentage: number }>, handleToggle: (tag: string) => void }) => {
     return (
         <div className="grid grid-cols-3 gap-1 w-full justify-center items-center">
             {probabilities.map(item => {
@@ -344,7 +344,7 @@ const BetButtons = ({ gameType, probabilities, handleToggle }: BetButtonsProps) 
         orphelinsPercentage: getProbabilityByTag('Orphelins')
     })
 
-    const getStraightUpProbabilities = () => {
+     const getStraightUpProbabilities = () => {
         return numbers.map(number => ({
             number: number.number,
             straightUpPercentage: getProbabilityByTag(`${number.number}`)

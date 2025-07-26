@@ -56,6 +56,11 @@ export const ChartRenderer: React.FC<ChartRendererProps> = ({
     const chartHeight = isFullscreen ? 620 : 500;
 
     const renderChart = () => {
+   
+        if (chartLoading) {
+            return <LoadingChart height={chartHeight} />;
+        }
+
         if (!selectedType || !gameType || !selectedTable) {
             return <ChartPlaceholder />;
         }
