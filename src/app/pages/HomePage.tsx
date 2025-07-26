@@ -8,6 +8,7 @@ import { showErrorToast } from '../components/Toast';
 import { GET_CURRENT_USER_SUBSCRIPTION_QUERY } from "../../graphql/query/subscription/getCurrentUserSubscription"
 import { START_FREE_SUBSCRIPTION_MUTATION } from "../../graphql/mutations/subscription/startFreeSubscription"
 import { useUserInfo } from "../../hooks/useUserInfo"
+import { getGraphQLErrorMessage } from "../../utils/errorMessages";
 
 
 
@@ -33,10 +34,9 @@ const HomePage = () => {
   const handleStartFreeSubscription = async () => {
     try {
       await startFreeSubscription()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log(error)
-      showErrorToast(error.message)
+      showErrorToast(getGraphQLErrorMessage(error))
     }
   }
 

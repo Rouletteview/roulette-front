@@ -9,6 +9,7 @@ import { useNavigate } from "react-router";
 import LoadingOverlay from "../../../components/LoadingOverlay";
 import { newPasswordFormData, newPasswordSchema } from "../../schemas/newPasswordSchema";
 import { useResetPassword } from "../../../hooks/useResetPassword";
+import { getGraphQLErrorMessage } from "../../../utils/errorMessages";
 
 
 interface Props {
@@ -48,23 +49,8 @@ const NewPasswordForm = ({ token }: Props) => {
             });
             navigate("/iniciar-sesion", { state: { message: "Contraseña cambiada con éxito", ok: true } });
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (error: any) {
-
-            if (error.graphQLErrors?.length > 0) {
-                const graphQLError = error.graphQLErrors[0];
-                if (error.graphQLErrors?.length) {
-                    setErrorMessage(error.graphQLErrors[0].message);
-                } else {
-                    setErrorMessage(`Error: ${graphQLError.message}`);
-                }
-            } else if (error.networkError) {
-                setErrorMessage("Error de red. Por favor, verifica tu conexión.");
-            } else {
-                setErrorMessage("Ocurrió un error inesperado. Por favor, intenta nuevamente.");
-            }
-
-
+        } catch (error: unknown) {
+            setErrorMessage(getGraphQLErrorMessage(error));
         }
     };
 

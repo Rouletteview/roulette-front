@@ -15,6 +15,7 @@ import LoadingOverlay from "../../../components/LoadingOverlay";
 import { useRegister } from "../../../hooks/useRegister";
 import { useCountries } from "../../../hooks/useCountries";
 import { RegisterFormData, registerSchema } from "../../schemas/registerSchema";
+import { getGraphQLErrorMessage } from "../../../utils/errorMessages";
 
 
 
@@ -76,20 +77,8 @@ const RegisterForm = () => {
             console.log("Usuario registrado exitosamente:", response.data);
             navigate("/confirmar-correo", { state: { message: "Email confirmado con éxito", ok: true } });
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (error: any) {
-            if (error.graphQLErrors?.length > 0) {
-                const graphQLError = error.graphQLErrors[0];
-                if (graphQLError.code === "BAD_REQUEST") {
-                    setErrorMessage('El correo electrónico ya está registrado');
-                } else {
-                    setErrorMessage(`Error: ${graphQLError.message}`);
-                }
-            } else if (error.networkError) {
-                setErrorMessage("Error de red. Por favor, verifica tu conexión.");
-            } else {
-                setErrorMessage("Ocurrió un error inesperado. Por favor, intenta nuevamente.");
-            }
+        } catch (error: unknown) {
+            setErrorMessage(getGraphQLErrorMessage(error));
         }
     };
 

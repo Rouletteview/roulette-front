@@ -3,6 +3,7 @@ import usdtUpload from '../../../assets/images/usdt-upload.png'
 import { useState } from 'react'
 import { SubscriptionState } from './SubscriptionCheckoutSection'
 import { showErrorToast } from '../Toast';
+import { getGraphQLErrorMessage } from "../../../utils/errorMessages";
 
 interface Props {
     setSubscriptionState: (state: SubscriptionState) => void;
@@ -53,7 +54,7 @@ const USDTTransferSection = ({ setSubscriptionState, subscriptionState, handleCr
             await handleCreateSubscription();
         } catch (error) {
             console.error('Error submitting:', error);
-            showErrorToast(error as string)
+            showErrorToast(getGraphQLErrorMessage(error))
         } finally {
             setIsSubmitting(false);
         }

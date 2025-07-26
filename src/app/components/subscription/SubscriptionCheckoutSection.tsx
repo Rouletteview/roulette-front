@@ -6,6 +6,7 @@ import { useMutation } from "@apollo/client";
 import { useState } from "react";
 import SuccessModal from "./SuccessModal";
 import { showErrorToast } from "../Toast";
+import { getGraphQLErrorMessage } from "../../../utils/errorMessages";
 
 
 interface Props {
@@ -52,11 +53,7 @@ const SubscriptionCheckoutSection = ({ selectedPlan, selectedMethod }: Props) =>
             await createSubscription({ variables: { input: subscriptionData } });
             setShowSuccessModal(true);
         } catch (error) {
-            if (error instanceof Error) {
-                showErrorToast(error.message);
-            } else {
-                showErrorToast("An unknown error occurred");
-            }
+            showErrorToast(getGraphQLErrorMessage(error));
         }
     }
 

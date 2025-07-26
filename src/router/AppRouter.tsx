@@ -15,6 +15,7 @@ import HistoryPage from "../app/pages/HistoryPage";
 import SubscriptionPage from '../app/pages/SubscriptionPage';
 import { useMutation } from "@apollo/client";
 import { ACTIVATE_USER } from "../graphql/mutations/auth/activateUser";
+import { getGraphQLErrorMessage } from "../utils/errorMessages";
 
 
 const ActivateUserRedirect = () => {
@@ -23,7 +24,7 @@ const ActivateUserRedirect = () => {
   const navigate = useNavigate();
   const [ActivateUser] = useMutation(ACTIVATE_USER)
 
-  
+
   useEffect(() => {
     if (token) {
       const activate = async () => {
@@ -32,11 +33,10 @@ const ActivateUserRedirect = () => {
           navigate("/iniciar-sesion", {
             state: { message: "Email confirmado con éxito", ok: true },
           });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.log(error);
           navigate("/iniciar-sesion", {
-            state: { message: "Error al activar el usuario", ok: false },
+            state: { message: getGraphQLErrorMessage(error), ok: false },
           });
         }
       };

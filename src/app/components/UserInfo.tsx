@@ -8,7 +8,7 @@ const UserInfo = () => {
 
   const { data: userInfo } = useUserInfo();
 const userInfoData: UserInfoResponse = userInfo?.GetUserInfo;
-const name = userInfoData.Name;
+const name = userInfoData.Name || '';
 
 
   const user = {
@@ -25,7 +25,7 @@ const name = userInfoData.Name;
       <div className="flex justify-between items-center mb-3">
         <div className="flex items-baseline gap-x-1.5">
         <img src={userIcon} alt="user icon" className="w-6 h-6" />
-        <span className="font-medium">{user.name}</span>
+        <span className="font-medium">{user.name || ''}</span>
         </div>
         <button className="cursor-pointer" onClick={() => {}}>
           <PlusIcon />
