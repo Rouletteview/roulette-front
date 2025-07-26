@@ -6,8 +6,7 @@ export const GET_USER_INFO = gql`
       Id
       IsAdmin
       Email
-      FirstName
-      LastName
+      Name
       Country
     }
   }

@@ -28,15 +28,6 @@ const Update = ({ selectedType, gameType, selectedTable, loading }: UpdateProps)
   }, [location.search, allSelected, resetCountdownIfInactive])
 
   useEffect(() => {
-    const savedScrollPosition = sessionStorage.getItem('scrollPosition');
-    if (savedScrollPosition) {
-      const position = JSON.parse(savedScrollPosition);
-      window.scrollTo(position.x, position.y);
-      sessionStorage.removeItem('scrollPosition');
-    }
-  }, []);
-
-  useEffect(() => {
     if (!allSelected) {
       setIsActive(false);
       return;
@@ -45,15 +36,7 @@ const Update = ({ selectedType, gameType, selectedTable, loading }: UpdateProps)
     setIsActive(true);
 
     if (countdown === 0) {
-      const scrollPosition = {
-        x: window.scrollX,
-        y: window.scrollY
-      };
-      sessionStorage.setItem('scrollPosition', JSON.stringify(scrollPosition));
-      
-   
       window.dispatchEvent(new CustomEvent('saveChartPosition'));
-      
       window.location.reload();
     }
 

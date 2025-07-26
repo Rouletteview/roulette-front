@@ -189,20 +189,14 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
                                             onZoomOut={onZoomOut}
                                         />
                                         <div className='absolute top-28 right-28 z-50'>
-                                            {/* {
-                                                state.selectedType &&
-                                                state.gameType &&
-                                                state.selectedTable &&
-                                                !chartLoading && (
-                                                    <Update
-                                                        selectedType={state.selectedType}
-                                                        gameType={state.gameType}
-                                                        selectedTable={state.selectedTable}
-                                                        loading={chartLoading}
-                                                    />
-                                                )
-                                            } */}
-
+                                            {state.selectedType && state.gameType && state.selectedTable && (
+                                                <Update
+                                                    selectedType={state.selectedType}
+                                                    gameType={state.gameType}
+                                                    selectedTable={state.selectedTable}
+                                                    loading={chartLoading}
+                                                />
+                                            )}
                                         </div>
                                         <div className='absolute top-28 left-1/2  z-50 pointer-events-none'>
                                             {betResult?.status === 'Won' ? (
@@ -213,6 +207,7 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
                                                 <PlacedBet value={betResult.value || ''} />
                                             ) : null}
                                         </div>
+                                        {/* chart */}
                                         <ChartRenderer
                                             selectedType={state.selectedType}
                                             gameType={state.gameType}
@@ -275,18 +270,13 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
                 selectedTableLabel={state.selectedTableLabel}
             >
                 <div className='absolute top-28 right-28 z-50'>
-                    {/* {
-                        state.selectedType &&
-                        state.gameType &&
-                        state.selectedTable &&
-                        !chartLoading && (
-                            <Update
-                                selectedType={state.selectedType}
-                                gameType={state.gameType}
-                                selectedTable={state.selectedTable}
-                            />
-                        )
-                    } */}
+                    {state.selectedType && state.gameType && state.selectedTable && !chartLoading && (
+                        <Update
+                            selectedType={state.selectedType}
+                            gameType={state.gameType}
+                            selectedTable={state.selectedTable}
+                        />
+                    )}
                 </div>
                 <ChartRenderer
                     selectedType={state.selectedType}
@@ -299,15 +289,17 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
                     isFullscreen={true}
                 />
 
-                {/* <div className="absolute bottom-4 right-4 left-4 flex justify-end pointer-events-none">
+                <div className="absolute bottom-4 right-4 left-4 flex justify-end pointer-events-none">
                     <div className="pointer-events-auto">
-                        <Update
-                            selectedType={state.selectedType}
-                            gameType={state.gameType}
-                            selectedTable={state.selectedTable}
-                        />
+                        {state.selectedType && state.gameType && state.selectedTable && (
+                            <Update
+                                selectedType={state.selectedType}
+                                gameType={state.gameType}
+                                selectedTable={state.selectedTable}
+                            />
+                        )}
                     </div>
-                </div> */}
+                </div>
             </FullscreenChartModal>
 
 

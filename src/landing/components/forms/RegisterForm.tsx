@@ -58,15 +58,13 @@ const RegisterForm = () => {
 
             if (isNaN(birthDate.getTime())) throw new Error("Fecha inválida");
 
-            const [name, ...lastnameArray] = data.fullName.trim().split(" ");
-            const lastname = lastnameArray.join(" ") || "N/A";
+            const [name] = data.fullName.trim().split(" ");
             const phoneNumber = data.countryCode + data.phone;
 
 
             const response = await registerUser({
                 variables: {
-                    FirstName: name,
-                    LastName: lastname,
+                    Name: name,
                     Password: data.password,
                     Email: data.email,
                     Country: data.country,

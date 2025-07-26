@@ -8,11 +8,11 @@ const UserInfo = () => {
 
   const { data: userInfo } = useUserInfo();
 const userInfoData: UserInfoResponse = userInfo?.GetUserInfo;
-const fullName = userInfoData?.FirstName + ' ' + userInfoData?.LastName;
+const name = userInfoData.Name;
 
 
   const user = {
-    name: fullName,
+    name,
     saldoInicial: 0.0,
     saldoFinal: 0.0,
     utilidad: 0.0,

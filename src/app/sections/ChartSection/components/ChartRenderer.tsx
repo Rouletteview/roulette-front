@@ -9,7 +9,6 @@ import { ChartType } from '../../../../types/chart/types';
 import { GameType } from '../../../../hooks/useFormattedChartData';
 import { UTCTimestamp } from 'lightweight-charts';
 
-
 interface ChartRendererProps {
     selectedType: ChartType | '';
     gameType: GameType | '';
@@ -54,9 +53,14 @@ export const ChartRenderer: React.FC<ChartRendererProps> = ({
     isFullscreen = false,
 }) => {
     const chartWidth = isFullscreen ? 1000 : (chartContainerWidth || 320);
-    const chartHeight = isFullscreen ? 620 : 550;
+    const chartHeight = isFullscreen ? 620 : 500;
 
     const renderChart = () => {
+   
+        if (chartLoading) {
+            return <LoadingChart height={chartHeight} />;
+        }
+
         if (!selectedType || !gameType || !selectedTable) {
             return <ChartPlaceholder />;
         }
