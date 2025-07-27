@@ -23,6 +23,7 @@ const HomePage = () => {
   const { data: userData, loading: userDataLoading } = useUserInfo();
 
   const isAdmin = userData?.GetUserInfo.IsAdmin
+  const hasLoggedIn = userData?.GetUserInfo.LastLogin
 
 
 
@@ -42,7 +43,7 @@ const HomePage = () => {
 
   return (
     <>
-      <WelcomeModal />
+      {!hasLoggedIn ? <WelcomeModal /> : null}
       <AppLayout>
         <HeroSection height='min-h-[60vh] md:min-h-[80vh]' imageURL='/background/home-background.webp'>
           <div className='text-start mx-7 lg:mx-24'>
