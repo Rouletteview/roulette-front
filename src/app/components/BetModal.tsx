@@ -97,7 +97,7 @@ const ModalContent: React.FC<ModalContentProps> = (props) => (
 );
 
 const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelectedChip, setCounter, counter, selectedTable, amount, gameType, betValue, setBetId }: Props) => {
-    const { createBet, createBetError } = useBetData({
+    const { createBet } = useBetData({
         rouletteTableId: selectedTable,
         amount: amount,
         gameType: gameType,
