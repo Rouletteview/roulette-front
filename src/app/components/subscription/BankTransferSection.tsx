@@ -2,6 +2,7 @@ import { SubscriptionState } from "./SubscriptionCheckoutSection"
 import { useForm } from 'react-hook-form'
 import { useState } from 'react'
 import { showErrorToast } from '../Toast'
+import { getGraphQLErrorMessage } from "../../../utils/errorMessages"
 
 interface FormData {
   phone: string
@@ -34,20 +35,10 @@ const BankTransferSection = ({ setSubscriptionState, subscriptionState, handleCr
 
       const { referenceNumber } = data
       setSubscriptionState({ ...subscriptionState, Reference: referenceNumber })
-       handleCreateSubscription()
+      handleCreateSubscription()
     } catch (error: unknown) {
       console.error('Error al enviar el pago:', error)
-
-      let errorMessage = 'Error al procesar el pago'
-
-      if (error instanceof Error) {
-        errorMessage = error.message
-      } else if (error && typeof error === 'object' && 'message' in error) {
-        const errorWithMessage = error as { message: string }
-        errorMessage = errorWithMessage.message
-      }
-
-      showErrorToast(errorMessage)
+      showErrorToast(getGraphQLErrorMessage(error))
     } finally {
       setIsSubmitting(false)
     }

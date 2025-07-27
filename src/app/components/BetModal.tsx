@@ -8,6 +8,7 @@ import chip6 from '../../assets/poker-chips/chip-6.png';
 import { useBetData } from '../sections/BetSection/hooks/useBetData';
 import { showErrorToast, showPlacedToast } from './Toast';
 import { translateRouletteTag } from '../../utils/formatters/rouletterNumbers';
+import { getGraphQLErrorMessage } from '../../utils/errorMessages';
 // import chip7 from '../../assets/poker-chips/chip-7.png';
 // import chip8 from '../../assets/poker-chips/chip-8.png';
 
@@ -96,7 +97,7 @@ const ModalContent: React.FC<ModalContentProps> = (props) => (
 );
 
 const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelectedChip, setCounter, counter, selectedTable, amount, gameType, betValue, setBetId }: Props) => {
-    const { createBet, createBetError } = useBetData({
+    const { createBet } = useBetData({
         rouletteTableId: selectedTable,
         amount: amount,
         gameType: gameType,
@@ -113,12 +114,7 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
             setBetId(response.data.CreateBet.id);
             onClose();
         } catch (error) {
-            let errorMessage = 'Error al realizar la apuesta';
-            if (createBetError?.message) {
-                errorMessage = createBetError.message;
-            } else if (error instanceof Error) {
-                errorMessage = error.message;
-            }
+            const errorMessage = getGraphQLErrorMessage(error);
             showErrorToast(errorMessage);
         }
     };
@@ -134,10 +130,10 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
         }
     };
 
-  
+
     return (
         <>
-         
+
             <div className="block md:hidden fixed inset-0 z-50 flex items-center justify-center bg-[#000000CC] bg-opacity-60">
                 <ModalContent
                     handleModalClick={handleModalClick}
@@ -151,7 +147,7 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
                     handleBet={handleBet}
                 />
             </div>
-   
+
             <div className="hidden md:block fixed bottom-0 right-0 z-50 my-6 mr-6">
                 <ModalContent
                     handleModalClick={handleModalClick}

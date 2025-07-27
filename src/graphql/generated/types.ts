@@ -399,6 +399,7 @@ export type UserInfoResponse = {
   IsAdmin: Scalars['Boolean']['output'];
   Name: Scalars['String']['output'];
   PhoneNumber: Scalars['String']['output'];
+  LastLogin: Scalars['DateTime']['output'];
 };
 
 export type UserSubscription = {

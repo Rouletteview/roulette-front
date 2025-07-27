@@ -13,6 +13,7 @@ import { useLogin } from "../../../hooks/useLogin";
 import { loginFormData, loginSchema } from "../../schemas/loginSchema";
 import { useQuery } from "@apollo/client";
 import { GET_USER_INFO } from "../../../graphql/query/getUserInfo";
+import { getGraphQLErrorMessage } from "../../../utils/errorMessages";
 
 
 const LoginForm = () => {
@@ -49,7 +50,7 @@ const LoginForm = () => {
             login(token);
             await new Promise((res) => setTimeout(res, 0));
             const userInfo = await getUserInfo();
-       
+
             if (userInfo.data?.GetUserInfo) {
                 const { FirstName, LastName, Email } = userInfo.data.GetUserInfo;
 
@@ -61,25 +62,9 @@ const LoginForm = () => {
 
             navigate('/home');
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (error: any) {
-
-
-            if (error.graphQLErrors?.length > 0) {
-                const graphQLError = error.graphQLErrors[0];
-
-                if (graphQLError.code === "BAD_REQUEST") {
-                    setErrorMessage('El correo electrónico o la contraseña ingresados son incorrectos');
-                } else {
-                    setErrorMessage(`Error: ${graphQLError.message}`);
-                }
-
-            } else if (error.networkError) {
-                setErrorMessage("Error de red. Por favor, verifica tu conexión.");
-            } else {
-                setErrorMessage("Ocurrió un error inesperado. Por favor, intenta nuevamente.");
-            }
-
-
+        } catch (error: unknown) {
+            console.log(error)
+            setErrorMessage(getGraphQLErrorMessage(error));
         }
     };
 
@@ -121,7 +106,7 @@ const LoginForm = () => {
 
                 <button
                     type="submit"
-                    className='block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-full  text-lg font-bold rounded-[10px] py-2 mt-5 mb-3 disabled:bg-[#B2B2B2] yellow-button-shadow'>
+                    className='cursor-pointer block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-full  text-lg font-bold rounded-[10px] py-2 mt-5 mb-3 disabled:bg-[#B2B2B2] yellow-button-shadow'>
                     {loading ? "Cargando..." : "Iniciar sesión"}
                 </button>
                 <div className="flex justify-center gap-x-2.5 lg:text-xl">

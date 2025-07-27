@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import Input from "./forms/Input";
+import { getGraphQLErrorMessage } from "../../utils/errorMessages";
 
 
 interface FormInput {
@@ -35,21 +36,8 @@ const RecoveryForm = () => {
 
       navigate("/correo-enviado");
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      if (error.graphQLErrors?.length > 0) {
-        const graphQLError = error.graphQLErrors[0];
-        if (graphQLError.code === "NOT_FOUND") {
-          setErrorMessage('No existe una cuenta asociada a este correo electrónico.');
-        } else {
-          setErrorMessage(`Error: ${graphQLError.message}`);
-        }
-      } else if (error.networkError) {
-        setErrorMessage("Error de red. Por favor, verifica tu conexión.");
-      } else {
-        setErrorMessage("Ocurrió un error inesperado. Por favor, intenta nuevamente.");
-      }
-
+    } catch (error: unknown) {
+      setErrorMessage(getGraphQLErrorMessage(error));
     }
   }
 
