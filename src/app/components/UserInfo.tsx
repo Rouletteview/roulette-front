@@ -7,12 +7,12 @@ import PlusIcon from "./icon/PlusIcon";
 const UserInfo = () => {
 
   const { data: userInfo } = useUserInfo();
-const userInfoData: UserInfoResponse = userInfo?.GetUserInfo;
-const name = userInfoData.Name || '';
+  const userInfoData: UserInfoResponse = userInfo?.GetUserInfo;
+  const name = userInfoData?.Name || '';
 
 
   const user = {
-    name,
+    name: name || '',
     saldoInicial: 0.0,
     saldoFinal: 0.0,
     utilidad: 0.0,
@@ -24,10 +24,10 @@ const name = userInfoData.Name || '';
     <div className=" bg-[#1a1a1a] text-white text-sm rounded p-4  mt-4 lg:mt-0 w-full lg:w-[190px] self-center lg:self-start my-4">
       <div className="flex justify-between items-center mb-3">
         <div className="flex items-baseline gap-x-1.5">
-        <img src={userIcon} alt="user icon" className="w-6 h-6" />
-        <span className="font-medium">{user.name || ''}</span>
+          <img src={userIcon} alt="user icon" className="w-6 h-6" />
+          <span className="font-medium">{user.name || ''}</span>
         </div>
-        <button className="cursor-pointer" onClick={() => {}}>
+        <button className="cursor-pointer" onClick={() => { }}>
           <PlusIcon />
         </button>
       </div>
