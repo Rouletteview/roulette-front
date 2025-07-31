@@ -1,12 +1,13 @@
 import { useMemo } from 'react';
 import { UTCTimestamp } from 'lightweight-charts';
-import { convertTagToNumber } from '../../../../utils/formatters/rouletterNumbers';
+import { convertTagToNumber, isVoisinDuZero } from '../../../../utils/formatters/rouletterNumbers';
 
 
 type RouletteProbability = {
   Date: string;
   Tag: string;
   Value: number;
+  Number?: number;
 };
 
 type HistogramPoint = {
@@ -34,7 +35,14 @@ export function useHistogramChartData(data?: RouletteProbability[], gameType?: s
       }
 
       // Convertir el tag a número para graficar
-      const tagNumber = convertTagToNumber(item.Tag, gameType);
+      let tagNumber;
+      if (gameType === 'HighAndLow') {
+        // Para alto y bajo, usar el número real de la ruleta (0-36)
+        // Necesitamos obtener el número original del item
+        tagNumber = item.Number || 0;
+      } else {
+        tagNumber = convertTagToNumber(item.Tag, gameType);
+      }
 
       // Determinar color basado en el Tag o el valor
       let color = '#2962FF'; // Color por defecto

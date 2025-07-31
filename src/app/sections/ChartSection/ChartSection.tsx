@@ -139,7 +139,7 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
 
             <div className="relative">
                 {isBlocked && (
-                    <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#121418CC] pointer-events-auto">
+                    <div className="absolute inset-0 z-[999999] flex items-center justify-center bg-[#121418CC] pointer-events-auto">
                         <div className='max-w-[900px] w-full'>
                             <h1 className='font-bold text-white text-[20px] md:text-[40px] text-center font-sans'>Para disfrutar de Roulettes View accede a  nuestros <a href='/subscription' className='text-[#D9A425] underline'>planes de suscripción</a> o <span onClick={handleStartFreeSubscription} className='text-[#D9A425] underline cursor-pointer'>activa tu prueba gratuita</span></h1>
                         </div>
@@ -189,14 +189,14 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
                                             onZoomOut={onZoomOut}
                                         />
                                         <div className='absolute top-28 right-28 z-50'>
-                                            {state.selectedType && state.gameType && state.selectedTable && (
+                                            {/* {state.selectedType && state.gameType && state.selectedTable && (
                                                 <Update
                                                     selectedType={state.selectedType}
                                                     gameType={state.gameType}
                                                     selectedTable={state.selectedTable}
                                                     loading={chartLoading}
                                                 />
-                                            )}
+                                            )} */}
                                         </div>
                                         <div className='absolute top-28 left-1/2  z-50 pointer-events-none'>
                                             {betResult?.status === 'Won' ? (
@@ -270,13 +270,13 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
                 selectedTableLabel={state.selectedTableLabel}
             >
                 <div className='absolute top-28 right-28 z-50'>
-                    {state.selectedType && state.gameType && state.selectedTable && !chartLoading && (
+                    {/* {state.selectedType && state.gameType && state.selectedTable && !chartLoading && (
                         <Update
                             selectedType={state.selectedType}
                             gameType={state.gameType}
                             selectedTable={state.selectedTable}
                         />
-                    )}
+                    )} */}
                 </div>
                 <ChartRenderer
                     selectedType={state.selectedType}
@@ -291,13 +291,13 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
 
                 <div className="absolute bottom-4 right-4 left-4 flex justify-end pointer-events-none">
                     <div className="pointer-events-auto">
-                        {state.selectedType && state.gameType && state.selectedTable && (
+                        {/* {state.selectedType && state.gameType && state.selectedTable && (
                             <Update
                                 selectedType={state.selectedType}
                                 gameType={state.gameType}
                                 selectedTable={state.selectedTable}
                             />
-                        )}
+                        )} */}
                     </div>
                 </div>
             </FullscreenChartModal>

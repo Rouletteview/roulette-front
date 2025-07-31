@@ -10,22 +10,20 @@ import barChart from "../../assets/icon/bar-chart.svg"
 import chart from "../../assets/icon/chart.svg"
 import desktopComputer from "../../assets/icon/desktop-computer.svg"
 import HeroSection from "../../sections/HeroSection"
-import { useUserInfo } from "../../hooks/useUserInfo"
 
 const LandingPage = () => {
-    const userInfo = useUserInfo();
-    const { Name } = userInfo.data?.GetUserInfo || {};
-   
+    const user = localStorage.getItem('user')
+    const userData = JSON.parse(user || '{}')
 
     return (
         <>
             <Header>
                 <a href="https://info.roulettesview.com/about/" target="_blank" className="text-white text-sm md:text-lg text-center">Conocenos</a>
                 <div className="flex flex-col md:flex-row gap-2 md:gap-3.5">
-                    {Name ? (
+                    {userData.name ? (
                         <div className="flex items-center gap-4">
                             <div className="text-white text-sm md:text-lg">
-                                Hola, <span className="text-[#D9A425]">{Name}</span>
+                                Hola, <span className="text-[#D9A425]">{userData.name}</span>
                             </div>
                             <a
                                 href="/home"

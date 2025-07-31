@@ -22,26 +22,32 @@ export const useChartData = (
 ) => {
     const limit = 10;
 
-   
+
     const startDate = new Date();
     startDate.setHours(0, 0, 0, 0);
     const endDate = new Date();
     endDate.setHours(23, 59, 59, 999);
 
- 
+
     const {
         data: tablesData,
         loading: marketLoading,
         error: errorTables
     } = useQuery(GET_ROULETTE_TABLES, {
         variables: {
-            Query: marketSearch || "",
-            Skip: (marketPage - 1) * 10,
-            Limit: limit
+            request: {
+                IsOnline: true,
+                Limit: limit,
+                Providers: ["evolution", "pragmatic", "ezugi"],
+                Query: marketSearch || "",
+                Skip: (marketPage - 1) * 10,
+            }
         },
     });
 
-    
+
+
+
     const {
         data: rouletteProbData,
         loading: chartLoading,
@@ -52,13 +58,15 @@ export const useChartData = (
                 TableId: selectedTable,
                 GameType: gameType,
                 StartDate: startDate.toISOString(),
-                EndDate: endDate.toISOString()
+                EndDate: endDate.toISOString(),
+                ProbabilitiesResultLimit: 10
+
             }
         },
         skip: !selectedTable || !gameType,
     });
 
-   
+
     const { data: chartNumbersData } = useQuery(GET_LAST_ROULETTE_TABLE_NUMBERS, {
         variables: {
             TableId: selectedTable,
@@ -67,26 +75,28 @@ export const useChartData = (
         skip: !selectedTable,
     });
 
-  
+    console.log(chartNumbersData)
 
-   
+
+
+
     const tableOptions = tablesData?.GetRouletteTables?.Tables?.map((table: RouletteTable) => ({
         label: `${table.Name} - ${table.Provider.charAt(0).toUpperCase() + table.Provider.slice(1)}`,
         value: table.Id
     })) || [];
 
-  
+
     const chartFormattedData = useFormattedChartData({
         data: rouletteProbData?.GetRouletteTableProbabilities.Results || [],
         chartType: selectedType ? chartTypes[selectedType as keyof typeof chartTypes] : chartTypes.Candlestick,
         gameType: gameType || undefined
     });
 
- 
+
     const numeros = chartNumbersData?.GetLastRouletteTableNumbers;
     const formattedNumbers = useRouletteNumbers(numeros || []);
 
-   
+
     const totalCount = tablesData?.GetRouletteTables.Total || 0;
     const marketHasNextPage = totalCount > 0 && (marketPage * limit) < totalCount;
     const marketHasPrevPage = marketPage > 1;

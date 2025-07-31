@@ -2,7 +2,7 @@
 import { useMemo } from "react";
 import { UTCTimestamp } from "lightweight-charts";
 import { chartTypes } from "../types/types";
-import { convertTagToNumber } from "../utils/formatters/rouletterNumbers";
+import { convertTagToNumber, isVoisinDuZero } from "../utils/formatters/rouletterNumbers";
 
 type RawEntry = {
   Date: string;
@@ -57,12 +57,12 @@ export const useFormattedChartData = ({
         }];
       case 'Area':
       case 'Lineal':
-        return formatMultipleLines(grouped, gameType).map(series => ({
+        return formatMultipleLines(grouped, gameType, chartType).map(series => ({
           ...series,
           data: series.data as { time: UTCTimestamp; value: number; color?: string }[]
         }));
       case 'VerticalColumn':
-        return formatMultipleHistograms(grouped, gameType).map(series => ({
+        return formatMultipleHistograms(grouped, gameType, chartType).map(series => ({
           ...series,
           data: series.data as { time: UTCTimestamp; value: number; color: string }[]
         }));
@@ -92,8 +92,8 @@ const groupByDate = (data: RawEntry[]): GroupedData[] => {
 };
 
 
-const formatMultipleLines = (grouped: GroupedData[], gameType?: GameType): MultiSeries[] => {
-  const data: { time: UTCTimestamp; value: number; tag?: string; originalValue?: number }[] = [];
+const formatMultipleLines = (grouped: GroupedData[], gameType?: GameType, chartType?: chartTypes): MultiSeries[] => {
+  const data: { time: UTCTimestamp; value: number; color?: string; tag?: string; originalValue?: number }[] = [];
 
   grouped.forEach(({ date, entries }) => {
     const sortedEntries = entries.sort((a, b) => {
@@ -107,8 +107,21 @@ const formatMultipleLines = (grouped: GroupedData[], gameType?: GameType): Multi
     sortedEntries.forEach(({ Number, Tag }, index) => {
       const time = (baseTime + index) as UTCTimestamp;
 
-      const value = (gameType === 'StraightUp' || gameType === 'Dozen') ? Number : convertTagToNumber(Tag, gameType);
-      data.push({ time, value, tag: Tag, originalValue: Number });
+      let value;
+      let color: string | undefined;
+
+      if (gameType === 'VoisinsDuZero') {
+
+        value = Number;
+
+        if (chartType === 'VerticalColumn') {
+          color = isVoisinDuZero(Number) ? '#00FF00' : '#FF0000';
+        }
+      } else {
+        value = (gameType === 'StraightUp' || gameType === 'Dozen' || gameType === 'HighAndLow') ? Number : convertTagToNumber(Tag, gameType);
+      }
+
+      data.push({ time, value, color, tag: Tag, originalValue: Number });
     });
   });
 
@@ -118,7 +131,7 @@ const formatMultipleLines = (grouped: GroupedData[], gameType?: GameType): Multi
 };
 
 
-const formatMultipleHistograms = (grouped: GroupedData[], gameType?: GameType): MultiSeries[] => {
+const formatMultipleHistograms = (grouped: GroupedData[], gameType?: GameType, chartType?: chartTypes): MultiSeries[] => {
   const data: { time: UTCTimestamp; value: number; color: string; tag?: string; originalValue?: number }[] = [];
   let lastValue: number | null = null;
 
@@ -145,8 +158,12 @@ const formatMultipleHistograms = (grouped: GroupedData[], gameType?: GameType): 
         } else if (Tag === 'Green' || Tag === 'Zero') {
           color = '#00FF00';
         }
+      } else if (gameType === 'VoisinsDuZero') {
+
+        value = Number;
+        color = isVoisinDuZero(Number) ? '#00FF00' : '#FF0000';
       } else {
-        value = (gameType === 'StraightUp' || gameType === 'Dozen') ? Number : convertTagToNumber(Tag, gameType);
+        value = (gameType === 'StraightUp' || gameType === 'Dozen' || gameType === 'HighAndLow') ? Number : convertTagToNumber(Tag, gameType);
         if (lastValue === null) {
           color = 'rgba(32, 178, 108, 1)';
         } else {

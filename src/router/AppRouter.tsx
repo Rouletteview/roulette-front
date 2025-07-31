@@ -13,6 +13,8 @@ import HomePage from "../app/pages/HomePage";
 import NotFound from "../landing/pages/NotFound";
 import HistoryPage from "../app/pages/HistoryPage";
 import SubscriptionPage from '../app/pages/SubscriptionPage';
+import UsersPage from '../app/pages/UsersPage';
+import AdminRoute from '../app/components/AdminRoute';
 import { useMutation } from "@apollo/client";
 import { ACTIVATE_USER } from "../graphql/mutations/auth/activateUser";
 import { getGraphQLErrorMessage } from "../utils/errorMessages";
@@ -74,6 +76,12 @@ const AppRouter = () => {
         element={isAuthenticated ? <HomePage /> : <Navigate to="/iniciar-sesion" />}
       />
       <Route path="/historial" element={<HistoryPage />} />
+
+      {/* Admin routes */}
+      <Route
+        path="/usuarios"
+        element={<AdminRoute><UsersPage /></AdminRoute>}
+      />
 
       <Route path="/*" element={<NotFound />} />
 

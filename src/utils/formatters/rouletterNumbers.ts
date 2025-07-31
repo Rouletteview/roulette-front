@@ -82,6 +82,12 @@ export const translateRouletteTag = (tag: string): string => {
 };
 
 
+
+export const isVoisinDuZero = (num: number): boolean => {
+    const voisinsDuZeroNumbers = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36];
+    return voisinsDuZeroNumbers.includes(num);
+};
+
 export const convertTagToNumber = (tag: string, gameType?: string): number => {
 
     if (gameType === 'RedAndBlack' || !gameType) {
@@ -97,8 +103,9 @@ export const convertTagToNumber = (tag: string, gameType?: string): number => {
 
     if (gameType === 'OddAndEven') {
         const oddEvenMap: Record<string, number> = {
+            'Zero': 0,
             'Odd': 1,
-            'Even': 0
+            'Even': 2
         };
         return oddEvenMap[tag] ?? 0;
     }
@@ -138,29 +145,28 @@ export const convertTagToNumber = (tag: string, gameType?: string): number => {
         const num = parseInt(tag);
         if (isNaN(num)) return 0;
 
- 
+
         if (num >= 1 && num <= 12) return 1;
         if (num >= 13 && num <= 24) return 2;
         if (num >= 25 && num <= 36) return 3;
-        return 0; 
+        return 0;
     }
 
     if (gameType === 'VoisinsDuZero') {
-      const voisinsDuZeroMap: Record<string, number> = {
-        'VoisinsDuZero': 1,
-        'Other': 2
-      };
-      return voisinsDuZeroMap[tag] ?? 0;
-     
+
+        const num = parseInt(tag);
+        if (isNaN(num)) return 0;
+        return num;
+
     }
 
 
     if (gameType === 'Orphelins') {
-       const orphelinsMap: Record<string, number> = {
-        'Orphelins': 1,
-        'Other': 2
-       };
-       return orphelinsMap[tag] ?? 0;
+        const orphelinsMap: Record<string, number> = {
+            'Orphelins': 1,
+            'Other': 2
+        };
+        return orphelinsMap[tag] ?? 0;
     }
 
     if (gameType === 'TiersDuCylindre') {
@@ -172,11 +178,11 @@ export const convertTagToNumber = (tag: string, gameType?: string): number => {
     }
 
     if (gameType === 'PlayZero') {
-       const playZeroMap: Record<string, number> = {
-        'PlayZero': 1,
-        'Other': 2
-       };
-       return playZeroMap[tag] ?? 0;
+        const playZeroMap: Record<string, number> = {
+            'PlayZero': 1,
+            'Other': 2
+        };
+        return playZeroMap[tag] ?? 0;
     }
 
     const num = parseInt(tag);
@@ -191,8 +197,9 @@ export const numberToTag = (value: number, gameType?: string): string => {
         if (value === 2) return 'Green';
     }
     if (gameType === 'OddAndEven') {
-        if (value === 1) return 'Odd';
-        if (value === 0) return 'Even';
+        if (value === 0) return 'Zero';
+        if (value === 1) return 'Even';
+        if (value === 2) return 'Odd';
     }
     if (gameType === 'HighAndLow') {
         if (value === 1) return 'High';
@@ -225,7 +232,7 @@ export const numberToTag = (value: number, gameType?: string): string => {
         return value.toString();
     }
 
- 
+
 
 
     return value.toString();
@@ -243,16 +250,16 @@ export const getYAxisTicks = (gameType?: string): { value: number, label: string
     }
     if (gameType === 'OddAndEven') {
         return [
-            { value: 1, label: translateRouletteTag('Even'), color: '#FF0000', lineWidth: 2, lineStyle: 1 },
-            { value: 0.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },
-            { value: 0, label: translateRouletteTag('Odd'), color: '#FF0000', lineWidth: 2, lineStyle: 1 },
+            { value: 2, label: translateRouletteTag('Even'), color: '#FF0000', lineWidth: 2, lineStyle: 1 },
+            { value: 1.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },
+            { value: 1, label: translateRouletteTag('Odd'), color: '#FF0000', lineWidth: 2, lineStyle: 1 },
         ];
     }
     if (gameType === 'HighAndLow') {
         return [
-            { value: 0, label: translateRouletteTag('Low'), color: '#FF0000', lineWidth: 2, lineStyle: 1 },
-            { value: 0.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },
-            { value: 1, label: translateRouletteTag('High'), color: '#FF0000', lineWidth: 2, lineStyle: 1 },
+            // { value: 0, label: translateRouletteTag('Low'), color: '#FF0000', lineWidth: 2, lineStyle: 1 },
+            // { value: 0.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },
+            // { value: 1, label: translateRouletteTag('High'), color: '#FF0000', lineWidth: 2, lineStyle: 1 },
         ];
     }
     if (gameType === 'Dozen') {
@@ -309,5 +316,5 @@ export const getYAxisTicks = (gameType?: string): { value: number, label: string
         ];
     }
 
- return []
+    return []
 };

@@ -3,13 +3,13 @@ import { useState } from 'react';
 
 const SliderComponent = () => {
     const [value, setValue] = useState(250);
- 
+
 
     return (
         <div className='w-full flex flex-col gap-2 text-white mb-12 h'>
             <h1 className='text-sm font-bold text-center'>Cantidad de resultados</h1>
             <div className='flex items-center gap-2 w-full text-[12px] '>
-                <span>00</span>
+                <span>0</span>
                 <Slider
                     defaultValue={30}
                     value={value}
