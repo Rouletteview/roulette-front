@@ -38,7 +38,7 @@ const PaymentAndSubscriptionSection = ({ selectedMethod, setSelectedMethod, sele
 
     const filteredPaymentMethods = paymentMethods.filter(method => {
         if (method.key === 'Phone') {
-            return country === 'Dominican Republic';
+            return country === 'Venezuela';
         }
         return true;
     });
