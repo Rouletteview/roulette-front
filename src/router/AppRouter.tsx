@@ -31,7 +31,7 @@ const ActivateUserRedirect = () => {
     if (token) {
       const activate = async () => {
         try {
-          await ActivateUser({ variables: { token } });
+          await ActivateUser({ variables: { user: { ValidationToken: token } } });
           navigate("/iniciar-sesion", {
             state: { message: "Email confirmado con éxito", ok: true },
           });

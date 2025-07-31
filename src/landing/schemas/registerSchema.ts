@@ -4,7 +4,9 @@ export const registerSchema = z.object({
     fullName: z
         .string()
         .min(3, "El nombre completo debe tener al menos 3 caracteres")
-        .regex(/^\S+\s+\S+$/, "Debe incluir nombre y apellido"),
+        .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, "Solo se permiten letras y espacios")
+        .regex(/^\S+\s+\S+/, "Debe incluir al menos nombre y apellido separados por espacio")
+        .transform((val) => val.trim()),
 
     birthDate: z
         .string()
@@ -14,7 +16,7 @@ export const registerSchema = z.object({
         .regex(/^\d{6,15}$/, "Número de teléfono inválido"),
     countryCode: z
         .string()
-        .trim() 
+        .trim()
         .regex(/^\+\d{1,4}(\s\d{1,15})?$/, "Prefijo telefónico inválido"),
 
     country: z

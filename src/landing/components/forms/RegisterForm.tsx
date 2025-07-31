@@ -59,22 +59,23 @@ const RegisterForm = () => {
 
             if (isNaN(birthDate.getTime())) throw new Error("Fecha inválida");
 
-            const [name] = data.fullName.trim().split(" ");
             const phoneNumber = data.countryCode + data.phone;
 
 
-            const response = await registerUser({
+            await registerUser({
                 variables: {
-                    Name: name,
-                    Password: data.password,
-                    Email: data.email,
-                    Country: data.country,
-                    BirthDate: birthDate.toISOString(),
-                    PhoneNumber: phoneNumber,
+                    registerUser: {
+                        Name: data.fullName,
+                        Password: data.password,
+                        Email: data.email,
+                        Country: data.country,
+                        BirthDate: birthDate.toISOString(),
+                        PhoneNumber: phoneNumber,
+                    }
                 },
             });
 
-            console.log("Usuario registrado exitosamente:", response.data);
+
             navigate("/confirmar-correo", { state: { message: "Email confirmado con éxito", ok: true } });
 
         } catch (error: unknown) {
@@ -142,7 +143,7 @@ const RegisterForm = () => {
 
                     <button
                         type="button"
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
                         onClick={() => setShowPassword(!showPassword)}
                     >
                         {showPassword ? (
@@ -176,7 +177,7 @@ const RegisterForm = () => {
                 <button
                     type="submit"
                     disabled={!isChecked || loading}
-                    className="block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-full md:w-[512px] text-lg font-bold rounded-[10px] py-2 mt-5 mb-24 disabled:bg-[#B2B2B2] yellow-button-shadow "
+                    className="block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-full md:w-[512px] text-lg font-bold rounded-[10px] py-2 mt-5 mb-24 disabled:bg-[#B2B2B2] yellow-button-shadow cursor-pointer"
                 >
                     {loading ? "Cargando..." : "Registrarse"}
                 </button>
