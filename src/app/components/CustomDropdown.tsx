@@ -22,6 +22,24 @@ interface CustomDropdownProps {
     hasNextPage?: boolean;
     hasPrevPage?: boolean;
     loading?: boolean;
+    bgButton?: string;
+    borderButton?: string;
+    textColor?: string;
+    bgDropdown?: string;
+    borderDropdown?: string;
+    bgOption?: string;
+    bgOptionHover?: string;
+    bgOptionSelected?: string;
+    textOption?: string;
+    textOptionSelected?: string;
+    textOptionHover?: string;
+    bgSearch?: string;
+    borderSearch?: string;
+    textSearch?: string;
+    placeholderSearch?: string;
+    bgPagination?: string;
+    textPagination?: string;
+    borderPagination?: string;
 }
 
 const CustomDropdown: React.FC<CustomDropdownProps> = ({
@@ -29,7 +47,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
     value,
     onChange,
     label,
-    className,
+    className = '',
     defaultLabel,
     searchable = false,
     searchQuery = '',
@@ -40,6 +58,21 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
     hasNextPage = false,
     hasPrevPage = false,
     loading = false,
+    bgButton = 'bg-[#121418F2]',
+    borderButton = 'border-[#000000]',
+    textColor = 'text-white',
+    bgDropdown = 'bg-[#404040]',
+    borderDropdown = 'border-[#444]',
+    bgOptionSelected = 'bg-[#181818]',
+    textOption = 'text-[#D9A425]',
+    textOptionSelected = 'text-[#D9A425]',
+    bgSearch = 'bg-[#181818]',
+    borderSearch = 'border-[#333]',
+    textSearch = 'text-[#D9A425]',
+    placeholderSearch = 'placeholder-[#D9A425]',
+    bgPagination = 'bg-[#181818]',
+    textPagination = 'text-[#D9A425]',
+    borderPagination = 'border-[#333]',
 }) => {
     const [open, setOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -67,11 +100,11 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
     const selectedOption = options.find(opt => opt.value === value);
 
     return (
-        <div className={`relative w-full sm:w-[180px] md:w-[200px] lg:w-[215px] ${className || ''}`} ref={dropdownRef}>
+        <div className={`relative ${className || ''}`} ref={dropdownRef}>
             {label && <span className="block mb-1 text-xs sm:text-sm md:text-base text-white font-medium">{label}</span>}
             <button
                 type="button"
-                className="w-full flex justify-between items-center text-xs sm:text-sm md:text-base bg-[#121418F2] border-2 border-[#000000] rounded-lg px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-left text-white font-medium focus:outline-none focus:ring-2 focus:ring-[#D9A425] transition"
+                className={`w-full flex justify-between items-center text-xs sm:text-sm md:text-base ${bgButton} border-2 ${borderButton} rounded-lg px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-left ${textColor} font-medium focus:outline-none focus:ring-2 focus:ring-[#D9A425] transition`}
                 onClick={() => setOpen((prev) => !prev)}
                 onKeyDown={handleKeyDown}
                 aria-haspopup="listbox"
@@ -83,13 +116,13 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
                 </svg>
             </button>
             {open && (
-                <div className="absolute z-20 mt-2 w-full bg-[#404040] border border-[#444] rounded-xl shadow-lg py-2 max-h-60 sm:max-h-72 overflow-hidden animate-fade-in" tabIndex={-1}>
+                <div className={`absolute z-20 mt-2 w-full ${bgDropdown} border ${borderDropdown} rounded-xl shadow-lg py-2 max-h-60 sm:max-h-72 overflow-hidden animate-fade-in`} tabIndex={-1}>
 
                     {searchable && (
-                        <div className="px-2 sm:px-3 md:px-4 pb-2 border-b border-[#333]">
+                        <div className={`px-2 sm:px-3 md:px-4 pb-2 border-b ${borderPagination}`}>
                             <input
                                 type="text"
-                                className="w-full px-2 sm:px-3 py-1 rounded-md bg-[#181818] text-[#D9A425] placeholder-[#D9A425] border border-[#333] focus:outline-none focus:ring-2 focus:ring-[#D9A425] text-xs sm:text-sm"
+                                className={`w-full px-2 sm:px-3 py-1 rounded-md ${bgSearch} ${textSearch} ${placeholderSearch} border ${borderSearch} focus:outline-none focus:ring-2 focus:ring-[#D9A425] text-xs sm:text-sm`}
                                 placeholder="Buscar..."
                                 value={searchQuery}
                                 onChange={e => onSearchQueryChange && onSearchQueryChange(e.target.value)}
@@ -108,13 +141,13 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
                                 </div>
 
                             ) : options.length === 0 ? (
-                                <li className="px-3 sm:px-4 md:px-5 py-2 text-[#D9A425] text-center text-xs sm:text-sm">Sin resultados</li>
+                                <li className={`px-3 sm:px-4 md:px-5 py-2 text-center text-xs sm:text-sm ${textOption}`}>Sin resultados</li>
                             ) : (
                                 options.map((opt) => (
                                     <li
                                         key={opt.value}
                                         className={`px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 cursor-pointer text-sm sm:text-base md:text-[17px] font-medium rounded-md transition-colors
-                ${opt.value === value ? 'bg-[#181818] text-[#D9A425]' : 'text-[#D9A425] hover:bg-[#181818]'}
+                ${opt.value === value ? `${bgOptionSelected} ${textOptionSelected}` : `${textOption} hover:bg-[#181818]`}
               `}
                                         role="option"
                                         aria-selected={opt.value === value}
@@ -138,9 +171,9 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
                     </div>
                     {/* Paginación */}
                     {paginated && (
-                        <div className="flex items-center justify-center gap-2 sm:gap-4 px-2 sm:px-3 md:px-4 pb-2 w-full border-t border-[#333]">
+                        <div className={`flex items-center justify-center gap-2 sm:gap-4 px-2 sm:px-3 md:px-4 pb-2 w-full border-t ${borderPagination}`}>
                             <button
-                                className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full text-[#D9A425] font-medium transition-colors text-lg sm:text-xl md:text-2xl ${!hasPrevPage ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#181818]'}`}
+                                className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full ${textPagination} font-medium transition-colors text-lg sm:text-xl md:text-2xl ${!hasPrevPage ? 'opacity-50 cursor-not-allowed' : `hover:${bgPagination}`}`}
                                 onClick={() => {
                                     if (hasPrevPage && onPageChange) {
                                         onPageChange(page - 1);
@@ -155,11 +188,11 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
                                     <path d="M15 19L8 12L15 5" stroke="#D9A425" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                             </button>
-                            <span className="text-[#D9A425] text-xs sm:text-sm min-w-[60px] sm:min-w-[70px] text-center select-none">
+                            <span className={`${textPagination} text-xs sm:text-sm min-w-[60px] sm:min-w-[70px] text-center select-none`}>
                                 Página {page}
                             </span>
                             <button
-                                className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full text-[#D9A425] font-medium transition-colors text-lg sm:text-xl md:text-2xl ${!hasNextPage ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#181818]'}`}
+                                className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full ${textPagination} font-medium transition-colors text-lg sm:text-xl md:text-2xl ${!hasNextPage ? 'opacity-50 cursor-not-allowed' : `hover:${bgPagination}`}`}
                                 onClick={() => {
                                     if (hasNextPage && onPageChange) {
                                         onPageChange(page + 1);

@@ -168,6 +168,7 @@ const CandleChart: React.FC<ChartProps> = ({
 
 
     const isRedAndBlack = gameType === 'RedAndBlack';
+    const isDozen = gameType === 'Dozen';
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let redSeries: any = null;
@@ -175,6 +176,8 @@ const CandleChart: React.FC<ChartProps> = ({
     let blackSeries: any = null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let greenSeries: any = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let whiteSeries: any = null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let defaultSeries: any = null;
 
@@ -196,6 +199,37 @@ const CandleChart: React.FC<ChartProps> = ({
         borderVisible: false,
         wickUpColor: '#000000',
         wickDownColor: '#000000',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+
+      greenSeries = chart.addSeries(CandlestickSeries, {
+        upColor: '#00FF00',
+        downColor: '#00FF00',
+        borderVisible: false,
+        wickUpColor: '#00FF00',
+        wickDownColor: '#00FF00',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+    } else if (isDozen) {
+      // Crear series separadas para cada docena
+      redSeries = chart.addSeries(CandlestickSeries, {
+        upColor: '#FF0000',
+        downColor: '#FF0000',
+        borderVisible: false,
+        wickUpColor: '#FF0000',
+        wickDownColor: '#FF0000',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+
+      whiteSeries = chart.addSeries(CandlestickSeries, {
+        upColor: '#FFFFFF',
+        downColor: '#FFFFFF',
+        borderVisible: false,
+        wickUpColor: '#FFFFFF',
+        wickDownColor: '#FFFFFF',
         lastValueVisible: false,
         priceLineVisible: false,
       });
@@ -294,6 +328,50 @@ const CandleChart: React.FC<ChartProps> = ({
             });
           });
         }
+      } else if (isDozen) {
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const redData: any[] = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const whiteData: any[] = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const greenData: any[] = [];
+
+        validData.forEach(candle => {
+          const strippedCandle = stripCandle(candle);
+          const closeValue = candle.close;
+
+     
+          if (closeValue >= 1 && closeValue <= 12) {
+         
+            redData.push(strippedCandle);
+          } else if (closeValue >= 13 && closeValue <= 24) {
+           
+            whiteData.push(strippedCandle);
+          } else if (closeValue >= 25 && closeValue <= 36) {
+         
+            greenData.push(strippedCandle);
+          }
+        });
+
+        if (redData.length > 0) redSeries.setData(redData);
+        if (whiteData.length > 0) whiteSeries.setData(whiteData);
+        if (greenData.length > 0) greenSeries.setData(greenData);
+
+        const firstSeries = redSeries || whiteSeries || greenSeries;
+       
+        if (firstSeries && yTicks && yTicks.length > 0 && chartType !== 'Candlestick') {
+          yTicks.forEach(tick => {
+            firstSeries.createPriceLine({
+              price: tick.value,
+              color: tick.color,
+              lineWidth: 2,
+              lineStyle: 1,
+              axisLabelVisible: true,
+              title: tick.label,
+            });
+          });
+        }
       } else {
 
         defaultSeries.setData(validData.map(stripCandle));
@@ -310,9 +388,35 @@ const CandleChart: React.FC<ChartProps> = ({
             });
           });
         }
+
+
+        if (gameType === 'OddAndEven' && defaultSeries) {
+          defaultSeries.createPriceLine({
+            price: 18,
+            color: '#D9A425',
+            lineWidth: 3,
+            lineStyle: 1,
+            axisLabelVisible: true,
+            title: '',
+          });
+        }
       }
 
-      // Set visible range after data is loaded
+         if (gameType === 'OddAndEven') {
+        const seriesToUse = redSeries || whiteSeries || greenSeries || defaultSeries;
+        if (seriesToUse) {
+          seriesToUse.createPriceLine({
+            price: 18,
+            color: '#D9A425',
+            lineWidth: 3,
+            lineStyle: 1,
+            axisLabelVisible: true,
+            title: '',
+          });
+        }
+      }
+
+  
       chart.timeScale().setVisibleRange(initialRange);
     }
 

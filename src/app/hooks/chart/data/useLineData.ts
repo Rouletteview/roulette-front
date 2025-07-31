@@ -6,6 +6,7 @@ type RouletteProbability = {
   Date: string;
   Tag: string;
   Value: number;
+  Number?: number;
 };
 
 type LinePoint = {
@@ -32,7 +33,13 @@ export function useLineChartData(data?: RouletteProbability[], gameType?: string
       }
 
       // Convertir el tag a número para graficar
-      const tagNumber = convertTagToNumber(item.Tag, gameType);
+      let tagNumber;
+      if (gameType === 'HighAndLow') {
+        // Para alto y bajo, usar el número real de la ruleta (0-36)
+        tagNumber = item.Number || 0;
+      } else {
+        tagNumber = convertTagToNumber(item.Tag, gameType);
+      }
 
       points.push({
         time: timestamp,

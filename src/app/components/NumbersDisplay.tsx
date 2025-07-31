@@ -1,8 +1,5 @@
 import { RouletteItem } from "../../utils/formatters/rouletterNumbers";
 
-
-
-
 interface Props {
     numbers: RouletteItem[];
     loading?: boolean;
@@ -14,29 +11,39 @@ const colorClasses = {
     green: "border-green-600 ",
 };
 
+const placeholderColors = ['red', 'white', 'green', 'red', 'white', 'green', 'red', 'white', 'green', 'red', 'white', 'green', 'red', 'white'];
 
 const NumbersDisplay = ({ numbers, loading }: Props) => {
     const lastNumbers = numbers;
-    if (!loading && lastNumbers.length === 0) return null
+
     return (
-        <ul className="flex flex-wrap gap-2 bg-black/30 p-2 rounded">
+        <ul className="flex flex-wrap gap-2 bg-black/30 p-2 rounded mb-4">
             {loading
-                ? Array.from({ length: 14 }).map((_, i) => (
+                ? placeholderColors.map((color, i) => (
                     <li
                         key={i}
-                        className="w-8 h-8 lg:w-7 lg:h-7 rounded-full border-3 flex items-center justify-center font-medium text-white text-[10px] md:text-xs bg-gray-700 animate-pulse"
+                        className={`w-8 h-8 lg:w-7 lg:h-7 rounded-full border-3 flex items-center justify-center font-medium text-white text-[10px] md:text-xs bg-gray-700 animate-pulse ${colorClasses[color as keyof typeof colorClasses]}`}
                     >
-                        &nbsp;
+                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></div>
                     </li>
                 ))
-                : lastNumbers.map((item, i) => (
-                    <li
-                        key={i}
-                        className={`w-8 h-8 lg:w-7 lg:h-7 rounded-full border-3 flex items-center justify-center font-medium text-white text-[10px] md:text-xs ${colorClasses[item.color]}`}
-                    >
-                        {item.value}
-                    </li>
-                ))}
+                : lastNumbers.length === 0
+                    ? placeholderColors.map((color, i) => (
+                        <li
+                            key={i}
+                            className={`w-8 h-8 lg:w-7 lg:h-7 rounded-full border-3 flex items-center justify-center font-medium text-white text-[10px] md:text-xs bg-gray-600/50 ${colorClasses[color as keyof typeof colorClasses]}`}
+                        >
+                            <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                        </li>
+                    ))
+                    : lastNumbers.map((item, i) => (
+                        <li
+                            key={i}
+                            className={`w-8 h-8 lg:w-7 lg:h-7 rounded-full border-3 flex items-center justify-center font-medium text-white text-[10px] md:text-xs ${colorClasses[item.color]}`}
+                        >
+                            {item.value}
+                        </li>
+                    ))}
         </ul>
     )
 }

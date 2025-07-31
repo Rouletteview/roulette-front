@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -42,8 +43,8 @@ export type Bet = {
   createdAt: Scalars['DateTime']['output'];
   gameType: GameType;
   id: Scalars['String']['output'];
-  rouletteTableId: Scalars['String']['output'];
   status: BetStatus;
+  table: RouletteTable;
   value: Scalars['String']['output'];
 };
 
@@ -108,6 +109,7 @@ export type GetLastRouletteTableNumbersRequest = {
 export type GetRouletteTableProbabilitiesRequest = {
   EndDate: Scalars['DateTime']['input'];
   GameType: GameType;
+  ProbabilitiesResultLimit: Scalars['Int']['input'];
   StartDate: Scalars['DateTime']['input'];
   TableId: Scalars['String']['input'];
 };
@@ -147,6 +149,19 @@ export type GetUserBetsRequest = {
   skip: Scalars['Int']['input'];
 };
 
+export type GetUsersRequest = {
+  limit: Scalars['Int']['input'];
+  paymentStatus?: InputMaybe<PaymentStatus>;
+  query?: InputMaybe<Scalars['String']['input']>;
+  skip: Scalars['Int']['input'];
+};
+
+export type GetUsersResponse = {
+  __typename?: 'GetUsersResponse';
+  Total: Scalars['Int']['output'];
+  Users: Array<User>;
+};
+
 export type LoginRequest = {
   Email: Scalars['String']['input'];
   Password: Scalars['String']['input'];
@@ -172,6 +187,8 @@ export type Mutation = {
   StartFreeSubscription: UserSubscription;
   UpdatePaymentStatus: Scalars['Boolean']['output'];
   UpdateSubscriptionStatus: Scalars['Boolean']['output'];
+  UpdateUserActiveStatus: Scalars['Boolean']['output'];
+  UpdateUserInfo: User;
 };
 
 
@@ -229,6 +246,17 @@ export type MutationUpdateSubscriptionStatusArgs = {
   input: UpdateSubscriptionStatusRequest;
 };
 
+
+export type MutationUpdateUserActiveStatusArgs = {
+  isActive: Scalars['Boolean']['input'];
+  userId: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateUserInfoArgs = {
+  input: UpdateUserInfoRequest;
+};
+
 export type Payment = {
   __typename?: 'Payment';
   CreatedAt: Scalars['DateTime']['output'];
@@ -236,6 +264,7 @@ export type Payment = {
   PaymentMethod: PaymentMethod;
   PhotoUrl: Scalars['String']['output'];
   Reference: Scalars['String']['output'];
+  ReviewComment?: Maybe<Scalars['String']['output']>;
   Status: PaymentStatus;
 };
 
@@ -262,8 +291,10 @@ export type Query = {
   GetRouletteTables: GetRouletteTablesResponse;
   GetSubscription: UserSubscription;
   GetSubscriptions: GetSubscriptionsResponse;
+  GetUser: User;
   GetUserBets: Array<Bet>;
   GetUserInfo: UserInfoResponse;
+  GetUsers: GetUsersResponse;
 };
 
 
@@ -302,8 +333,18 @@ export type QueryGetSubscriptionsArgs = {
 };
 
 
+export type QueryGetUserArgs = {
+  userId: Scalars['String']['input'];
+};
+
+
 export type QueryGetUserBetsArgs = {
   request: GetUserBetsRequest;
+};
+
+
+export type QueryGetUsersArgs = {
+  request: GetUsersRequest;
 };
 
 export type RegisterUserRequest = {
@@ -384,6 +425,7 @@ export enum SubscriptionFrequency {
 
 export type UpdatePaymentStatusRequest = {
   PaymentId: Scalars['String']['input'];
+  ReviewComment?: InputMaybe<Scalars['String']['input']>;
   Status: PaymentStatus;
   SubscriptionId: Scalars['String']['input'];
 };
@@ -393,6 +435,29 @@ export type UpdateSubscriptionStatusRequest = {
   SubscriptionId: Scalars['String']['input'];
 };
 
+export type UpdateUserInfoRequest = {
+  BirthDate: Scalars['DateTime']['input'];
+  Country: Scalars['String']['input'];
+  Name: Scalars['String']['input'];
+  Password: Scalars['String']['input'];
+  PhoneNumber: Scalars['String']['input'];
+};
+
+export type User = {
+  __typename?: 'User';
+  Bets: Array<Bet>;
+  BirthDate: Scalars['DateTime']['output'];
+  Country: Scalars['String']['output'];
+  CreatedAt: Scalars['DateTime']['output'];
+  Email: Scalars['String']['output'];
+  Id: Scalars['String']['output'];
+  IsActive: Scalars['Boolean']['output'];
+  LastLogin: Scalars['DateTime']['output'];
+  Name: Scalars['String']['output'];
+  PhoneNumber: Scalars['String']['output'];
+  Subscription?: Maybe<UserSubscription>;
+};
+
 export type UserInfoResponse = {
   __typename?: 'UserInfoResponse';
   BirthDate: Scalars['DateTime']['output'];
@@ -400,6 +465,7 @@ export type UserInfoResponse = {
   Email: Scalars['String']['output'];
   Id: Scalars['String']['output'];
   IsAdmin: Scalars['Boolean']['output'];
+  LastLogin?: Maybe<Scalars['DateTime']['output']>;
   Name: Scalars['String']['output'];
   PhoneNumber: Scalars['String']['output'];
 };
@@ -416,3 +482,13 @@ export type UserSubscription = {
   StartDate: Scalars['DateTime']['output'];
   UserId: Scalars['String']['output'];
 };
+
+export type GetUsersQueryVariables = Exact<{
+  request: GetUsersRequest;
+}>;
+
+
+export type GetUsersQuery = { __typename?: 'Query', GetUsers: { __typename?: 'GetUsersResponse', Users: Array<{ __typename?: 'User', Id: string, Name: string, Email: string, Country: string, BirthDate: any, PhoneNumber: string, Subscription?: { __typename?: 'UserSubscription', Id: string, UserId: string, IsActive: boolean, Frequency: SubscriptionFrequency, EndDate: any, StartDate: any, LastPay?: any | null, CreatedAt: any, Payments: Array<{ __typename?: 'Payment', Id: string, PhotoUrl: string, Reference: string, Status: PaymentStatus, PaymentMethod: PaymentMethod, CreatedAt: any }> } | null }> } };
+
+
+export const GetUsersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUsers"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"request"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GetUsersRequest"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"GetUsers"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"request"},"value":{"kind":"Variable","name":{"kind":"Name","value":"request"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"Users"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"Id"}},{"kind":"Field","name":{"kind":"Name","value":"Name"}},{"kind":"Field","name":{"kind":"Name","value":"Email"}},{"kind":"Field","name":{"kind":"Name","value":"Country"}},{"kind":"Field","name":{"kind":"Name","value":"BirthDate"}},{"kind":"Field","name":{"kind":"Name","value":"PhoneNumber"}},{"kind":"Field","name":{"kind":"Name","value":"Subscription"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"Id"}},{"kind":"Field","name":{"kind":"Name","value":"UserId"}},{"kind":"Field","name":{"kind":"Name","value":"IsActive"}},{"kind":"Field","name":{"kind":"Name","value":"Frequency"}},{"kind":"Field","name":{"kind":"Name","value":"EndDate"}},{"kind":"Field","name":{"kind":"Name","value":"StartDate"}},{"kind":"Field","name":{"kind":"Name","value":"LastPay"}},{"kind":"Field","name":{"kind":"Name","value":"CreatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"Payments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"Id"}},{"kind":"Field","name":{"kind":"Name","value":"PhotoUrl"}},{"kind":"Field","name":{"kind":"Name","value":"Reference"}},{"kind":"Field","name":{"kind":"Name","value":"Status"}},{"kind":"Field","name":{"kind":"Name","value":"PaymentMethod"}},{"kind":"Field","name":{"kind":"Name","value":"CreatedAt"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetUsersQuery, GetUsersQueryVariables>;

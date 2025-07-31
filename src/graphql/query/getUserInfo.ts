@@ -8,6 +8,8 @@ export const GET_USER_INFO = gql`
       Email
       Name
       Country
+      BirthDate
+      PhoneNumber
       LastLogin
     }
   }

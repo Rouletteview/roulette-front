@@ -65,7 +65,7 @@ const LineChart: React.FC<ChartProps> = ({
     const yTicks = getYAxisTicks(gameType);
     const initialRange = getInitialRange();
 
- 
+
 
     const chart = createChart(chartContainerRef.current, {
 
@@ -138,7 +138,6 @@ const LineChart: React.FC<ChartProps> = ({
           lineWidth: 2,
           lastValueVisible: false,
           priceLineVisible: false,
-
         });
 
         const validData = series.data

@@ -48,6 +48,7 @@ interface ModalContentProps {
     counter: number;
     handleChipClick: (chip: string) => void;
     handleBet: () => void;
+    loading: boolean;
 }
 
 const ModalContent: React.FC<ModalContentProps> = (props) => (
@@ -90,14 +91,25 @@ const ModalContent: React.FC<ModalContentProps> = (props) => (
             <span className="w-16 h-12 flex items-center justify-center rounded-full bg-gray-100 text-3xl font-semibold text-[#D9A425] mx-2 select-none">{props.counter}</span>
             <button onClick={() => props.setCounter(props.counter + 1)} className="w-12 h-12 rounded-full bg-gray-200 text-3xl text-black flex items-center justify-center font-bold cursor-pointer hover:bg-gray-300">+</button>
         </div>
-        <button onClick={props.handleBet} disabled={props.counter === 0 && props.selectedChip === ""} className="w-full py-4 rounded-xl bg-[#D9A425] text-white text-xl font-semibold shadow-md mt-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#D9A425]/80 cursor-pointer">
-            Apostar
+        <button
+            onClick={props.handleBet}
+            disabled={props.counter === 0 || props.selectedChip === "" || props.loading}
+            className="w-full py-4 rounded-xl bg-[#D9A425] text-white text-xl font-semibold shadow-md mt-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#D9A425]/80 cursor-pointer flex items-center justify-center gap-2"
+        >
+            {props.loading ? (
+                <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Procesando...
+                </>
+            ) : (
+                "Apostar"
+            )}
         </button>
     </div>
 );
 
 const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelectedChip, setCounter, counter, selectedTable, amount, gameType, betValue, setBetId }: Props) => {
-    const { createBet } = useBetData({
+    const { createBet, createBetLoading } = useBetData({
         rouletteTableId: selectedTable,
         amount: amount,
         gameType: gameType,
@@ -145,6 +157,7 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
                     counter={counter}
                     handleChipClick={handleChipClick}
                     handleBet={handleBet}
+                    loading={createBetLoading}
                 />
             </div>
 
@@ -159,6 +172,7 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
                     counter={counter}
                     handleChipClick={handleChipClick}
                     handleBet={handleBet}
+                    loading={createBetLoading}
                 />
             </div>
         </>

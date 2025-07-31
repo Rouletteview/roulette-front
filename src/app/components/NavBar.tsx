@@ -7,8 +7,11 @@ import homeIcon from '../../assets/icon/homepage-icon.svg';
 // import chartIcon from '../../assets/icon/chart-icon.svg';
 import subIcon from '../../assets/icon/sub-icon.svg'
 import historyIcon from '../../assets/icon/history-icon.svg'
+import userIcon from '../../assets/icon/user-icon.svg'
 // import notiIcon from '../../assets/icon/notification-icon.svg'
 import { useAuthStore } from '../../stores/authStore';
+import { useUserInfo } from '../../hooks/useUserInfo';
+
 
 
 const NavBar = () => {
@@ -16,15 +19,25 @@ const NavBar = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const logout = useAuthStore((state) => state.logout);
-    const isSubscriptionPage = location.pathname === '/subscription';
+    const isBlankPage = location.pathname === '/subscription' || location.pathname === '/usuarios';
+    const { data: userInfo } = useUserInfo();
+    const isAdmin = userInfo?.GetUserInfo?.IsAdmin || false;
 
-    const navLinks = [
+    const allNavLinks = [
         { name: "Inicio", path: "/home", icon: homeIcon },
         // { name: "Probar Gráficos", path: "/graficos", icon: chartIcon },
         { name: "Subscripción", path: "/subscription", icon: subIcon },
         { name: "Historial", path: "/historial", icon: historyIcon },
         // { name: "Notificaciones", path: "/notificaciones", icon: notiIcon },
     ];
+
+    if (isAdmin) {
+        allNavLinks.push({ name: "Usuarios", path: "/usuarios", icon: userIcon });
+    }
+
+    const navLinks = location.pathname === '/usuarios'
+        ? allNavLinks.filter(link => link.path === '/usuarios' || link.path === '/home')
+        : allNavLinks;
 
     const handleLogout = () => {
         logout();
@@ -36,7 +49,7 @@ const NavBar = () => {
         <nav className="px-6 py-4">
             <div className="flex justify-between items-center">
                 {/* menu desktop */}
-                <ul className={`hidden lg:flex items-center space-x-6 ${isSubscriptionPage ? 'text-black' : 'text-white'}`}>
+                <ul className={`hidden lg:flex items-center space-x-6 ${isBlankPage ? 'text-black' : 'text-white'}`}>
                     {navLinks.map((item) => (
                         <li key={item.path}>
                             <a
@@ -102,7 +115,13 @@ const NavBar = () => {
                                         setIsOpen(false);
                                     }}
                                 >
-                                    {item.icon && <img src={item.icon} alt="" className="w-6 h-6" />}
+                                    {item.icon && (
+                                        typeof item.icon === 'string' ? (
+                                            <img src={item.icon} alt="" className="w-6 h-6" />
+                                        ) : (
+                                            null
+                                        )
+                                    )}
                                     <span className={clsx("text-xl font-medium", isActive && "text-white")}>
                                         {item.name}
                                     </span>

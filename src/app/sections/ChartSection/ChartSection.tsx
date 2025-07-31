@@ -139,7 +139,7 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
 
             <div className="relative">
                 {isBlocked && (
-                    <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#121418CC] pointer-events-auto">
+                    <div className="absolute inset-0 z-[999999] flex items-center justify-center bg-[#121418CC] pointer-events-auto">
                         <div className='max-w-[900px] w-full'>
                             <h1 className='font-bold text-white text-[20px] md:text-[40px] text-center font-sans'>Para disfrutar de Roulettes View accede a  nuestros <a href='/subscription' className='text-[#D9A425] underline'>planes de suscripción</a> o <span onClick={handleStartFreeSubscription} className='text-[#D9A425] underline cursor-pointer'>activa tu prueba gratuita</span></h1>
                         </div>

@@ -52,10 +52,10 @@ const LoginForm = () => {
             const userInfo = await getUserInfo();
 
             if (userInfo.data?.GetUserInfo) {
-                const { FirstName, LastName, Email } = userInfo.data.GetUserInfo;
+                const { Name, Email } = userInfo.data.GetUserInfo;
 
                 localStorage.setItem('user', JSON.stringify({
-                    name: `${FirstName} ${LastName}`,
+                    name: Name,
                     email: Email
                 }));
             }

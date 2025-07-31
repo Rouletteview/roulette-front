@@ -1,6 +1,5 @@
 import React from 'react';
 import { Suspense } from 'react';
-import LoadingOverlay from '../../../../components/LoadingOverlay';
 import CandleChart from '../../../components/chart/CandleChart';
 import AreaChart from '../../../components/chart/AreaChart';
 import LineChart from '../../../components/chart/LineChart';
@@ -21,7 +20,7 @@ interface ChartRendererProps {
 }
 
 const ChartPlaceholder = () => (
-    <div className="flex items-center justify-center w-full h-[500px] bg-[#0d1b2a]">
+    <div className="flex items-center justify-center w-full h-[550px] bg-[#0d1b2a]">
         <div className="text-center">
             <h2 className="text-white text-xl font-medium mb-2">
                 Selecciona un tipo de gráfico, una zona y un mercado
@@ -33,8 +32,11 @@ const ChartPlaceholder = () => (
     </div>
 );
 
-const LoadingChart = ({ height = 500 }: { height?: number }) => (
-    <div className={`flex items-center justify-center w-full h-[${height}px] bg-[#0d1b2a]`}>
+const LoadingChart = ({ height = 550 }: { height?: number }) => (
+    <div
+        className="flex items-center justify-center w-full bg-[#0d1b2a]"
+        style={{ height: `${height}px` }}
+    >
         <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D9A425] mx-auto mb-4"></div>
             <p className="text-white text-sm">Cargando datos del gráfico...</p>
@@ -53,10 +55,10 @@ export const ChartRenderer: React.FC<ChartRendererProps> = ({
     isFullscreen = false,
 }) => {
     const chartWidth = isFullscreen ? 1000 : (chartContainerWidth || 320);
-    const chartHeight = isFullscreen ? 620 : 500;
+    const chartHeight = isFullscreen ? 620 : 550;
 
     const renderChart = () => {
-   
+
         if (chartLoading) {
             return <LoadingChart height={chartHeight} />;
         }
@@ -114,7 +116,7 @@ export const ChartRenderer: React.FC<ChartRendererProps> = ({
     };
 
     return (
-        <Suspense fallback={<LoadingOverlay />}>
+        <Suspense fallback={<LoadingChart height={chartHeight} />}>
             <div className="lg:cursor-default cursor-pointer relative group w-full max-w-full overflow-hidden">
                 <div className=" inset-0 bg-black/0 hover:bg-black/10 transition-all duration-200 lg:hidden pointer-events-none z-10 rounded-lg " />
                 {renderChart()}
