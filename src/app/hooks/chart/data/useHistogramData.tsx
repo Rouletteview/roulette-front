@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { UTCTimestamp } from 'lightweight-charts';
-import { convertTagToNumber, isVoisinDuZero } from '../../../../utils/formatters/rouletterNumbers';
+import { convertTagToNumber } from '../../../../utils/formatters/rouletterNumbers';
 
 
 type RouletteProbability = {

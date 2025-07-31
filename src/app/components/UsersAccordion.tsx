@@ -18,7 +18,7 @@ interface UsersTableProps {
 }
 
 
-const UsersAccordion: React.FC<UsersTableProps> = ({ users, onViewUser, onDeleteUser }) => {
+const UsersAccordion: React.FC<UsersTableProps> = ({ users }) => {
 
     const getPaymentStatusColor = (status: string) => {
         switch (status) {

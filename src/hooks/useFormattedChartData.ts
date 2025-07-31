@@ -62,7 +62,7 @@ export const useFormattedChartData = ({
           data: series.data as { time: UTCTimestamp; value: number; color?: string }[]
         }));
       case 'VerticalColumn':
-        return formatMultipleHistograms(grouped, gameType, chartType).map(series => ({
+        return formatMultipleHistograms(grouped, gameType).map(series => ({
           ...series,
           data: series.data as { time: UTCTimestamp; value: number; color: string }[]
         }));
@@ -131,7 +131,7 @@ const formatMultipleLines = (grouped: GroupedData[], gameType?: GameType, chartT
 };
 
 
-const formatMultipleHistograms = (grouped: GroupedData[], gameType?: GameType, chartType?: chartTypes): MultiSeries[] => {
+const formatMultipleHistograms = (grouped: GroupedData[], gameType?: GameType): MultiSeries[] => {
   const data: { time: UTCTimestamp; value: number; color: string; tag?: string; originalValue?: number }[] = [];
   let lastValue: number | null = null;
 
