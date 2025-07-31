@@ -30,7 +30,7 @@ const NewPasswordForm = ({ token }: Props) => {
 
 
     const { ResetPassword, loading } = useResetPassword();
-
+   
 
     if (loading) return <LoadingOverlay />;
 
@@ -43,8 +43,10 @@ const NewPasswordForm = ({ token }: Props) => {
         try {
             await ResetPassword({
                 variables: {
-                    newPassword: data.NewPassword,
-                    validationToken: token,
+                    input: {
+                        NewPassword: data.NewPassword,
+                        ValidationToken: token,
+                    },
                 },
             });
             navigate("/iniciar-sesion", { state: { message: "Contraseña cambiada con éxito", ok: true } });
@@ -67,7 +69,7 @@ const NewPasswordForm = ({ token }: Props) => {
 
                         <button
                             type="button"
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
                             onClick={() => setShowPassword(!showPassword)}
                         >
                             {showPassword ? (
@@ -87,7 +89,7 @@ const NewPasswordForm = ({ token }: Props) => {
 
                         <button
                             type="button"
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
                             onClick={() => setShowPassword(!showPassword)}
                         >
                             {showPassword ? (
@@ -110,7 +112,7 @@ const NewPasswordForm = ({ token }: Props) => {
                 <button
                     type="submit"
                     disabled={loading}
-                    className='block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-full  text-lg font-bold rounded-[10px] py-2 mt-5 mb-3 disabled:bg-[#B2B2B2] yellow-button-shadow'>
+                    className='block bg-[#D9A425] hover:bg-[#B3831D] transition-all w-full  text-lg font-bold rounded-[10px] py-2 mt-5 mb-3 disabled:bg-[#B2B2B2] yellow-button-shadow cursor-pointer'>
                     {loading ? "Cargando..." : "Restablecer Contraseña"}
                 </button>
 
