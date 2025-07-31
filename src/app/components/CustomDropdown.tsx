@@ -169,7 +169,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
                             )}
                         </ul>
                     </div>
-                    {/* Paginación */}
+                   
                     {paginated && (
                         <div className={`flex items-center justify-center gap-2 sm:gap-4 px-2 sm:px-3 md:px-4 pb-2 w-full border-t ${borderPagination}`}>
                             <button
@@ -183,7 +183,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
                                 type="button"
                                 aria-label="Anterior"
                             >
-                                {/* Flecha izquierda */}
+                                
                                 <svg width="20" height="20" className="sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M15 19L8 12L15 5" stroke="#D9A425" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
@@ -202,7 +202,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
                                 type="button"
                                 aria-label="Siguiente"
                             >
-                                {/* Flecha derecha */}
+                               
                                 <svg width="20" height="20" className="sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M9 5L16 12L9 19" stroke="#D9A425" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>

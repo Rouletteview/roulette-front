@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/client';
+import { useSearchParams } from 'react-router';
 import { GET_ROULETTE_TABLES } from '../../../../graphql/query/getRouletteTables';
 import { GET_ROULETTE_TABLES_PROBABILITIES } from '../../../../graphql/query/getRouletteTableProbabilities';
 import { GET_LAST_ROULETTE_TABLE_NUMBERS } from '../../../../graphql/query/getLastRouletteTableNumbers';
@@ -20,8 +21,11 @@ export const useChartData = (
     marketSearch: string,
     marketPage: number
 ) => {
+    const [searchParams] = useSearchParams();
     const limit = 10;
 
+    const resultsParam = searchParams.get('results');
+    const probabilitiesResultLimit = resultsParam ? parseInt(resultsParam) : 250;
 
     const startDate = new Date();
     startDate.setHours(0, 0, 0, 0);
@@ -59,8 +63,7 @@ export const useChartData = (
                 GameType: gameType,
                 StartDate: startDate.toISOString(),
                 EndDate: endDate.toISOString(),
-                ProbabilitiesResultLimit: 10
-
+                ProbabilitiesResultLimit: probabilitiesResultLimit
             }
         },
         skip: !selectedTable || !gameType,
@@ -75,7 +78,6 @@ export const useChartData = (
         skip: !selectedTable,
     });
 
-    console.log(chartNumbersData)
 
 
 

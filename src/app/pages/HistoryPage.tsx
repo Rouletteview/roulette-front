@@ -1,25 +1,89 @@
 import HeroSection from "../../sections/HeroSection";
 import AppLayout from "../layouts/AppLayout"
 import ColumnIcon from '../../assets/icon/column-icon.svg'
+import { GET_USER_BETS_QUERY } from "../../graphql/query/bet/getUserBets";
+import { useQuery } from "@apollo/client";
+import { useEffect } from "react";
+import Pagination from "../components/Pagination";
+import { usePagination } from "../../hooks/usePagination";
+import HistorySkeleton from "../components/HistorySkeleton";
 
-
-const data = Array.from({ length: 9 }, (_, i) => {
-  const randomAmount = Math.random() * 200 - 100;
-  const formattedAmount = (randomAmount < 0 ? '-$' : '$') + Math.abs(randomAmount).toFixed(2);
-  const amountColor = formattedAmount.startsWith('-') ? 'text-red-600' : 'text-green-600';
-
-  return {
-    id: i + 1,
-    mercado: 'Web de apuestas',
-    subtitulo: 'Ruleta',
-    ganancia: formattedAmount,
-    color: amountColor
+interface UserBet {
+  id: string;
+  amount: number;
+  gameType: string;
+  value: string;
+  status: string;
+  createdAt: string;
+  table: {
+    Name: string;
+    Provider: string;
   };
-});
+}
 
 const HistoryPage = () => {
+  const {
+    currentPage,
+    limit,
+    skip,
+    handlePreviousPage,
+    handleNextPage
+  } = usePagination({
+    defaultPage: 1,
+    defaultLimit: 10,
+    paramName: 'page'
+  });
+
+  const { data: bets, loading, error, refetch } = useQuery(GET_USER_BETS_QUERY, {
+    variables: {
+      request: {
+        limit,
+        skip
+      }
+    }
+  });
 
 
+  useEffect(() => {
+    refetch({
+      request: {
+        limit,
+        skip
+      }
+    });
+  }, [currentPage, refetch, limit, skip]);
+
+
+  const userBets = bets?.GetUserBets || [];
+  const hasNextPage = userBets.length === limit; 
+  const hasPreviousPage = currentPage > 1; 
+
+
+  if (loading) {
+    return (
+      <AppLayout>
+        <HeroSection heroBackground={false} backgroundColor="#121418F2">
+          <div className="w-auto sm:min-w-2xl lg:min-w-4xl mx-auto overflow-x-auto rounded-xl shadow-lg bg-white text-gray-800 py-4 sm:py-6 md:py-8 mb-8 sm:mb-12 md:mb-16">
+            <HistorySkeleton />
+          </div>
+        </HeroSection>
+      </AppLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AppLayout>
+        <HeroSection heroBackground={false} backgroundColor="#121418F2">
+          <div className="w-auto sm:min-w-2xl lg:min-w-4xl mx-auto overflow-x-auto rounded-xl shadow-lg bg-white text-gray-800 py-4 sm:py-6 md:py-8 mb-8 sm:mb-12 md:mb-16">
+            <div className="flex items-center justify-center py-8">
+              <span className="text-red-600">Error al cargar el historial</span>
+            </div>
+          </div>
+        </HeroSection>
+      </AppLayout>
+    );
+  }
 
   return (
     <>
@@ -37,43 +101,44 @@ const HistoryPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {data.map((fila) => (
-                  <tr
-                    key={fila.id}
-                    className="hover:bg-gray-50 transition-colors odd:bg-white even:bg-[#F9FAFC]"
-                  >
-                    <td className="px-4 sm:px-4 md:px-8 py-2 sm:py-3 md:py-4 hidden lg:table-cell">
-                      {fila.id}
-                    </td>
-                    <td className="px-4 sm:px-4 md:px-8 py-2 sm:py-3 md:py-4">
-                      <div className="font-medium">{fila.mercado}</div>
-                      <div className="text-xs text-gray-400">{fila.subtitulo}</div>
-                    </td>
-                    <td className={`px-2 sm:px-4 md:px-8 py-2 sm:py-3 md:py-4 ${fila.color} font-light`}>
-                      {fila.ganancia}
+                {userBets.length === 0 ? (
+                  <tr>
+                    <td colSpan={3} className="px-4 sm:px-4 md:px-8 py-8 text-center text-gray-500">
+                      No hay apuestas en el historial
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  userBets.map((bet: UserBet) => (
+                    <tr
+                      key={bet.id}
+                      className="hover:bg-gray-50 transition-colors odd:bg-white even:bg-[#F9FAFC]"
+                    >
+                      <td className="px-4 sm:px-4 md:px-8 py-2 sm:py-3 md:py-4 hidden lg:table-cell">
+                        {bet.id.slice(0, 4) + '...' + bet.id.slice(-4)}
+                      </td>
+                      <td className="px-4 sm:px-4 md:px-8 py-2 sm:py-3 md:py-4">
+                        <div className="font-medium">{bet.table.Name}</div>
+                        <div className="text-xs text-gray-400">{bet.gameType}</div>
+                      </td>
+                      <td className={`px-2 sm:px-4 md:px-8 py-2 sm:py-3 md:py-4 ${bet.status === 'Won' ? 'text-green-600' : bet.status === 'Lost' ? 'text-red-600' : 'text-gray-600'} font-light`}>
+                        {bet.status === 'Won' ? '+' : bet.status === 'Lost' ? '-' : ''}${bet.amount}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
 
-            <div className="flex items-center justify-center gap-2 px-4 py-3 text-sm bg-[#F4F7FCBF] text-gray-500">
-              <button
-                disabled
-                className="bg-white disabled:bg-gray-200 text-gray-500 px-2 py-1 border border-gray-300 rounded-md font-semibold cursor-pointer disabled:cursor-not-allowed"
-              >
-                &lt;
-              </button>
-              <span>1/10</span>
-              <button
-                className="bg-white disabled:bg-gray-200 text-gray-500 px-2 py-1 border border-gray-300 rounded-md font-semibold cursor-pointer disabled:cursor-not-allowed"
-              >
-                &gt;
-              </button>
-            </div>
+            {userBets.length > 0 && (
+              <Pagination
+                currentPage={currentPage}
+                onPreviousPage={handlePreviousPage}
+                onNextPage={handleNextPage}
+                hasNextPage={hasNextPage}
+                hasPreviousPage={hasPreviousPage}
+              />
+            )}
           </div>
-
-
         </HeroSection>
       </AppLayout>
     </>

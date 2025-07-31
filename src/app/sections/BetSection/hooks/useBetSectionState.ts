@@ -43,7 +43,7 @@ export const useBetSectionState = () => {
         updateState({ betStatus });
     }
 
-    
+
     const amount = state.selectedChip ? parseFloat(state.selectedChip) * state.counter : 0;
 
     return {
