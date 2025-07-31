@@ -89,20 +89,20 @@ const BetSection: React.FC<Props> = ({ gameType, probabilities, tableId }) => {
           md:inset-auto md:bottom-0 md:right-0
           md:block md:w-auto
         ">
-          <BetModal
-            open={state.isOpen}
-            onClose={() => handleToggle("")}
-            selectedChip={selectedChip || ""}
-            setSelectedChip={setSelectedChip}
-            setCounter={setCounter}
-            counter={counter}
-            selectedTable={selectedTable}
-            amount={amount}
-            gameType={gameType}
-            betValue={betValue}
-            setBetId={setBetId}
-          />
-        </div>
+            <BetModal
+              open={state.isOpen}
+              onClose={() => handleToggle("")}
+              selectedChip={selectedChip || ""}
+              setSelectedChip={setSelectedChip}
+              setCounter={setCounter}
+              counter={counter}
+              selectedTable={selectedTable}
+              amount={amount}
+              gameType={gameType}
+              betValue={betValue}
+              setBetId={setBetId}
+            />
+          </div>
         )
       }
       <div className="w-full flex flex-col items-center">

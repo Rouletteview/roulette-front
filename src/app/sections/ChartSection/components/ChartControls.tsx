@@ -53,7 +53,7 @@ export const ChartControls: React.FC<ChartControlsProps> = ({
         value: zone.zone
     }));
 
-    console.log('freeSubscription', freeSubscription)
+
 
     return (
         <div className="flex justify-between">
