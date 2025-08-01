@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import UsersTable from '../components/UsersTable';
 import AppLayout from '../layouts/AppLayout';
 import HeroSection from '../../sections/HeroSection';
 import CustomDropdown from '../components/CustomDropdown';
 import searcIcon from '../../assets/icon/search-icon.svg'
 import UsersAccordion from '../components/UsersAccordion';
+import TableSkeleton from '../components/TableSkeleton';
+import AccordionSkeleton from '../components/AccordionSkeleton';
 import { GET_USERS } from '../../graphql/query/users/getUsers';
 import { useQuery } from '@apollo/client';
-import LoadingOverlay from '../../components/LoadingOverlay';
 
 interface UserFromAPI {
     Id: string;
@@ -45,22 +46,25 @@ interface TransformedUser {
 }
 
 const UsersPage: React.FC = () => {
-    const { data, error, loading } = useQuery(GET_USERS, {
+    const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>('');
+    const [nameFilter, setNameFilter] = useState<string>('');
+    const [emailFilter, setEmailFilter] = useState<string>('');
+
+    const { data, loading } = useQuery(GET_USERS, {
         variables: {
             request: {
                 skip: 0,
                 limit: 10,
-                query: '',
+                query: nameFilter || emailFilter || '',
+                paymentStatus: paymentStatusFilter || undefined,
             }
         }
     });
 
-    console.log('Users data:', data?.GetUsers?.Users);
-    console.log('Users error:', error);
 
-  
+
     const users: TransformedUser[] = data?.GetUsers?.Users?.map((user: UserFromAPI) => {
-      
+
         const mapPaymentStatus = (status: string): 'Por verificar' | 'Rechazado' | 'Verificado' | '' => {
             switch (status?.toLowerCase()) {
                 case 'pending':
@@ -86,19 +90,33 @@ const UsersPage: React.FC = () => {
         };
     }) || [];
 
-    if (loading) {
-        return <LoadingOverlay />;
-    }
+
+
+
 
     const handleViewUser = (userId: string) => {
-
         console.log('View user:', userId);
     };
 
     const handleDeleteUser = (userId: string) => {
-
         console.log('Delete user:', userId);
     };
+
+    const handlePaymentStatusChange = (value: string) => {
+        setPaymentStatusFilter(value);
+    };
+
+    const paymentStatusOptions = [
+        { label: 'Todos', value: '' },
+        { label: 'Verificado', value: 'Approved' },
+        { label: 'Rechazado', value: 'Rejected' },
+        { label: 'Por verificar', value: 'Pending' },
+    ];
+
+    const paymentStatusOptionsDropdown = paymentStatusOptions.map(status => ({
+        label: status.label,
+        value: status.value,
+    }));
 
     return (
         <AppLayout>
@@ -106,9 +124,9 @@ const UsersPage: React.FC = () => {
                 <div className='flex flex-col sm:flex-row flex-wrap justify-center w-full gap-4 px-4 max-w-[320px] sm:max-w-none mx-auto'>
                     <div className='flex gap-4 w-full sm:w-auto'>
                         <CustomDropdown
-                            options={[]}
-                            value={''}
-                            onChange={() => { }}
+                            options={paymentStatusOptionsDropdown}
+                            value={paymentStatusFilter}
+                            onChange={handlePaymentStatusChange}
                             defaultLabel='Estado de pago'
                             bgButton='bg-white'
                             borderButton='border-[#ACACAC]'
@@ -116,7 +134,7 @@ const UsersPage: React.FC = () => {
                             bgDropdown='bg-white'
                             borderDropdown='border-[#ACACAC]'
                             bgOption='bg-white'
-                            textOption='text-black'
+                            textOption='text-black hover:text-[#D9A425]'
                             className='w-[144px] sm:w-[200px] lg:w-[250px]'
                         />
 
@@ -124,6 +142,8 @@ const UsersPage: React.FC = () => {
                             <input
                                 type="text"
                                 placeholder='Nombre del usuario'
+                                value={nameFilter}
+                                onChange={(e) => setNameFilter(e.target.value)}
                                 className='w-full px-2 md:px-4 py-2 rounded-lg border border-[#ACACAC] bg-white text-gray-900 text-xs md:text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#D9A425] focus:border-[#D9A425] transition-colors'
                             />
                             <div className="absolute inset-y-0 right-0 pr-1 md:pr-3 flex items-center pointer-events-none">
@@ -134,8 +154,10 @@ const UsersPage: React.FC = () => {
 
                     <div className="relative w-[144px] sm:w-[200px] lg:w-[300px]">
                         <input
-                            type="text"
+                            type="email"
                             placeholder='Correo del usuario'
+                            value={emailFilter}
+                            onChange={(e) => setEmailFilter(e.target.value)}
                             className='w-full px-4 py-2 rounded-lg border border-[#ACACAC] bg-white text-gray-900 text-xs md:text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#D9A425] focus:border-[#D9A425] transition-colors'
                         />
                         <div className="absolute inset-y-0 right-0 pr-2 md:pr-3 flex items-center pointer-events-none">
@@ -150,19 +172,27 @@ const UsersPage: React.FC = () => {
                     <div className='flex flex-col gap-4'>
 
                         <div className='hidden lg:block'>
-                            <UsersTable 
-                            users={users} 
-                            onViewUser={handleViewUser} 
-                            onDeleteUser={handleDeleteUser} />
+                            {loading ? (
+                                <TableSkeleton rows={10} />
+                            ) : (
+                                <UsersTable
+                                    users={users}
+                                    onViewUser={handleViewUser}
+                                    onDeleteUser={handleDeleteUser} />
+                            )}
                         </div>
 
 
                         <div className='block lg:hidden'>
-                            <UsersAccordion 
-                            users={users} 
-                            onViewUser={handleViewUser} 
-                            onDeleteUser={handleDeleteUser}
-                            />
+                            {loading ? (
+                                <AccordionSkeleton items={10} />
+                            ) : (
+                                <UsersAccordion
+                                    users={users}
+                                    onViewUser={handleViewUser}
+                                    onDeleteUser={handleDeleteUser}
+                                />
+                            )}
                         </div>
                     </div>
                 </section>

@@ -8,7 +8,7 @@ import {
   UTCTimestamp,
 
 } from 'lightweight-charts';
-import { translateRouletteTag, getYAxisTicks } from '../../../utils/formatters/rouletterNumbers';
+import { translateRouletteTag, getYAxisTicks, isVoisinDuZero, isOrphelins, isTiersDuCylindre, isPlayZero } from '../../../utils/formatters/rouletterNumbers';
 import { useChartPosition } from '../../../hooks/useChartPosition';
 
 type ChartProps = {
@@ -59,14 +59,13 @@ const CandleChart: React.FC<ChartProps> = ({
 
     const yTicks = getYAxisTicks(gameType);
 
-    // Try to find any saved position for this gameType and selectedTable
+
     const debugKey = `chartPosition_${chartType}_${gameType || ''}_${selectedTable}`;
     let savedPosition = sessionStorage.getItem(debugKey);
 
-    console.log('📊 CandleChart - looking for position with key:', debugKey);
-    console.log('📊 CandleChart - savedPosition found:', !!savedPosition);
 
-    // If no position found with current chartType, try other chartTypes
+
+
     if (!savedPosition) {
       const allChartPositionKeys = Object.keys(sessionStorage).filter(key =>
         key.startsWith('chartPosition_') &&
@@ -74,10 +73,6 @@ const CandleChart: React.FC<ChartProps> = ({
         key.includes(selectedTable)
       );
 
-      console.log('📊 CandleChart - no position found with current chartType, trying other keys:', allChartPositionKeys);
-      console.log('📊 CandleChart - all sessionStorage keys:', Object.keys(sessionStorage));
-
-      // Try to find any saved position with same gameType and selectedTable
       for (const key of allChartPositionKeys) {
         const position = sessionStorage.getItem(key);
         if (position) {
@@ -88,7 +83,6 @@ const CandleChart: React.FC<ChartProps> = ({
       }
     }
 
-    // Create custom initial range if we found a saved position
     let initialRange;
     if (savedPosition) {
       try {
@@ -97,7 +91,7 @@ const CandleChart: React.FC<ChartProps> = ({
           from: position.from,
           to: position.to,
         };
-        console.log('📊 CandleChart - using saved position for initial range:', initialRange);
+
       } catch (error) {
         console.warn('📊 CandleChart - error parsing saved position:', error);
         initialRange = getInitialRange();
@@ -106,7 +100,7 @@ const CandleChart: React.FC<ChartProps> = ({
       initialRange = getInitialRange();
     }
 
-    console.log('📊 CandleChart - final initialRange:', initialRange);
+
 
     const chart = createChart(chartContainerRef.current, {
       width: width || chartContainerRef.current.clientWidth,
@@ -169,6 +163,7 @@ const CandleChart: React.FC<ChartProps> = ({
 
     const isRedAndBlack = gameType === 'RedAndBlack';
     const isDozen = gameType === 'Dozen';
+    const isSpecialGame = gameType === 'VoisinsDuZero' || gameType === 'Orphelins' || gameType === 'TiersDuCylindre' || gameType === 'PlayZero';
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let redSeries: any = null;
@@ -182,7 +177,7 @@ const CandleChart: React.FC<ChartProps> = ({
     let defaultSeries: any = null;
 
     if (isRedAndBlack) {
-      // Crear series separadas para cada color
+
       redSeries = chart.addSeries(CandlestickSeries, {
         upColor: '#FF0000',
         downColor: '#FF0000',
@@ -213,7 +208,7 @@ const CandleChart: React.FC<ChartProps> = ({
         priceLineVisible: false,
       });
     } else if (isDozen) {
-      // Crear series separadas para cada docena
+
       redSeries = chart.addSeries(CandlestickSeries, {
         upColor: '#FF0000',
         downColor: '#FF0000',
@@ -240,6 +235,27 @@ const CandleChart: React.FC<ChartProps> = ({
         borderVisible: false,
         wickUpColor: '#00FF00',
         wickDownColor: '#00FF00',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+    } else if (isSpecialGame) {
+
+      greenSeries = chart.addSeries(CandlestickSeries, {
+        upColor: '#25A69A',
+        downColor: '#25A69A',
+        borderVisible: false,
+        wickUpColor: '#25A69A',
+        wickDownColor: '#25A69A',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+
+      redSeries = chart.addSeries(CandlestickSeries, {
+        upColor: '#ef5350',
+        downColor: '#ef5350',
+        borderVisible: false,
+        wickUpColor: '#ef5350',
+        wickDownColor: '#ef5350',
         lastValueVisible: false,
         priceLineVisible: false,
       });
@@ -283,7 +299,6 @@ const CandleChart: React.FC<ChartProps> = ({
     };
 
     const validData = [
-      // ...forcedCandles,  // ← ESTO ES EL PROBLEMA
       ...data
     ].sort((a, b) => Number(a.time) - Number(b.time));
 
@@ -308,14 +323,12 @@ const CandleChart: React.FC<ChartProps> = ({
           }
         });
 
-        // const seriesMap = new Map<string, ISeriesApi<'Candlestick'>>();
-
         if (redData.length > 0) redSeries.setData(redData);
         if (blackData.length > 0) blackSeries.setData(blackData);
         if (greenData.length > 0) greenSeries.setData(greenData);
 
         const firstSeries = redSeries || blackSeries || greenSeries;
-        // Solo crear price lines si el tipo de gráfico NO es Candlestick
+
         if (firstSeries && yTicks && yTicks.length > 0 && chartType !== 'Candlestick') {
           yTicks.forEach(tick => {
             firstSeries.createPriceLine({
@@ -341,15 +354,15 @@ const CandleChart: React.FC<ChartProps> = ({
           const strippedCandle = stripCandle(candle);
           const closeValue = candle.close;
 
-     
+
           if (closeValue >= 1 && closeValue <= 12) {
-         
+
             redData.push(strippedCandle);
           } else if (closeValue >= 13 && closeValue <= 24) {
-           
+
             whiteData.push(strippedCandle);
           } else if (closeValue >= 25 && closeValue <= 36) {
-         
+
             greenData.push(strippedCandle);
           }
         });
@@ -359,7 +372,55 @@ const CandleChart: React.FC<ChartProps> = ({
         if (greenData.length > 0) greenSeries.setData(greenData);
 
         const firstSeries = redSeries || whiteSeries || greenSeries;
-       
+
+        if (firstSeries && yTicks && yTicks.length > 0 && chartType !== 'Candlestick') {
+          yTicks.forEach(tick => {
+            firstSeries.createPriceLine({
+              price: tick.value,
+              color: tick.color,
+              lineWidth: 2,
+              lineStyle: 1,
+              axisLabelVisible: true,
+              title: tick.label,
+            });
+          });
+        }
+      } else if (isSpecialGame) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const greenData: any[] = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const redData: any[] = [];
+
+        validData.forEach(candle => {
+          const strippedCandle = stripCandle(candle);
+          const closeValue = candle.close;
+
+
+          let belongsToGameType = false;
+
+          if (gameType === 'VoisinsDuZero') {
+            belongsToGameType = isVoisinDuZero(closeValue);
+          } else if (gameType === 'Orphelins') {
+            belongsToGameType = isOrphelins(closeValue);
+          } else if (gameType === 'TiersDuCylindre') {
+            belongsToGameType = isTiersDuCylindre(closeValue);
+          } else if (gameType === 'PlayZero') {
+            belongsToGameType = isPlayZero(closeValue);
+          }
+
+
+          if (belongsToGameType || closeValue === 0) {
+            greenData.push(strippedCandle);
+          } else {
+            redData.push(strippedCandle);
+          }
+        });
+
+        if (greenData.length > 0) greenSeries.setData(greenData);
+        if (redData.length > 0) redSeries.setData(redData);
+
+        const firstSeries = greenSeries || redSeries;
+
         if (firstSeries && yTicks && yTicks.length > 0 && chartType !== 'Candlestick') {
           yTicks.forEach(tick => {
             firstSeries.createPriceLine({
@@ -400,9 +461,20 @@ const CandleChart: React.FC<ChartProps> = ({
             title: '',
           });
         }
+
+        if (gameType === 'HighAndLow' && defaultSeries) {
+          defaultSeries.createPriceLine({
+            price: 18,
+            color: '#D9A425',
+            lineWidth: 3,
+            lineStyle: 1,
+            axisLabelVisible: true,
+            title: '',
+          });
+        }
       }
 
-         if (gameType === 'OddAndEven') {
+      if (gameType === 'OddAndEven') {
         const seriesToUse = redSeries || whiteSeries || greenSeries || defaultSeries;
         if (seriesToUse) {
           seriesToUse.createPriceLine({
@@ -416,7 +488,21 @@ const CandleChart: React.FC<ChartProps> = ({
         }
       }
 
-  
+      if (gameType === 'HighAndLow') {
+        const seriesToUse = redSeries || whiteSeries || greenSeries || defaultSeries;
+        if (seriesToUse) {
+          seriesToUse.createPriceLine({
+            price: 18,
+            color: '#D9A425',
+            lineWidth: 3,
+            lineStyle: 1,
+            axisLabelVisible: true,
+            title: '',
+          });
+        }
+      }
+
+
       chart.timeScale().setVisibleRange(initialRange);
     }
 

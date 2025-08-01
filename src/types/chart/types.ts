@@ -25,6 +25,8 @@ export const selectChartTypes = [
 ];
 
 
+
+
 export const chartTypes = {
   Candlestick: CandleChart,
   Area: AreaChart,

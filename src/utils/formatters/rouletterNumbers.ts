@@ -88,6 +88,20 @@ export const isVoisinDuZero = (num: number): boolean => {
     return voisinsDuZeroNumbers.includes(num);
 };
 
+export const isOrphelins = (num: number): boolean => {
+    const orphelinsNumbers = [1, 6, 9, 14, 17, 20, 31, 34];
+    return orphelinsNumbers.includes(num);
+};
+
+export const isTiersDuCylindre = (num: number): boolean => {
+    const tiersDuCylindreNumbers = [5, 8, 10, 11, 13, 16, 23, 24, 27, 30, 33, 36];
+    return tiersDuCylindreNumbers.includes(num);
+};
+
+export const isPlayZero = (num: number): boolean => {
+    return num === 0;
+};
+
 export const convertTagToNumber = (tag: string, gameType?: string): number => {
 
     if (gameType === 'RedAndBlack' || !gameType) {
@@ -257,6 +271,7 @@ export const getYAxisTicks = (gameType?: string): { value: number, label: string
     }
     if (gameType === 'HighAndLow') {
         return [
+            { value: 18, label: '', color: '#FF0000', lineWidth: 2, lineStyle: 1 },
             // { value: 0, label: translateRouletteTag('Low'), color: '#FF0000', lineWidth: 2, lineStyle: 1 },
             // { value: 0.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },
             // { value: 1, label: translateRouletteTag('High'), color: '#FF0000', lineWidth: 2, lineStyle: 1 },

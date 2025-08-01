@@ -14,6 +14,7 @@ type HistogramPoint = {
   time: UTCTimestamp;
   value: number;
   color: string;
+  originalValue?: number;
 };
 
 export function useHistogramChartData(data?: RouletteProbability[], gameType?: string) {
@@ -34,34 +35,51 @@ export function useHistogramChartData(data?: RouletteProbability[], gameType?: s
         continue;
       }
 
-      // Convertir el tag a número para graficar
+      // Para OddAndEven, usar el número original de la ruleta (0-36)
       let tagNumber;
-      if (gameType === 'HighAndLow') {
+      let originalValue;
+
+      if (gameType === 'OddAndEven') {
+        // Usar el número original de la ruleta
+        originalValue = item.Number || 0;
+        tagNumber = originalValue;
+      } else if (gameType === 'HighAndLow') {
         // Para alto y bajo, usar el número real de la ruleta (0-36)
-        // Necesitamos obtener el número original del item
-        tagNumber = item.Number || 0;
+        originalValue = item.Number || 0;
+        tagNumber = originalValue;
       } else {
         tagNumber = convertTagToNumber(item.Tag, gameType);
+        // Para otros tipos, también preservar el valor original si está disponible
+        originalValue = item.Number;
       }
 
       // Determinar color basado en el Tag o el valor
       let color = '#2962FF'; // Color por defecto
-      if (item.Tag === 'Red') {
-        color = '#FF0000';
-      } else if (item.Tag === 'Black') {
-        color = '#000000';
-      } else if (item.Tag === 'Green' || item.Tag === 'Zero') {
-        color = '#00FF00';
-      } else if (tagNumber >= 50) {
-        color = '#0f0';
+
+      if (gameType === 'OddAndEven') {
+        // Para OddAndEven, el color se determinará dinámicamente en el componente
+        // basado en si es subida o bajada
+        color = '#00FF00'; // Color por defecto, será sobrescrito
       } else {
-        color = '#f00';
+        // Para otros tipos de juego, usar la lógica original
+        if (item.Tag === 'Red') {
+          color = '#FF0000';
+        } else if (item.Tag === 'Black') {
+          color = '#000000';
+        } else if (item.Tag === 'Green' || item.Tag === 'Zero') {
+          color = '#00FF00';
+        } else if (tagNumber >= 50) {
+          color = '#0f0';
+        } else {
+          color = '#f00';
+        }
       }
 
       points.push({
         time: timestamp,
         value: tagNumber,
         color,
+        originalValue,
       });
     }
 

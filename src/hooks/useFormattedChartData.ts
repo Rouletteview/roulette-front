@@ -148,7 +148,7 @@ const formatMultipleHistograms = (grouped: GroupedData[], gameType?: GameType): 
       const time = (baseTime + index) as UTCTimestamp;
 
       let value;
-      let color = 'rgba(32, 178, 108, 1)';
+      let color = '#25A69A';
       if (gameType === 'RedAndBlack') {
         value = Number;
         if (Tag === 'Red') {
@@ -159,15 +159,14 @@ const formatMultipleHistograms = (grouped: GroupedData[], gameType?: GameType): 
           color = '#00FF00';
         }
       } else if (gameType === 'VoisinsDuZero') {
-
         value = Number;
-        color = isVoisinDuZero(Number) ? '#00FF00' : '#FF0000';
+        color = isVoisinDuZero(Number) ? '#25A69A' : '#ef5350';
       } else {
         value = (gameType === 'StraightUp' || gameType === 'Dozen' || gameType === 'HighAndLow') ? Number : convertTagToNumber(Tag, gameType);
         if (lastValue === null) {
-          color = 'rgba(32, 178, 108, 1)';
+          color = '#25A69A';
         } else {
-          color = value >= lastValue ? '#00FF00' : '#FF0000';
+          color = value >= lastValue ? '#25A69A' : '#ef5350';
         }
       }
       lastValue = value;
