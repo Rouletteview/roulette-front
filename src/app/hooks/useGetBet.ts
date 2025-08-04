@@ -1,9 +1,9 @@
 import { useQuery } from '@apollo/client';
 import { GET_BET_QUERY } from '../../graphql/query/bet/getBet';
 
-export const useGetBet = (betId: string, options = {}) => {
+export const useGetBet = (betIds: string[], options = {}) => {
     return useQuery(GET_BET_QUERY, {
-        variables: { request: { id: betId } },
+        variables: { request: { ids: betIds } },
         fetchPolicy: 'network-only',
         ...options,
     });

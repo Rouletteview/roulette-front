@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import UsersTable from '../components/UsersTable';
 import AppLayout from '../layouts/AppLayout';
 import HeroSection from '../../sections/HeroSection';
@@ -7,8 +7,10 @@ import searcIcon from '../../assets/icon/search-icon.svg'
 import UsersAccordion from '../components/UsersAccordion';
 import TableSkeleton from '../components/TableSkeleton';
 import AccordionSkeleton from '../components/AccordionSkeleton';
+import UserDetailsModal from '../components/UserDetailsModal';
 import { GET_USERS } from '../../graphql/query/users/getUsers';
 import { useQuery } from '@apollo/client';
+import { useSearchParams } from 'react-router';
 
 interface UserFromAPI {
     Id: string;
@@ -17,6 +19,7 @@ interface UserFromAPI {
     Country: string;
     BirthDate: string;
     PhoneNumber: string;
+    IsActive: boolean;
     Subscription?: {
         Id: string;
         UserId: string;
@@ -43,14 +46,17 @@ interface TransformedUser {
     email: string;
     planExpiration: string;
     paymentStatus: 'Por verificar' | 'Rechazado' | 'Verificado' | '';
+    isActive: boolean;
 }
 
 const UsersPage: React.FC = () => {
     const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>('');
     const [nameFilter, setNameFilter] = useState<string>('');
     const [emailFilter, setEmailFilter] = useState<string>('');
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    const { data, loading } = useQuery(GET_USERS, {
+    const { data, loading, refetch } = useQuery(GET_USERS, {
         variables: {
             request: {
                 skip: 0,
@@ -62,19 +68,22 @@ const UsersPage: React.FC = () => {
     });
 
 
+    useEffect(() => {
+        const userId = searchParams.get('userId');
+        if (userId) {
+            setIsModalVisible(true);
+        }
+    }, [searchParams]);
 
-    const users: TransformedUser[] = data?.GetUsers?.Users?.map((user: UserFromAPI) => {
+    const users: TransformedUser[] = data?.GetUsers?.Users?.map((user: UserFromAPI): TransformedUser => {
 
         const mapPaymentStatus = (status: string): 'Por verificar' | 'Rechazado' | 'Verificado' | '' => {
             switch (status?.toLowerCase()) {
                 case 'pending':
-                case 'por verificar':
                     return 'Por verificar';
                 case 'rejected':
-                case 'rechazado':
                     return 'Rechazado';
                 case 'approved':
-                case 'verificado':
                     return 'Verificado';
                 default:
                     return '';
@@ -86,20 +95,24 @@ const UsersPage: React.FC = () => {
             name: user.Name,
             email: user.Email,
             planExpiration: user.Subscription?.EndDate ? new Date(user.Subscription.EndDate).toLocaleDateString() : '',
-            paymentStatus: mapPaymentStatus(user.Subscription?.Payments?.[0]?.Status || '')
+            paymentStatus: mapPaymentStatus(user.Subscription?.Payments?.[0]?.Status || ''),
+            isActive: user.IsActive
         };
-    }) || [];
-
-
-
-
+    }).filter((user: TransformedUser) => !user.isActive) || []; 
 
     const handleViewUser = (userId: string) => {
-        console.log('View user:', userId);
+        setSearchParams({ userId: userId });
+        setIsModalVisible(true);
     };
 
-    const handleDeleteUser = (userId: string) => {
-        console.log('Delete user:', userId);
+    const handleDeleteUser = async (userId: string) => {
+        console.log('Deactivating user:', userId);
+        await refetch();
+    };
+
+    const handleModalClose = () => {
+        setIsModalVisible(false);
+        setSearchParams({});
     };
 
     const handlePaymentStatusChange = (value: string) => {
@@ -196,6 +209,12 @@ const UsersPage: React.FC = () => {
                         </div>
                     </div>
                 </section>
+
+
+                <UserDetailsModal
+                    isVisible={isModalVisible}
+                    onClose={handleModalClose}
+                />
             </HeroSection>
         </AppLayout>
     );

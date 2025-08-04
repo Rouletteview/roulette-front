@@ -9,6 +9,7 @@ import { useBetData } from '../sections/BetSection/hooks/useBetData';
 import { showErrorToast, showPlacedToast } from './Toast';
 import { translateRouletteTag } from '../../utils/formatters/rouletterNumbers';
 import { getGraphQLErrorMessage } from '../../utils/errorMessages';
+import { useBetStatusStore } from '../../stores/betStatusStore';
 // import chip7 from '../../assets/poker-chips/chip-7.png';
 // import chip8 from '../../assets/poker-chips/chip-8.png';
 
@@ -116,14 +117,46 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
         value: betValue || ""
     });
 
+    const { addActiveBet } = useBetStatusStore();
+
     if (!open) return null;
 
     const handleBet = async () => {
         try {
             const response = await createBet();
-            localStorage.setItem('betId', response.data.CreateBet.id);
+            const betId = response.data.CreateBet.id;
+
+            // Agregar la apuesta al estado global si es Columna o Docena
+            if (gameType === 'Column' || gameType === 'Dozen') {
+                addActiveBet({
+                    id: betId,
+                    tag: betValue,
+                    gameType: gameType,
+                    amount: amount
+                });
+            }
+
+            // Obtener el array actual de betIds del localStorage
+            const existingBetIds = localStorage.getItem('betId');
+            let betIdsArray: string[] = [];
+
+            if (existingBetIds) {
+                try {
+                    betIdsArray = JSON.parse(existingBetIds);
+                } catch (error) {
+                    // Si no es un array válido, crear uno nuevo
+                    betIdsArray = [];
+                }
+            }
+
+            // Agregar el nuevo betId al array
+            betIdsArray.push(betId);
+
+            // Guardar el array actualizado en localStorage
+            localStorage.setItem('betId', JSON.stringify(betIdsArray));
+
             showPlacedToast(translateRouletteTag(betValue));
-            setBetId(response.data.CreateBet.id);
+            setBetId(betId);
             onClose();
         } catch (error) {
             const errorMessage = getGraphQLErrorMessage(error);

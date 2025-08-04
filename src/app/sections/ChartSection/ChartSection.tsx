@@ -18,6 +18,7 @@ import SuccessBet from '../../components/bet/SuccessBet';
 import PlacedBet from '../../components/bet/PlacedBet';
 import { Query } from '../../../graphql/generated/types';
 import SliderComponent from '../../components/slider/Slider';
+import { useIsAdmin } from '../../../hooks/useIsAdmin';
 
 
 
@@ -46,8 +47,10 @@ function useContainerWidth() {
 
 const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, handleStartFreeSubscription: () => void }> = ({ subscriptionData, handleStartFreeSubscription }) => {
 
+    console.log(subscriptionData)
 
     const freeSubscription = subscriptionData?.GetCurrentUserSubscription?.Payments
+    console.log(freeSubscription)
 
     const endFreeDate = subscriptionData?.GetCurrentUserSubscription?.EndDate
 
@@ -56,8 +59,9 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
 
     const { betResult } = useBetStatusStore();
 
+    const { isAdmin } = useIsAdmin();
 
-    const isBlocked = !subscriptionData?.GetCurrentUserSubscription;
+    const isBlocked = !subscriptionData?.GetCurrentUserSubscription && !isAdmin;
 
 
     const {

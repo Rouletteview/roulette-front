@@ -71,10 +71,10 @@ export const translateRouletteTag = (tag: string): string => {
         '00': '00',
 
 
-        'Daily': ' diario',
-        'Weekly': ' semanal',
-        'Monthly': ' mensual',
-        'Annual': ' anual',
+        'Daily': ' Diario',
+        'Weekly': ' Semanal',
+        'Monthly': ' Mensual',
+        'Annual': ' Anual',
         'default': tag
     };
 
@@ -253,16 +253,29 @@ export const numberToTag = (value: number, gameType?: string): string => {
 };
 
 
-export const getYAxisTicks = (gameType?: string): { value: number, label: string, color: string, lineWidth?: number, lineStyle?: number, lineHeight?: number }[] | null => {
+export const getYAxisTicks = (gameType?: string, chartType?: string): { value: number, label: string, color: string, lineWidth?: number, lineStyle?: number, lineHeight?: number }[] | null => {
     if (gameType === 'RedAndBlack') {
+
+        if (chartType === 'VerticalColumn') {
+            return [
+                { value: 18, label: '', color: '#D9A425', lineWidth: 3, lineStyle: 1 },
+            ];
+        }
+
         return [
             { value: 1, label: translateRouletteTag('Black'), color: '#FFFFFF' },
             { value: 1.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },
             { value: 2, label: translateRouletteTag('Red'), color: '#FF0000' },
-            // { value: 0, label: 'Cero', color: '#00FF00' },
         ];
     }
     if (gameType === 'OddAndEven') {
+
+        if (chartType === 'VerticalColumn') {
+            return [
+                { value: 18, label: '', color: '#D9A425', lineWidth: 3, lineStyle: 1 },
+            ];
+        }
+
         return [
             { value: 2, label: translateRouletteTag('Even'), color: '#FF0000', lineWidth: 2, lineStyle: 1 },
             { value: 1.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },
@@ -271,7 +284,7 @@ export const getYAxisTicks = (gameType?: string): { value: number, label: string
     }
     if (gameType === 'HighAndLow') {
         return [
-            { value: 18, label: '', color: '#FF0000', lineWidth: 2, lineStyle: 1 },
+            { value: 18, label: '', color: '#D9A425', lineWidth: 2, lineStyle: 1 },
             // { value: 0, label: translateRouletteTag('Low'), color: '#FF0000', lineWidth: 2, lineStyle: 1 },
             // { value: 0.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },
             // { value: 1, label: translateRouletteTag('High'), color: '#FF0000', lineWidth: 2, lineStyle: 1 },
@@ -279,35 +292,48 @@ export const getYAxisTicks = (gameType?: string): { value: number, label: string
     }
     if (gameType === 'Dozen') {
         return [
-            { value: 1, label: translateRouletteTag('FirstDozen'), color: '#FFF' },
-            { value: 13, label: translateRouletteTag('SecondDozen'), color: '#FFF' },
-            { value: 25, label: translateRouletteTag('ThirdDozen'), color: '#FFF' },
+
+            { value: 12, label: '', color: '#D9A425', lineWidth: 2, lineStyle: 1 },
+
+            { value: 24, label: '', color: '#D9A425', lineWidth: 2, lineStyle: 1 },
+
         ];
     }
     if (gameType === 'Column') {
+        if (chartType === 'VerticalColumn') {
+            return [
+                { value: 12, label: '', color: '#D9A425', lineWidth: 2, lineStyle: 1 },
+                { value: 24, label: '', color: '#D9A425', lineWidth: 2, lineStyle: 1 },
+            ];
+        }
         return [
-            { value: 1, label: translateRouletteTag('FirstColumn'), color: '#FFFFFF' },
-            { value: 2, label: translateRouletteTag('SecondColumn'), color: '#FFFFFF' },
-            { value: 3, label: translateRouletteTag('ThirdColumn'), color: '#FFFFFF' },
+            { value: 1, label: translateRouletteTag('FirstColumn'), color: '#D9A425' },
+            { value: 2, label: translateRouletteTag('SecondColumn'), color: '#D9A425' },
+            { value: 3, label: translateRouletteTag('ThirdColumn'), color: '#D9A425' },
         ];
     }
     if (gameType === 'StraightUp') {
         return [
-            { value: 1, label: '1-12', color: '#FFFFFF' },
-            { value: 13, label: '13-24', color: '#FFFFFF' },
-            { value: 25, label: '25-36', color: '#FFFFFF' },
+            { value: 1, label: '1-12', color: '#D9A425' },
+            { value: 13, label: '13-24', color: '#D9A425' },
+            { value: 25, label: '25-36', color: '#D9A425' },
         ];
     }
 
     if (gameType === 'VoisinsDuZero') {
         return [
-            { value: 1, label: 'Vecinos del Cero', color: '#FF0000', lineWidth: 2, lineStyle: 1 },
-            { value: 1.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },
-            { value: 2, label: 'Otros', color: '#FF0000', lineWidth: 2, lineStyle: 1 },
+            { value: 18, label: '', color: '#D9A425', lineWidth: 2, lineStyle: 1 },
+
         ];
     }
 
     if (gameType === 'Orphelins') {
+        if (chartType === 'VerticalColumn') {
+            return [
+                { value: 18, label: '', color: '#D9A425', lineWidth: 3, lineStyle: 1 },
+            ];
+        }
+        
         return [
             { value: 1, label: 'Huerfanos', color: '#FF0000', lineWidth: 2, lineStyle: 1 },
             { value: 1.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },
@@ -316,6 +342,12 @@ export const getYAxisTicks = (gameType?: string): { value: number, label: string
     }
 
     if (gameType === 'TiersDuCylindre') {
+        if (chartType === 'VerticalColumn') {
+            return [
+                { value: 18, label: '', color: '#D9A425', lineWidth: 3, lineStyle: 1 },
+            ];
+        }
+
         return [
             { value: 1, label: 'Tercios', color: '#FF0000', lineWidth: 2, lineStyle: 1 },
             { value: 1.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },
@@ -324,6 +356,12 @@ export const getYAxisTicks = (gameType?: string): { value: number, label: string
     }
 
     if (gameType === 'PlayZero') {
+        if (chartType === 'VerticalColumn') {
+            return [
+                { value: 18, label: '', color: '#D9A425', lineWidth: 3, lineStyle: 1 },
+            ];
+        }
+
         return [
             { value: 1, label: 'Juego del Cero', color: '#FF0000', lineWidth: 2, lineStyle: 1 },
             { value: 1.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },

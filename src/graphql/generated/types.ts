@@ -92,6 +92,10 @@ export type GetBetRequest = {
   id: Scalars['String']['input'];
 };
 
+export type GetBetsBatchRequest = {
+  ids: Array<Scalars['String']['input']>;
+};
+
 export type GetLastBetsRequest = {
   limit: Scalars['Int']['input'];
   skip: Scalars['Int']['input'];
@@ -279,6 +283,7 @@ export enum PaymentStatus {
 export type Query = {
   __typename?: 'Query';
   GetBet: Bet;
+  GetBetsBatch: Array<Bet>;
   GetCountriesWithPhonePrefixes: Array<Country>;
   GetCurrentUserSubscription: UserSubscription;
   GetLastBets: Array<Bet>;
@@ -290,12 +295,18 @@ export type Query = {
   GetUser: User;
   GetUserBets: Array<Bet>;
   GetUserInfo: UserInfoResponse;
+  GetUserSubscriptionPaymentHistory: Array<UserSubscriptionPaymentHistory>;
   GetUsers: GetUsersResponse;
 };
 
 
 export type QueryGetBetArgs = {
   request: GetBetRequest;
+};
+
+
+export type QueryGetBetsBatchArgs = {
+  request: GetBetsBatchRequest;
 };
 
 
@@ -336,6 +347,11 @@ export type QueryGetUserArgs = {
 
 export type QueryGetUserBetsArgs = {
   request: GetUserBetsRequest;
+};
+
+
+export type QueryGetUserSubscriptionPaymentHistoryArgs = {
+  userId: Scalars['String']['input'];
 };
 
 
@@ -477,6 +493,17 @@ export type UserSubscription = {
   Payments: Array<Payment>;
   StartDate: Scalars['DateTime']['output'];
   UserId: Scalars['String']['output'];
+};
+
+export type UserSubscriptionPaymentHistory = {
+  __typename?: 'UserSubscriptionPaymentHistory';
+  Frequency: SubscriptionFrequency;
+  PaidAt: Scalars['DateTime']['output'];
+  PaymentId: Scalars['String']['output'];
+  PaymentMethod: PaymentMethod;
+  Reference: Scalars['String']['output'];
+  Status: PaymentStatus;
+  SubscriptionId: Scalars['String']['output'];
 };
 
 export type GetUsersQueryVariables = Exact<{

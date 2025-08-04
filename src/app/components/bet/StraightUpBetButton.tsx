@@ -1,4 +1,5 @@
 
+import { useSearchParams } from "react-router";
 import { RouletteTableProbability } from "../../../graphql/generated/types"
 import { GET_ROULETTE_TABLES_PROBABILITIES } from "../../../graphql/query/getRouletteTableProbabilities"
 import { StraightUpButtons } from "./BetButtons"
@@ -165,6 +166,9 @@ const numbers = [
 const StraightUpButton = ({ handleToggle, TableId }: Props) => {
 
   const [open, setOpen] = useState(false);
+  const [searchParams] = useSearchParams();
+  const resultsParam = searchParams.get('results');
+  const probabilitiesResultLimit = resultsParam ? parseInt(resultsParam) : 250;
 
 
   const startDate = new Date();
@@ -179,7 +183,9 @@ const StraightUpButton = ({ handleToggle, TableId }: Props) => {
         TableId,
         GameType: 'StraightUp',
         StartDate: startDate.toISOString(),
-        EndDate: endDate.toISOString()
+        EndDate: endDate.toISOString(),
+        ProbabilitiesResultLimit: probabilitiesResultLimit
+
       }
     },
     skip: !open,

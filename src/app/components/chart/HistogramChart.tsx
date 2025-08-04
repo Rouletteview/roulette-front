@@ -48,7 +48,7 @@ const HistogramChart: React.FC<ChartProps> = ({
     if (!chartContainerRef.current) return;
 
 
-    const yTicks = getYAxisTicks(gameType);
+    const yTicks = getYAxisTicks(gameType, chartType);
     const initialRange = getInitialRange();
 
     const chart = createChart(chartContainerRef.current, {
@@ -125,8 +125,253 @@ const HistogramChart: React.FC<ChartProps> = ({
           }
         }
       });
-    } else {
+
+    
+      if (yTicks && yTicks.length > 0) {
+        const firstSeries = Array.from(seriesMap.values())[0];
+        if (firstSeries) {
+          yTicks.forEach(tick => {
+            firstSeries.createPriceLine({
+              price: tick.value,
+              color: tick.color,
+              lineWidth: 2,
+              lineStyle: 1,
+              axisLabelVisible: true,
+              title: tick.label,
+            });
+          });
+        }
+      }
+    } else if (gameType === 'OddAndEven') {
+   
+      const upSeries = chart.addSeries(HistogramSeries, {
+        color: '#25A69A',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+
+      const downSeries = chart.addSeries(HistogramSeries, {
+        color: '#ef5350',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+
+      const upData: HistogramData[] = [];
+      const downData: HistogramData[] = [];
+
+      data.forEach((series) => {
+        if ('value' in series.data[0] && 'color' in series.data[0]) {
+          const validData = series.data
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .filter(item => item && typeof item.time === 'number' && !isNaN((item as any).value))
+            .sort((a, b) => Number(a.time) - Number(b.time));
+
+          validData.forEach((item, index) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const value = (item as any).value;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const originalValue = (item as any).originalValue;
+            const numberToUse = originalValue !== undefined ? originalValue : value;
+
+            let isUp = true;
+            if (index > 0) {
+              const prevItem = validData[index - 1];
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const prevValue = (prevItem as any).originalValue !== undefined ? (prevItem as any).originalValue : (prevItem as any).value;
+              isUp = numberToUse >= prevValue;
+            }
+
+            const histogramPoint: HistogramData = {
+              time: item.time,
+              value: numberToUse,
+              color: isUp ? '#25A69A' : '#ef5350',
+            };
+
+            if (isUp) {
+              upData.push(histogramPoint);
+            } else {
+              downData.push(histogramPoint);
+            }
+          });
+        }
+      });
+
+      if (upData.length > 0) upSeries.setData(upData);
+      if (downData.length > 0) downSeries.setData(downData);
+
+      seriesMap.set('up', upSeries);
+      seriesMap.set('down', downSeries);
+
+
+      if (yTicks && yTicks.length > 0) {
+        const firstSeries = upSeries || downSeries;
+        if (firstSeries) {
+          yTicks.forEach(tick => {
+            firstSeries.createPriceLine({
+              price: tick.value,
+              color: tick.color,
+              lineWidth: 2,
+              lineStyle: 1,
+              axisLabelVisible: true,
+              title: tick.label,
+            });
+          });
+        }
+      }
+    } else if (gameType === 'Dozen') {
+
+      const upSeries = chart.addSeries(HistogramSeries, {
+        color: '#25A69A',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+
+      const downSeries = chart.addSeries(HistogramSeries, {
+        color: '#ef5350',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+
+      const upData: HistogramData[] = [];
+      const downData: HistogramData[] = [];
+
+      data.forEach((series) => {
+        if ('value' in series.data[0] && 'color' in series.data[0]) {
+          const validData = series.data
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .filter(item => item && typeof item.time === 'number' && !isNaN((item as any).value))
+            .sort((a, b) => Number(a.time) - Number(b.time));
+
+          validData.forEach((item, index) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const value = (item as any).value;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const originalValue = (item as any).originalValue;
+            const numberToUse = originalValue !== undefined ? originalValue : value;
+
+            let isUp = true;
+            if (index > 0) {
+              const prevItem = validData[index - 1];
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const prevValue = (prevItem as any).originalValue !== undefined ? (prevItem as any).originalValue : (prevItem as any).value;
+              isUp = numberToUse >= prevValue;
+            }
+
+            const histogramPoint: HistogramData = {
+              time: item.time,
+              value: numberToUse,
+              color: isUp ? '#25A69A' : '#ef5350',
+            };
+
+            if (isUp) {
+              upData.push(histogramPoint);
+            } else {
+              downData.push(histogramPoint);
+            }
+          });
+        }
+      });
+
+      if (upData.length > 0) upSeries.setData(upData);
+      if (downData.length > 0) downSeries.setData(downData);
+
+      seriesMap.set('up', upSeries);
+      seriesMap.set('down', downSeries);
+
+    
+      if (yTicks && yTicks.length > 0) {
+        const firstSeries = upSeries || downSeries;
+        if (firstSeries) {
+          yTicks.forEach(tick => {
+            firstSeries.createPriceLine({
+              price: tick.value,
+              color: tick.color,
+              lineWidth: 2,
+              lineStyle: 1,
+              axisLabelVisible: true,
+              title: tick.label,
+            });
+          });
+        }
+      }
+    } else if (gameType === 'Column') {
+   
+      const upSeries = chart.addSeries(HistogramSeries, {
+        color: '#25A69A',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+
+      const downSeries = chart.addSeries(HistogramSeries, {
+        color: '#ef5350',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+
+      const upData: HistogramData[] = [];
+      const downData: HistogramData[] = [];
+
+      data.forEach((series) => {
+        if ('value' in series.data[0] && 'color' in series.data[0]) {
+          const validData = series.data
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .filter(item => item && typeof item.time === 'number' && !isNaN((item as any).value))
+            .sort((a, b) => Number(a.time) - Number(b.time));
+
+          validData.forEach((item, index) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const value = (item as any).value;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const originalValue = (item as any).originalValue;
+            const numberToUse = originalValue !== undefined ? originalValue : value;
+
+            let isUp = true;
+            if (index > 0) {
+              const prevItem = validData[index - 1];
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const prevValue = (prevItem as any).originalValue !== undefined ? (prevItem as any).originalValue : (prevItem as any).value;
+              isUp = numberToUse >= prevValue;
+            }
+
+            const histogramPoint: HistogramData = {
+              time: item.time,
+              value: numberToUse,
+              color: isUp ? '#25A69A' : '#ef5350',
+            };
+
+            if (isUp) {
+              upData.push(histogramPoint);
+            } else {
+              downData.push(histogramPoint);
+            }
+          });
+        }
+      });
+
+      if (upData.length > 0) upSeries.setData(upData);
+      if (downData.length > 0) downSeries.setData(downData);
+
+      seriesMap.set('up', upSeries);
+      seriesMap.set('down', downSeries);
+
      
+      if (yTicks && yTicks.length > 0) {
+        const firstSeries = upSeries || downSeries;
+        if (firstSeries) {
+          yTicks.forEach(tick => {
+            firstSeries.createPriceLine({
+              price: tick.value,
+              color: tick.color,
+              lineWidth: 2,
+              lineStyle: 1,
+              axisLabelVisible: true,
+              title: tick.label,
+            });
+          });
+        }
+      }
+    } else {
+
       const upSeries = chart.addSeries(HistogramSeries, {
         color: '#25A69A',
         lastValueVisible: false,
@@ -187,19 +432,6 @@ const HistogramChart: React.FC<ChartProps> = ({
       seriesMap.set('down', downSeries);
     }
 
-    if (gameType === 'HighAndLow') {
-      const firstSeries = Array.from(seriesMap.values())[0];
-      if (firstSeries) {
-        firstSeries.createPriceLine({
-          price: 18,
-          color: '#D9A425',
-          lineWidth: 3,
-          lineStyle: 1,
-          axisLabelVisible: true,
-          title: '',
-        });
-      }
-    }
 
 
     if (seriesMap.size > 0) {
@@ -208,23 +440,10 @@ const HistogramChart: React.FC<ChartProps> = ({
     }
 
 
-    if (gameType === 'HighAndLow' && seriesMap.size > 0) {
-      const firstSeries = Array.from(seriesMap.values())[0];
-      if (firstSeries) {
-        firstSeries.createPriceLine({
-          price: 18,
-          color: '#D9A425',
-          lineWidth: 3,
-          lineStyle: 1,
-          axisLabelVisible: true,
-          title: '',
-        });
-      }
-    }
 
 
 
-    if (seriesMap.size > 0 && yTicks && yTicks.length > 0 && chartType !== 'VerticalColumn') {
+    if (seriesMap.size > 0 && yTicks && yTicks.length > 0) {
       const firstSeries = Array.from(seriesMap.values())[0];
       yTicks.forEach(tick => {
         firstSeries.createPriceLine({
@@ -267,6 +486,34 @@ const HistogramChart: React.FC<ChartProps> = ({
           let tooltipColor = (dataAtTime as { color?: string }).color || 'white';
 
           if (gameType === 'OddAndEven') {
+            const numberToUse = originalValue !== undefined ? originalValue : value;
+
+            const currentIndex = series.data.findIndex(d => d.time === time);
+            let isUp = true;
+
+            if (currentIndex > 0) {
+              const prevItem = series.data[currentIndex - 1];
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const prevValue = (prevItem as any).originalValue !== undefined ? (prevItem as any).originalValue : (prevItem as any).value;
+              isUp = numberToUse >= prevValue;
+            }
+
+            tooltipColor = isUp ? '#25A69A' : '#ef5350';
+          } else if (gameType === 'Dozen') {
+            const numberToUse = originalValue !== undefined ? originalValue : value;
+
+            const currentIndex = series.data.findIndex(d => d.time === time);
+            let isUp = true;
+
+            if (currentIndex > 0) {
+              const prevItem = series.data[currentIndex - 1];
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const prevValue = (prevItem as any).originalValue !== undefined ? (prevItem as any).originalValue : (prevItem as any).value;
+              isUp = numberToUse >= prevValue;
+            }
+
+            tooltipColor = isUp ? '#25A69A' : '#ef5350';
+          } else if (gameType === 'Column') {
             const numberToUse = originalValue !== undefined ? originalValue : value;
 
             const currentIndex = series.data.findIndex(d => d.time === time);
