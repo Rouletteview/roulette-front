@@ -19,7 +19,9 @@ const HomePage = () => {
   const [startFreeSubscription, { loading }] = useMutation(START_FREE_SUBSCRIPTION_MUTATION, {
     refetchQueries: [{ query: GET_CURRENT_USER_SUBSCRIPTION_QUERY }],
   });
-  const { data: subscriptionData, loading: getCurrentUserSubscriptionLoading } = useQuery(GET_CURRENT_USER_SUBSCRIPTION_QUERY);
+  const { data: subscriptionData, loading: getCurrentUserSubscriptionLoading, error: subscriptionError } = useQuery(GET_CURRENT_USER_SUBSCRIPTION_QUERY);
+  console.log('subscriptionError', subscriptionError)
+  console.log(subscriptionData)
   const { data: userData, loading: userDataLoading } = useUserInfo();
 
   const isAdmin = userData?.GetUserInfo.IsAdmin

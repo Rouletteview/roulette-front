@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { useCountdownStore } from '../../../stores/countdownStore';
+import { useBetStatusStore } from '../../../stores/betStatusStore';
 
 interface BetButtonsProps {
     gameType: string
@@ -200,21 +201,85 @@ const EvenOddButtons = ({ evenPercentage, oddPercentage, handleToggle }: { evenP
 }
 
 const DozenButtons = ({ dozen1Percentage, dozen2Percentage, dozen3Percentage, handleToggle }: { dozen1Percentage: number, dozen2Percentage: number, dozen3Percentage: number, handleToggle: (tag: string) => void }) => {
+    const { canPlaceBet, getActiveBetsByGameType } = useBetStatusStore();
+
+    const canPlaceFirstDozen = canPlaceBet('Dozen', 'FirstDozen');
+    const canPlaceSecondDozen = canPlaceBet('Dozen', 'SecondDozen');
+    const canPlaceThirdDozen = canPlaceBet('Dozen', 'ThirdDozen');
+
+    const activeDozenBets = getActiveBetsByGameType('Dozen');
+    const activeBetsCount = activeDozenBets.length;
+
     return (
         <div className="flex flex-col gap-6 w-full">
-            <button onClick={() => handleToggle('FirstDozen')} className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Docena 1 - 12 ({dozen1Percentage}%)</button>
-            <button onClick={() => handleToggle('SecondDozen')} className="bg-[#0D7FFC41] hover:bg-[#0D7FFC41]/80 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer">Docena 13 - 24 ({dozen2Percentage}%)</button>
-            <button onClick={() => handleToggle('ThirdDozen')} className="bg-[#85FFE099] hover:bg-[#85FFE099]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Docena 25 - 36 ({dozen3Percentage}%)</button>
+            {activeBetsCount > 0 && (
+                <div className="text-center text-white text-sm bg-yellow-600/20 rounded p-2 mb-2">
+                    Apuestas activas: {activeBetsCount}/2
+                </div>
+            )}
+            <button
+                onClick={() => handleToggle('FirstDozen')}
+                disabled={!canPlaceFirstDozen}
+                className={`bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${!canPlaceFirstDozen ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+                Docena 1 - 12 ({dozen1Percentage}%)
+            </button>
+            <button
+                onClick={() => handleToggle('SecondDozen')}
+                disabled={!canPlaceSecondDozen}
+                className={`bg-[#0D7FFC41] hover:bg-[#0D7FFC41]/80 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${!canPlaceSecondDozen ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+                Docena 13 - 24 ({dozen2Percentage}%)
+            </button>
+            <button
+                onClick={() => handleToggle('ThirdDozen')}
+                disabled={!canPlaceThirdDozen}
+                className={`bg-[#85FFE099] hover:bg-[#85FFE099]/80 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${!canPlaceThirdDozen ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+                Docena 25 - 36 ({dozen3Percentage}%)
+            </button>
         </div>
     )
 }
 
 const ColumnButtons = ({ column1Percentage, column2Percentage, column3Percentage, handleToggle }: { column1Percentage: number, column2Percentage: number, column3Percentage: number, handleToggle: (tag: string) => void }) => {
+    const { canPlaceBet, getActiveBetsByGameType } = useBetStatusStore();
+
+    const canPlaceFirstColumn = canPlaceBet('Column', 'FirstColumn');
+    const canPlaceSecondColumn = canPlaceBet('Column', 'SecondColumn');
+    const canPlaceThirdColumn = canPlaceBet('Column', 'ThirdColumn');
+
+    const activeColumnBets = getActiveBetsByGameType('Column');
+    const activeBetsCount = activeColumnBets.length;
+
     return (
         <div className="flex flex-col gap-6 w-full">
-            <button onClick={() => handleToggle('FirstColumn')} className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Columna 1 ({column1Percentage}%)</button>
-            <button onClick={() => handleToggle('SecondColumn')} className="bg-[#0D7FFC41] hover:bg-[#0D7FFC41]/80 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer">Columna 2 ({column2Percentage}%)</button>
-            <button onClick={() => handleToggle('ThirdColumn')} className="bg-[#85FFE099] hover:bg-[#85FFE099]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Columna 3 ({column3Percentage}%)</button>
+            {activeBetsCount > 0 && (
+                <div className="text-center text-white text-sm bg-yellow-600/20 rounded p-2 mb-2">
+                    Apuestas activas: {activeBetsCount}/2
+                </div>
+            )}
+            <button
+                onClick={() => handleToggle('FirstColumn')}
+                disabled={!canPlaceFirstColumn}
+                className={`bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${!canPlaceFirstColumn ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+                Columna 1 ({column1Percentage}%)
+            </button>
+            <button
+                onClick={() => handleToggle('SecondColumn')}
+                disabled={!canPlaceSecondColumn}
+                className={`bg-[#0D7FFC41] hover:bg-[#0D7FFC41]/80 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${!canPlaceSecondColumn ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+                Columna 2 ({column2Percentage}%)
+            </button>
+            <button
+                onClick={() => handleToggle('ThirdColumn')}
+                disabled={!canPlaceThirdColumn}
+                className={`bg-[#85FFE099] hover:bg-[#85FFE099]/80 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${!canPlaceThirdColumn ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+                Columna 3 ({column3Percentage}%)
+            </button>
         </div>
     )
 }
@@ -344,7 +409,7 @@ const BetButtons = ({ gameType, probabilities, handleToggle }: BetButtonsProps) 
         orphelinsPercentage: getProbabilityByTag('Orphelins')
     })
 
-     const getStraightUpProbabilities = () => {
+    const getStraightUpProbabilities = () => {
         return numbers.map(number => ({
             number: number.number,
             straightUpPercentage: getProbabilityByTag(`${number.number}`)

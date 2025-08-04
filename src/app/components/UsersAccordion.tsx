@@ -1,7 +1,9 @@
-import { Collapse } from "antd"
-import arrowIcon from '../../assets/icon/accordion-arrow.svg'
+import React from 'react';
+import { Collapse } from "antd";
+import { useMutation } from '@apollo/client';
+import arrowIcon from '../../assets/icon/accordion-arrow.svg';
+import { UPDATE_USER_ACTIVATE_STATUS_MUTATION } from '../../graphql/mutations/users/updateUserActivateStatus';
 const { Panel } = Collapse;
-
 
 interface User {
     id: string;
@@ -17,8 +19,25 @@ interface UsersTableProps {
     onDeleteUser: (userId: string) => void;
 }
 
+const UsersAccordion: React.FC<UsersTableProps> = ({ users, onViewUser, onDeleteUser }) => {
+    const [updateUserStatus] = useMutation(UPDATE_USER_ACTIVATE_STATUS_MUTATION);
 
-const UsersAccordion: React.FC<UsersTableProps> = ({ users }) => {
+    const handleToggleUserStatus = async (userId: string) => {
+        try {
+            // Desactivar el usuario (isActive: false)
+            await updateUserStatus({
+                variables: {
+                    userId: userId,
+                    isActive: false
+                }
+            });
+
+            // Callback para actualizar el estado local
+            onDeleteUser(userId);
+        } catch (error) {
+            console.error('Error updating user status:', error);
+        }
+    };
 
     const getPaymentStatusColor = (status: string) => {
         switch (status) {
@@ -32,6 +51,7 @@ const UsersAccordion: React.FC<UsersTableProps> = ({ users }) => {
                 return 'text-gray-400';
         }
     };
+
     return (
         <section className="mx-6">
             <div className="bg-[#D9A425] p-4 ">
@@ -49,8 +69,6 @@ const UsersAccordion: React.FC<UsersTableProps> = ({ users }) => {
                     />
                 )}
             >
-
-
                 {
                     users.map((user) => (
                         <Panel key={user.id} header={user.name} className="border-y border-[#EBEBEB]">
@@ -62,7 +80,7 @@ const UsersAccordion: React.FC<UsersTableProps> = ({ users }) => {
                                     </div>
                                     <div className="flex flex-col border-b border-white pb-2">
                                         <h1 className="text-[#444444] font-light text-xs">Fecha de vencimiento del plan</h1>
-                                        <h1 className="text-[#000000] text-sm font-light">{user.planExpiration}</h1>
+                                        <h1 className="text-[#000000] text-sm font-light">{user.planExpiration ? new Date(user.planExpiration).toLocaleDateString('es-VE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}</h1>
                                     </div>
                                     <div className="flex flex-col border-b border-white pb-2">
                                         <h1 className="text-[#444444] font-light text-xs">Estado de pago</h1>
@@ -71,8 +89,18 @@ const UsersAccordion: React.FC<UsersTableProps> = ({ users }) => {
                                     <div className="flex flex-col">
                                         <h1 className="text-[#444444] font-light text-xs">Acciones</h1>
                                         <div className="flex flex-row justify-between gap-4 mt-2">
-                                            <button className="text-white text-xs font-bold bg-[#20B26C] rounded-[10px] py-4 px-4  yellow-button-shadow">Ver información </button>
-                                            <button className="text-white text-xs font-bold bg-[#FF0000] rounded-[10px] py-4 px-4  yellow-button-shadow">Eliminar usuario</button>
+                                            <button
+                                                onClick={() => onViewUser(user.id)}
+                                                className="text-white text-xs font-bold bg-[#20B26C] rounded-[10px] py-4 px-4 yellow-button-shadow"
+                                            >
+                                                Ver información
+                                            </button>
+                                            <button
+                                                onClick={() => handleToggleUserStatus(user.id)}
+                                                className="text-white text-xs font-bold bg-[#FF0000] rounded-[10px] py-4 px-4 yellow-button-shadow"
+                                            >
+                                                Desactivar usuario
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -82,8 +110,7 @@ const UsersAccordion: React.FC<UsersTableProps> = ({ users }) => {
                 }
             </Collapse>
         </section>
+    );
+};
 
-    )
-}
-
-export default UsersAccordion
+export default UsersAccordion;

@@ -57,7 +57,7 @@ const CandleChart: React.FC<ChartProps> = ({
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
-    const yTicks = getYAxisTicks(gameType);
+    const yTicks = getYAxisTicks(gameType, chartType);
 
 
     const debugKey = `chartPosition_${chartType}_${gameType || ''}_${selectedTable}`;
@@ -451,7 +451,7 @@ const CandleChart: React.FC<ChartProps> = ({
         }
 
 
-        if (gameType === 'OddAndEven' && defaultSeries) {
+        if (gameType === '' && defaultSeries) {
           defaultSeries.createPriceLine({
             price: 18,
             color: '#D9A425',
@@ -462,7 +462,7 @@ const CandleChart: React.FC<ChartProps> = ({
           });
         }
 
-        if (gameType === 'HighAndLow' && defaultSeries) {
+        if (gameType === '' && defaultSeries) {
           defaultSeries.createPriceLine({
             price: 18,
             color: '#D9A425',
@@ -474,7 +474,7 @@ const CandleChart: React.FC<ChartProps> = ({
         }
       }
 
-      if (gameType === 'OddAndEven') {
+      if (gameType === '') {
         const seriesToUse = redSeries || whiteSeries || greenSeries || defaultSeries;
         if (seriesToUse) {
           seriesToUse.createPriceLine({
@@ -488,7 +488,7 @@ const CandleChart: React.FC<ChartProps> = ({
         }
       }
 
-      if (gameType === 'HighAndLow') {
+      if (gameType === '') {
         const seriesToUse = redSeries || whiteSeries || greenSeries || defaultSeries;
         if (seriesToUse) {
           seriesToUse.createPriceLine({
@@ -502,6 +502,42 @@ const CandleChart: React.FC<ChartProps> = ({
         }
       }
 
+
+      const universalSeriesToUse = redSeries || whiteSeries || greenSeries || blackSeries || defaultSeries;
+      if (universalSeriesToUse) {
+
+        if (gameType !== 'Column' && gameType !== 'Dozen') {
+          universalSeriesToUse.createPriceLine({
+            price: 18,
+            color: '#D9A425',
+            lineWidth: 3,
+            lineStyle: 1,
+            axisLabelVisible: true,
+            title: '',
+          });
+        }
+
+
+        if (gameType === 'Column' || gameType === 'Dozen') {
+          universalSeriesToUse.createPriceLine({
+            price: 12,
+            color: '#D9A425',
+            lineWidth: 2,
+            lineStyle: 1,
+            axisLabelVisible: true,
+            title: '',
+          });
+
+          universalSeriesToUse.createPriceLine({
+            price: 24,
+            color: '#D9A425',
+            lineWidth: 2,
+            lineStyle: 1,
+            axisLabelVisible: true,
+            title: '',
+          });
+        }
+      }
 
       chart.timeScale().setVisibleRange(initialRange);
     }

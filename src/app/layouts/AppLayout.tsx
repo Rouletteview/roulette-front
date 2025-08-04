@@ -4,13 +4,13 @@ import NavBar from "../components/NavBar"
 import Toast from "../components/Toast"
 
 type Props = {
-    children: ReactNode
+  children: ReactNode
 }
 
 
 
 const AppLayout = ({ children }: Props) => {
-    
+
   useEffect(() => {
     const savedScrollPosition = sessionStorage.getItem('scrollPosition');
     if (savedScrollPosition) {
@@ -35,16 +35,16 @@ const AppLayout = ({ children }: Props) => {
     };
   }, []);
 
-    return (
-        <>
-            <Toast />
-            <Header>
-                <NavBar />
-            </Header>
-            {children}
-            {/* Footer */}
-        </>
-    )
+  return (
+    <>
+      <Toast />
+      <Header>
+        <NavBar />
+      </Header>
+      {children}
+      {/* Footer */}
+    </>
+  )
 }
 
 export default AppLayout

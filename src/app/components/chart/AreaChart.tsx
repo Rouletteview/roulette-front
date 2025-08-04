@@ -56,7 +56,7 @@ const AreaChart: React.FC<ChartProps> = ({
     if (!chartContainerRef.current) return;
 
 
-    const yTicks = getYAxisTicks(gameType);
+    const yTicks = getYAxisTicks(gameType, chartType);
     const initialRange = getInitialRange();
 
     console.log('📊 AreaChart - initialRange:', initialRange);
