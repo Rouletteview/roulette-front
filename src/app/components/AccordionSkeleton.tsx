@@ -9,7 +9,7 @@ const AccordionSkeleton: React.FC<AccordionSkeletonProps> = ({
     items = 5,
     className = ""
 }) => {
-    // Crear diferentes tamaños para simular contenido real
+
     const getRandomWidth = (min: number, max: number) => {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     };
@@ -18,7 +18,7 @@ const AccordionSkeleton: React.FC<AccordionSkeletonProps> = ({
         <div className={`space-y-4 ${className}`}>
             {Array.from({ length: items }).map((_, index) => (
                 <div key={index} className="bg-white rounded-lg shadow-md border border-gray-200">
-                    {/* Header */}
+                   
                     <div className="p-4 border-b border-gray-200">
                         <div className="flex items-center justify-between">
                             <div className="flex-1 space-y-2">
@@ -38,7 +38,7 @@ const AccordionSkeleton: React.FC<AccordionSkeletonProps> = ({
                         </div>
                     </div>
 
-                    {/* Content */}
+                 
                     <div className="p-4 space-y-3">
                         <div className="flex justify-between items-center">
                             <div className="space-y-2">
