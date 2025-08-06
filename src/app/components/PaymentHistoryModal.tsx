@@ -20,6 +20,8 @@ interface PaymentHistoryData {
     status: string;
     frequency: string;
     paymentMethod: string;
+    originalReference: string;
+    photoUrl?: string;
 }
 
 interface PaymentHistoryModalProps {
@@ -54,8 +56,11 @@ const PaymentHistoryModal: React.FC<PaymentHistoryModalProps> = ({
         paramName: 'paymentPage'
     });
 
-    const handleViewReceipt = (paymentReference: string) => {
-        setSelectedPaymentReference(paymentReference);
+    const handleViewReceipt = (paymentReference: string, paymentMethod: string, photoUrl?: string) => {
+
+        console.log(paymentMethod, photoUrl);
+        const referenceToPass = paymentMethod === 'Crypto' ? photoUrl : paymentReference;
+        setSelectedPaymentReference(referenceToPass || paymentReference);
         setIsReceiptModalVisible(true);
     };
 
@@ -72,6 +77,9 @@ const PaymentHistoryModal: React.FC<PaymentHistoryModalProps> = ({
         paymentReference: payment.PaymentMethod === 'Crypto' ? 'USDT' :
             payment.PaymentMethod === 'Phone' ? payment.Reference :
                 payment.PaymentMethod || 'N/A',
+        paymentMethod: payment.PaymentMethod,
+        originalReference: payment.Reference,
+        photoUrl: payment.PhotoUrl,
     })) || [];
 
     const totalItems = allData.length;
@@ -104,7 +112,7 @@ const PaymentHistoryModal: React.FC<PaymentHistoryModalProps> = ({
                     {record.paymentReference === 'USDT' && (
                         <button
                             className='cursor-pointer'
-                            onClick={() => handleViewReceipt(record.paymentReference)}
+                            onClick={() => handleViewReceipt(record.paymentReference, record.paymentMethod, record.photoUrl)}
                         >
                             <img src={viewIcon} alt="view" />
                         </button>

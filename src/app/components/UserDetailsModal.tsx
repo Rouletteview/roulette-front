@@ -7,7 +7,9 @@ import { useQuery } from '@apollo/client';
 import { useSearchParams } from 'react-router';
 import PaymentHistoryModal from './PaymentHistoryModal';
 import PaymentRejectionModal from './Modal/PaymentRejectionModal';
+import UserActionModal from './Modal/UserActionModal';
 import { UPDATE_PAYMENTS_STATUS_MUTATION } from '../../graphql/mutations/subscription/updatePaymentsStatus';
+import { UPDATE_USER_ACTIVATE_STATUS_MUTATION } from '../../graphql/mutations/users/updateUserActivateStatus';
 
 interface UserDetailsModalProps {
     isVisible: boolean;
@@ -19,8 +21,10 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ isVisible, onClose 
     const userId = searchParams.get('userId');
     const [isPaymentHistoryVisible, setIsPaymentHistoryVisible] = useState(false);
     const [isRejectionModalVisible, setIsRejectionModalVisible] = useState(false);
+    const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
 
     const [updatePaymentStatus] = useMutation(UPDATE_PAYMENTS_STATUS_MUTATION);
+    const [updateUserStatus] = useMutation(UPDATE_USER_ACTIVATE_STATUS_MUTATION);
 
     const { data, loading } = useQuery(GET_USER, {
         variables: {
@@ -74,8 +78,30 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ isVisible, onClose 
     };
 
     const handleDeleteUser = () => {
-        console.log('Eliminar usuario');
-        onClose();
+        setShowDeleteConfirmModal(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!user) return;
+
+        try {
+            await updateUserStatus({
+                variables: {
+                    userId: user.Id,
+                    isActive: false
+                }
+            });
+
+            console.log('Usuario eliminado exitosamente');
+            setShowDeleteConfirmModal(false);
+            onClose();
+        } catch (error) {
+            console.error('Error deleting user:', error);
+        }
+    };
+
+    const handleCancelDelete = () => {
+        setShowDeleteConfirmModal(false);
     };
 
     const handleShowPaymentHistory = () => {
@@ -341,6 +367,25 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ isVisible, onClose 
                 isVisible={isRejectionModalVisible}
                 onClose={handleCloseRejectionModal}
                 onSubmit={handleSubmitRejection}
+                paymentId={user?.Subscription?.Payments?.[0]?.Id || ''}
+                subscriptionId={user?.Subscription?.Id || ''}
+            />
+
+            <UserActionModal
+                open={showDeleteConfirmModal}
+                user={user ? {
+                    id: user.Id,
+                    name: user.Name,
+                    email: user.Email,
+                    planExpiration: user.Subscription?.EndDate || '',
+                    paymentStatus: user.Subscription?.Payments?.[0]?.Status === 'Pending' ? 'Por verificar' :
+                        user.Subscription?.Payments?.[0]?.Status === 'Rejected' ? 'Rechazado' :
+                            user.Subscription?.Payments?.[0]?.Status === 'Approved' ? 'Verificado' : '',
+                    isActive: user.IsActive
+                } : null}
+                action="delete"
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
             />
         </>
     );

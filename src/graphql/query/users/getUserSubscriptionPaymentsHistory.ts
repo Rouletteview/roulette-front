@@ -7,6 +7,7 @@ export const GET_USER_SUBSCRIPTION_PAYMENTS_HISTORY_QUERY = gql`
       PaymentId
       Status
       Reference
+      PhotoUrl
       PaidAt
       PaymentMethod
       Frequency

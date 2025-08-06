@@ -11,6 +11,7 @@ import UserDetailsModal from '../components/UserDetailsModal';
 import { GET_USERS } from '../../graphql/query/users/getUsers';
 import { useQuery } from '@apollo/client';
 import { useSearchParams } from 'react-router';
+import { usePagination } from '../../hooks/usePagination';
 
 interface UserFromAPI {
     Id: string;
@@ -56,11 +57,20 @@ const UsersPage: React.FC = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
 
+    const {
+        currentPage,
+        limit,
+        skip,
+        handlePreviousPage,
+        handleNextPage,
+        resetToFirstPage
+    } = usePagination({ defaultPage: 1, defaultLimit: 10, paramName: 'page' });
+
     const { data, loading, refetch } = useQuery(GET_USERS, {
         variables: {
             request: {
-                skip: 0,
-                limit: 10,
+                skip: skip,
+                limit: limit,
                 query: nameFilter || emailFilter || '',
                 paymentStatus: paymentStatusFilter || undefined,
             }
@@ -76,6 +86,7 @@ const UsersPage: React.FC = () => {
     }, [searchParams]);
 
     const users: TransformedUser[] = data?.GetUsers?.Users?.map((user: UserFromAPI): TransformedUser => {
+     
 
         const mapPaymentStatus = (status: string): 'Por verificar' | 'Rechazado' | 'Verificado' | '' => {
             switch (status?.toLowerCase()) {
@@ -98,7 +109,7 @@ const UsersPage: React.FC = () => {
             paymentStatus: mapPaymentStatus(user.Subscription?.Payments?.[0]?.Status || ''),
             isActive: user.IsActive
         };
-    }).filter((user: TransformedUser) => !user.isActive) || []; 
+    }).filter((user: TransformedUser) => user.isActive) || [];
 
     const handleViewUser = (userId: string) => {
         setSearchParams({ userId: userId });
@@ -117,7 +128,13 @@ const UsersPage: React.FC = () => {
 
     const handlePaymentStatusChange = (value: string) => {
         setPaymentStatusFilter(value);
+        resetToFirstPage(); 
     };
+
+  
+    useEffect(() => {
+        resetToFirstPage();
+    }, [nameFilter, emailFilter]);
 
     const paymentStatusOptions = [
         { label: 'Todos', value: '' },
@@ -191,7 +208,13 @@ const UsersPage: React.FC = () => {
                                 <UsersTable
                                     users={users}
                                     onViewUser={handleViewUser}
-                                    onDeleteUser={handleDeleteUser} />
+                                    onDeleteUser={handleDeleteUser}
+                                    currentPage={currentPage}
+                                    onPreviousPage={handlePreviousPage}
+                                    onNextPage={handleNextPage}
+                                    hasNextPage={users.length === limit}
+                                    hasPreviousPage={currentPage > 1}
+                                />
                             )}
                         </div>
 
@@ -204,6 +227,11 @@ const UsersPage: React.FC = () => {
                                     users={users}
                                     onViewUser={handleViewUser}
                                     onDeleteUser={handleDeleteUser}
+                                    currentPage={currentPage}
+                                    onPreviousPage={handlePreviousPage}
+                                    onNextPage={handleNextPage}
+                                    hasNextPage={users.length === limit}
+                                    hasPreviousPage={currentPage > 1}
                                 />
                             )}
                         </div>

@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Collapse } from "antd";
 import { useMutation } from '@apollo/client';
 import arrowIcon from '../../assets/icon/accordion-arrow.svg';
 import { UPDATE_USER_ACTIVATE_STATUS_MUTATION } from '../../graphql/mutations/users/updateUserActivateStatus';
+import UserActionModal from './Modal/UserActionModal';
+import Pagination from './Pagination';
 const { Panel } = Collapse;
 
 interface User {
@@ -11,32 +13,69 @@ interface User {
     email: string;
     planExpiration: string;
     paymentStatus: 'Por verificar' | 'Rechazado' | 'Verificado' | '';
+    isActive: boolean;
 }
 
 interface UsersTableProps {
     users: User[];
     onViewUser: (userId: string) => void;
     onDeleteUser: (userId: string) => void;
+    currentPage: number;
+    onPreviousPage: () => void;
+    onNextPage: () => void;
+    hasNextPage?: boolean;
+    hasPreviousPage?: boolean;
 }
 
-const UsersAccordion: React.FC<UsersTableProps> = ({ users, onViewUser, onDeleteUser }) => {
+const UsersAccordion: React.FC<UsersTableProps> = ({
+    users,
+    onViewUser,
+    onDeleteUser,
+    currentPage,
+    onPreviousPage,
+    onNextPage,
+    hasNextPage = true,
+    hasPreviousPage = true
+}) => {
     const [updateUserStatus] = useMutation(UPDATE_USER_ACTIVATE_STATUS_MUTATION);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [userToToggle, setUserToToggle] = useState<User | null>(null);
 
-    const handleToggleUserStatus = async (userId: string) => {
+    const handleToggleUserStatus = (userId: string) => {
+        const currentUser = users.find(user => user.id === userId);
+        if (!currentUser) {
+            console.error('User not found');
+            return;
+        }
+
+        setUserToToggle(currentUser);
+        setShowConfirmModal(true);
+    };
+
+    const handleConfirmToggle = async () => {
+        if (!userToToggle) return;
+
         try {
-            // Desactivar el usuario (isActive: false)
+            const newIsActive = !userToToggle.isActive;
+
             await updateUserStatus({
                 variables: {
-                    userId: userId,
-                    isActive: false
+                    userId: userToToggle.id,
+                    isActive: newIsActive
                 }
             });
 
-            // Callback para actualizar el estado local
-            onDeleteUser(userId);
+            onDeleteUser(userToToggle.id);
+            setShowConfirmModal(false);
+            setUserToToggle(null);
         } catch (error) {
             console.error('Error updating user status:', error);
         }
+    };
+
+    const handleCancelToggle = () => {
+        setShowConfirmModal(false);
+        setUserToToggle(null);
     };
 
     const getPaymentStatusColor = (status: string) => {
@@ -99,7 +138,7 @@ const UsersAccordion: React.FC<UsersTableProps> = ({ users, onViewUser, onDelete
                                                 onClick={() => handleToggleUserStatus(user.id)}
                                                 className="text-white text-xs font-bold bg-[#FF0000] rounded-[10px] py-4 px-4 yellow-button-shadow"
                                             >
-                                                Desactivar usuario
+                                                Eliminar usuario
                                             </button>
                                         </div>
                                     </div>
@@ -109,6 +148,25 @@ const UsersAccordion: React.FC<UsersTableProps> = ({ users, onViewUser, onDelete
                     ))
                 }
             </Collapse>
+
+        
+            <div className="mt-4">
+                <Pagination
+                    currentPage={currentPage}
+                    onPreviousPage={onPreviousPage}
+                    onNextPage={onNextPage}
+                    hasNextPage={hasNextPage}
+                    hasPreviousPage={hasPreviousPage}
+                />
+            </div>
+
+            <UserActionModal
+                open={showConfirmModal}
+                user={userToToggle}
+                action={userToToggle?.isActive ? 'deactivate' : 'activate'}
+                onConfirm={handleConfirmToggle}
+                onCancel={handleCancelToggle}
+            />
         </section>
     );
 };

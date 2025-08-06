@@ -11,8 +11,9 @@ interface PaymentReceiptModalProps {
 const PaymentReceiptModal: React.FC<PaymentReceiptModalProps> = ({
     isVisible,
     onClose,
-
+    paymentReference,
 }) => {
+    console.log(paymentReference);
     return (
         <Modal
             open={isVisible}
@@ -50,16 +51,39 @@ const PaymentReceiptModal: React.FC<PaymentReceiptModalProps> = ({
 
                 </div>
 
-                {/* Image Placeholder */}
+                {/* Image Display */}
                 <div className='flex justify-center mt-8'>
-                    <div className='w-64 h-64 bg-gray-300 rounded-lg flex items-center justify-center'>
-                        <div className='text-gray-500 text-center'>
-                            <div className='w-16 h-16 bg-gray-400 rounded-lg mx-auto mb-2 flex items-center justify-center'>
-                                <div className='w-8 h-8 bg-gray-500 rounded-full'></div>
+                    {paymentReference && paymentReference.startsWith('http') ? (
+                        <div className='w-64 h-64 rounded-lg overflow-hidden border border-gray-300'>
+                            <img
+                                src={paymentReference}
+                                alt="Comprobante de pago"
+                                className='w-full h-full object-contain'
+                                onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.display = 'none';
+                                    target.nextElementSibling?.classList.remove('hidden');
+                                }}
+                            />
+                            <div className='hidden w-full h-full bg-gray-300 flex items-center justify-center'>
+                                <div className='text-gray-500 text-center'>
+                                    <div className='w-16 h-16 bg-gray-400 rounded-lg mx-auto mb-2 flex items-center justify-center'>
+                                        <div className='w-8 h-8 bg-gray-500 rounded-full'></div>
+                                    </div>
+                                    <p className='text-sm'>Error al cargar imagen</p>
+                                </div>
                             </div>
-                            <p className='text-sm'>Imagen del comprobante</p>
                         </div>
-                    </div>
+                    ) : (
+                        <div className='w-64 h-64 bg-gray-300 rounded-lg flex items-center justify-center'>
+                            <div className='text-gray-500 text-center'>
+                                <div className='w-16 h-16 bg-gray-400 rounded-lg mx-auto mb-2 flex items-center justify-center'>
+                                    <div className='w-8 h-8 bg-gray-500 rounded-full'></div>
+                                </div>
+                                <p className='text-sm'>No hay imagen disponible</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
 

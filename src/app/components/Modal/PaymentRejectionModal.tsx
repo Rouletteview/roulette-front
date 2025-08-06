@@ -1,23 +1,56 @@
 import React, { useState } from 'react';
 import { Modal } from 'antd';
+import { useMutation } from '@apollo/client';
 import backIcon from '../../../assets/icon/back-icon.svg';
+import { UPDATE_PAYMENTS_STATUS_MUTATION } from '../../../graphql/mutations/subscription/updatePaymentsStatus';
 
 interface PaymentRejectionModalProps {
     isVisible: boolean;
     onClose: () => void;
     onSubmit: (comment: string) => void;
+    paymentId: string;
+    subscriptionId: string;
 }
 
 const PaymentRejectionModal: React.FC<PaymentRejectionModalProps> = ({
     isVisible,
     onClose,
-    onSubmit
+    onSubmit,
+    paymentId,
+    subscriptionId
 }) => {
     const [comment, setComment] = useState('No encontramos tu pago con los datos que dejaste en el registro');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleSubmit = () => {
-        onSubmit(comment);
-        onClose();
+    const [updatePaymentStatus] = useMutation(UPDATE_PAYMENTS_STATUS_MUTATION);
+
+    const handleSubmit = async () => {
+        if (!paymentId || !subscriptionId) {
+            console.error('Missing paymentId or subscriptionId');
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            await updatePaymentStatus({
+                variables: {
+                    input: {
+                        PaymentId: paymentId,
+                        SubscriptionId: subscriptionId,
+                        Status: 'Rejected',
+                        ReviewComment: comment
+                    }
+                }
+            });
+
+            console.log('Pago rechazado exitosamente');
+            onSubmit(comment);
+            onClose();
+        } catch (error) {
+            console.error('Error rejecting payment:', error);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -75,9 +108,11 @@ const PaymentRejectionModal: React.FC<PaymentRejectionModalProps> = ({
                     {/* Submit button */}
                     <button
                         onClick={handleSubmit}
-                        className="px-12 bg-[#D9A425] hover:bg-[#B3831D] text-white font-bold py-3  rounded-xl transition-all cursor-pointer yellow-button-shadow"
+                        disabled={isSubmitting}
+                        className={`px-12 bg-[#D9A425] hover:bg-[#B3831D] text-white font-bold py-3 rounded-xl transition-all cursor-pointer yellow-button-shadow ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
                     >
-                        Enviar
+                        {isSubmitting ? 'Enviando...' : 'Enviar'}
                     </button>
                 </div>
             </div>
