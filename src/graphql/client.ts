@@ -1,17 +1,17 @@
-import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
+import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { useAuthStore } from "../stores/authStore";
 import { onError } from "@apollo/client/link/error";
+import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
+
 // import { decryptToken } from "../utils/crypto";
 
-
-const httpLink = createHttpLink({
+const uploadLink = createUploadLink({
   uri: import.meta.env.VITE_GRAPHQL_URL,
 });
 
 const authLink = setContext((_, { headers }) => {
   const token = useAuthStore.getState().token;
-
 
   return {
     headers: {
@@ -35,7 +35,7 @@ const errorLink = onError(({ graphQLErrors }) => {
 });
 
 const client = new ApolloClient({
-  link: errorLink.concat(authLink.concat(httpLink)),
+  link: errorLink.concat(authLink.concat(uploadLink)),
   cache: new InMemoryCache(),
 });
 

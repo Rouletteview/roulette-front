@@ -26,8 +26,11 @@ const SuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose, message = 
 
                 <div className="flex justify-center">
                     <button
-                        onClick={onClose}
-                        className="bg-[#D9A425] hover:bg-[#B3831D] text-white font-bold py-3 px-8 rounded-lg transition-all duration-200 yellow-button-shadow"
+                        onClick={() => {
+                            onClose();
+                            window.location.href = '/home';
+                        }}
+                        className="bg-[#D9A425] hover:bg-[#B3831D] text-white font-bold py-3 px-8 rounded-lg transition-all duration-200 yellow-button-shadow cursor-pointer"
                     >
                         Cerrar
                     </button>

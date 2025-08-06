@@ -12,18 +12,16 @@ interface Props {
 }
 
 const USDTTransferSection = ({ setSubscriptionState, subscriptionState, handleCreateSubscription }: Props) => {
-    const [uploadedImage, setUploadedImage] = useState<string | null>(null)
+    const [uploadedImage, setUploadedImage] = useState<File | null>(null)
+    console.log(uploadedImage)
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleFileUpload = (file: File) => {
         if (file && file.type.startsWith('image/')) {
-            const reader = new FileReader()
-            reader.onload = (e) => {
-                const base64String = e.target?.result as string
-                setUploadedImage(base64String)
-                setSubscriptionState({ ...subscriptionState, PhotoFile: base64String })
-            }
-            reader.readAsDataURL(file)
+            setUploadedImage(file)
+            console.log(file)
+            console.log(subscriptionState)
+            setSubscriptionState({ ...subscriptionState, PhotoFile: file })
         }
     }
 
@@ -102,7 +100,7 @@ const USDTTransferSection = ({ setSubscriptionState, subscriptionState, handleCr
                                 {uploadedImage ? (
                                     <div className="flex flex-col items-center justify-center text-center">
                                         <img
-                                            src={uploadedImage}
+                                            src={URL.createObjectURL(uploadedImage)}
                                             alt="Uploaded"
                                             className="max-w-64 h-64 object-contain"
                                         />

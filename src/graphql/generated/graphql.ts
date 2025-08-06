@@ -490,6 +490,7 @@ export type UserSubscription = {
   __typename?: 'UserSubscription';
   CreatedAt: Scalars['DateTime']['output'];
   EndDate: Scalars['DateTime']['output'];
+  FreeTrial: Scalars['Boolean']['output'];
   Frequency: SubscriptionFrequency;
   Id: Scalars['String']['output'];
   IsActive: Scalars['Boolean']['output'];
@@ -505,6 +506,7 @@ export type UserSubscriptionPaymentHistory = {
   PaidAt: Scalars['DateTime']['output'];
   PaymentId: Scalars['String']['output'];
   PaymentMethod: PaymentMethod;
+  PhotoUrl: Scalars['String']['output'];
   Reference: Scalars['String']['output'];
   Status: PaymentStatus;
   SubscriptionId: Scalars['String']['output'];

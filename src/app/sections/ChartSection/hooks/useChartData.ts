@@ -32,6 +32,8 @@ export const useChartData = (
     const endDate = new Date();
     endDate.setHours(23, 59, 59, 999);
 
+    console.log(startDate, endDate)
+
 
     const {
         data: tablesData,
@@ -69,6 +71,7 @@ export const useChartData = (
         skip: !selectedTable || !gameType,
     });
 
+  
 
     const { data: chartNumbersData } = useQuery(GET_LAST_ROULETTE_TABLE_NUMBERS, {
         variables: {
@@ -77,6 +80,8 @@ export const useChartData = (
         },
         skip: !selectedTable,
     });
+
+
 
 
 

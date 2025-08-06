@@ -10,6 +10,7 @@ export const GET_USERS = gql`
         Country
         BirthDate
         PhoneNumber
+        IsActive
         Subscription {
           Id
           UserId

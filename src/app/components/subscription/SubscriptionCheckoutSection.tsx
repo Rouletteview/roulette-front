@@ -24,7 +24,7 @@ export interface SubscriptionState {
     Frequency: string;
     PaymentMethod: string;
     Reference: string;
-    PhotoFile: File | string | null;
+    PhotoFile: File | null;
 }
 
 
@@ -37,20 +37,25 @@ const SubscriptionCheckoutSection = ({ selectedPlan, selectedMethod }: Props) =>
         PhotoFile: null
     })
 
+    console.log('subscriptionState', subscriptionState)
+
     const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-    const [createSubscription] = useMutation(CREATE_SUBSCRIPTION_MUTATION);
-
+    const [createSubscription, { error: createSubscriptionError }] = useMutation(CREATE_SUBSCRIPTION_MUTATION);
+    console.log('createSubscriptionError', createSubscriptionError)
 
     const handleCreateSubscription = async () => {
         const subscriptionData = {
             Frequency: subscriptionState.Frequency,
             PaymentMethod: subscriptionState.PaymentMethod,
-            Reference: subscriptionState.Reference
+            Reference: subscriptionState.Reference,
+            PhotoFile: subscriptionState.PhotoFile
         };
 
         try {
-            await createSubscription({ variables: { input: subscriptionData } });
+            await createSubscription({
+                variables: { input: subscriptionData }
+            });
             setShowSuccessModal(true);
         } catch (error) {
             showErrorToast(getGraphQLErrorMessage(error));

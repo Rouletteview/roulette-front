@@ -333,7 +333,7 @@ export const getYAxisTicks = (gameType?: string, chartType?: string): { value: n
                 { value: 18, label: '', color: '#D9A425', lineWidth: 3, lineStyle: 1 },
             ];
         }
-        
+
         return [
             { value: 1, label: 'Huerfanos', color: '#FF0000', lineWidth: 2, lineStyle: 1 },
             { value: 1.50, label: '', color: '#FFFFFF', lineWidth: 3, lineStyle: 1 },
