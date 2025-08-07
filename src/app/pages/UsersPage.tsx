@@ -86,7 +86,6 @@ const UsersPage: React.FC = () => {
     }, [searchParams]);
 
     const users: TransformedUser[] = data?.GetUsers?.Users?.map((user: UserFromAPI): TransformedUser => {
-     
 
         const mapPaymentStatus = (status: string): 'Por verificar' | 'Rechazado' | 'Verificado' | '' => {
             switch (status?.toLowerCase()) {
@@ -128,10 +127,10 @@ const UsersPage: React.FC = () => {
 
     const handlePaymentStatusChange = (value: string) => {
         setPaymentStatusFilter(value);
-        resetToFirstPage(); 
+        resetToFirstPage();
     };
 
-  
+
     useEffect(() => {
         resetToFirstPage();
     }, [nameFilter, emailFilter]);
