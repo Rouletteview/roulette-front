@@ -21,6 +21,7 @@ const HomePage = () => {
   });
   const { data: subscriptionData, loading: getCurrentUserSubscriptionLoading } = useQuery(GET_CURRENT_USER_SUBSCRIPTION_QUERY);
   const { data: userData, loading: userDataLoading } = useUserInfo();
+  console.log(subscriptionData)
 
   const isAdmin = userData?.GetUserInfo.IsAdmin
   const hasLoggedIn = userData?.GetUserInfo.LastLogin
@@ -28,6 +29,7 @@ const HomePage = () => {
 
 
   const payments = subscriptionData?.GetCurrentUserSubscription.Payments
+  console.log(payments)
   if (loading || getCurrentUserSubscriptionLoading || userDataLoading) return <LoadingOverlay />
 
 

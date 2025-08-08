@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Modal } from 'antd';
 import { useMutation } from '@apollo/client';
 import CloseModal from '../../assets/icon/close-info-modal.svg'
+import viewIcon from '../../assets/icon/view-icon.svg';
 import { GET_USER } from '../../graphql/query/users/getUser';
 import { useQuery } from '@apollo/client';
 import { useSearchParams } from 'react-router';
 import PaymentHistoryModal from './PaymentHistoryModal';
+import PaymentReceiptModal from './PaymentReceiptModal';
 import PaymentRejectionModal from './Modal/PaymentRejectionModal';
 import UserActionModal from './Modal/UserActionModal';
 import { UPDATE_PAYMENTS_STATUS_MUTATION } from '../../graphql/mutations/subscription/updatePaymentsStatus';
@@ -20,8 +22,10 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ isVisible, onClose 
     const [searchParams] = useSearchParams();
     const userId = searchParams.get('userId');
     const [isPaymentHistoryVisible, setIsPaymentHistoryVisible] = useState(false);
+    const [isReceiptModalVisible, setIsReceiptModalVisible] = useState(false);
     const [isRejectionModalVisible, setIsRejectionModalVisible] = useState(false);
     const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+    const [selectedPaymentReference, setSelectedPaymentReference] = useState<string>('');
 
     const [updatePaymentStatus] = useMutation(UPDATE_PAYMENTS_STATUS_MUTATION);
     const [updateUserStatus] = useMutation(UPDATE_USER_ACTIVATE_STATUS_MUTATION);
@@ -110,6 +114,19 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ isVisible, onClose 
 
     const handleClosePaymentHistory = () => {
         setIsPaymentHistoryVisible(false);
+    };
+
+    const handleViewReceipt = () => {
+        const payment = user?.Subscription?.Payments?.[0];
+        if (payment?.PaymentMethod === 'Crypto' && payment?.PhotoUrl) {
+            setSelectedPaymentReference(payment.PhotoUrl);
+            setIsReceiptModalVisible(true);
+        }
+    };
+
+    const handleCloseReceiptModal = () => {
+        setIsReceiptModalVisible(false);
+        setSelectedPaymentReference('');
     };
 
 
@@ -320,12 +337,24 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ isVisible, onClose 
                                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                                     Numero de referencia
                                                 </label>
-                                                <input
-                                                    type="text"
-                                                    value={user?.Subscription?.Payments?.[0]?.Reference || ''}
-                                                    readOnly
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 bg-gray-50"
-                                                />
+                                                {user?.Subscription?.Payments?.[0]?.PaymentMethod === 'Crypto' ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-sm font-medium text-gray-700">USDT</span>
+                                                        <button
+                                                            onClick={handleViewReceipt}
+                                                            className="cursor-pointer"
+                                                        >
+                                                            <img src={viewIcon} alt="view" className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <input
+                                                        type="text"
+                                                        value={user?.Subscription?.Payments?.[0]?.Reference || ''}
+                                                        readOnly
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 bg-gray-50"
+                                                    />
+                                                )}
                                             </div>
                                         )}
 
@@ -369,6 +398,12 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ isVisible, onClose 
                 onSubmit={handleSubmitRejection}
                 paymentId={user?.Subscription?.Payments?.[0]?.Id || ''}
                 subscriptionId={user?.Subscription?.Id || ''}
+            />
+
+            <PaymentReceiptModal
+                isVisible={isReceiptModalVisible}
+                onClose={handleCloseReceiptModal}
+                paymentReference={selectedPaymentReference}
             />
 
             <UserActionModal
