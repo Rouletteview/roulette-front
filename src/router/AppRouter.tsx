@@ -15,6 +15,7 @@ import HistoryPage from "../app/pages/HistoryPage";
 import SubscriptionPage from '../app/pages/SubscriptionPage';
 import UsersPage from '../app/pages/UsersPage';
 import AdminRoute from '../app/components/AdminRoute';
+import PremiumRoute from '../app/components/PremiumRoute';
 import { useMutation } from "@apollo/client";
 import { ACTIVATE_USER } from "../graphql/mutations/auth/activateUser";
 import { getGraphQLErrorMessage } from "../utils/errorMessages";
@@ -44,7 +45,7 @@ const ActivateUserRedirect = () => {
       };
       activate();
     }
-  }, [token, navigate]);
+  }, [token, navigate, ActivateUser]);
 
   return null;
 };
@@ -75,7 +76,14 @@ const AppRouter = () => {
         path="/home"
         element={isAuthenticated ? <HomePage /> : <Navigate to="/iniciar-sesion" />}
       />
-      <Route path="/historial" element={<HistoryPage />} />
+      <Route
+        path="/historial"
+        element={
+          <PremiumRoute>
+            <HistoryPage />
+          </PremiumRoute>
+        }
+      />
 
       {/* Admin routes */}
       <Route

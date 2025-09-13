@@ -8,6 +8,8 @@ export const ERROR_MESSAGES = {
     SUBSCRIPTION_NOT_FOUND: "Suscripción no encontrada",
     BET_NOT_FOUND: "Apuesta no encontrada",
     USER_ALREADY_SUBSCRIBED: "El usuario ya tiene una suscripción",
+    FREE_TIER_BETTING_NOT_ALLOWED: "Las apuestas no están permitidas para suscripciones de nivel gratuito",
+    FREE_TIER_TABLE_ACCESS_DENIED: "Acceso denegado: la suscripción de nivel gratuito solo permite acceso a mesa seleccionada",
 
     // Probability Service Errors
     UNSUPPORTED_STRATEGY: "Estrategia no soportada",

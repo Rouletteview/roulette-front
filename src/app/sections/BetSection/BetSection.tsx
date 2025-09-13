@@ -11,6 +11,7 @@ import { showWinToast, showLoseToast, showInfoToast } from '../../components/Toa
 import StraightUpButton from "../../components/bet/StraightUpBetButton";
 import { GameType } from "../../../graphql/generated/types";
 import { chartTypes } from "../../../types/types";
+// import { useSubscription } from "../../../hooks/useSubscription";
 
 interface BetData {
   id: string;
@@ -35,6 +36,7 @@ interface Props {
 const BetSection: React.FC<Props> = ({ gameType, probabilities, tableId }) => {
 
   const [searchParams] = useSearchParams();
+  // const { canBet, isFreeTrial } = useSubscription();
   const selectedTable = searchParams.get('table') || '';
   const gameTypeParams = searchParams.get('chartZone') as GameType;
   const chartTypeParams = searchParams.get('chartType') as chartTypes;
@@ -65,7 +67,7 @@ const BetSection: React.FC<Props> = ({ gameType, probabilities, tableId }) => {
     try {
       betIdsArray = JSON.parse(betIdsFromStorage);
     } catch {
-    
+
       if (betIdsFromStorage) {
         betIdsArray = [betIdsFromStorage];
       }
@@ -85,7 +87,7 @@ const BetSection: React.FC<Props> = ({ gameType, probabilities, tableId }) => {
         const value = bet.value;
         const betId = bet.id;
 
-      
+
         if (processedBetsRef.current.has(betId)) {
           return;
         }
@@ -110,7 +112,7 @@ const BetSection: React.FC<Props> = ({ gameType, probabilities, tableId }) => {
         }
       });
 
-    
+
       if (completedBets.length > 0) {
         const remainingBets = betIdsArray.filter(id => !completedBets.includes(id));
         if (remainingBets.length > 0) {
@@ -122,7 +124,7 @@ const BetSection: React.FC<Props> = ({ gameType, probabilities, tableId }) => {
     }
   }, [countdown, betData, setBetResult]);
 
- 
+
   useEffect(() => {
     if (countdown === 29) {
       clearActiveBets();

@@ -292,8 +292,8 @@ export const StraightUpButtons = ({ probabilities, handleToggle }: { probabiliti
                 return (
                     <div key={item.number} className="">
                         <div className="flex flex-col items-center justify-center">
-                            <p className="text-xs text-white" key={item.number}>{item.straightUpPercentage}%</p>
-                            <button onClick={() => handleToggle(String(item.number))} key={item.number} className={`cursor-pointer w-8 h-8 lg:w-7 lg:h-7 rounded-full border-3 flex items-center justify-center font-medium text-white text-[10px] md:text-xs ${colorClasses[numberData?.color || 'black']}`}>{item.number} </button>
+                            <p className="text-xs text-white">{item.straightUpPercentage}%</p>
+                            <button onClick={() => handleToggle(String(item.number))} className={`cursor-pointer w-8 h-8 lg:w-7 lg:h-7 rounded-full border-3 flex items-center justify-center font-medium text-white text-[10px] md:text-xs ${colorClasses[numberData?.color || 'black']}`}>{item.number} </button>
                         </div>
                     </div>
                 );

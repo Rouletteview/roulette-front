@@ -13,15 +13,12 @@ import Update from '../../components/Update';
 import { FullscreenChartModal } from './components/FullscreenChartModal';
 import BetSection from '../BetSection/BetSection';
 import { useBetStatusStore } from '../../../stores/betStatusStore';
+import { useSubscription } from '../../../hooks/useSubscription';
 import LostBet from '../../components/bet/LostBet';
 import SuccessBet from '../../components/bet/SuccessBet';
 import PlacedBet from '../../components/bet/PlacedBet';
 import { Query } from '../../../graphql/generated/types';
 import SliderComponent from '../../components/slider/Slider';
-import { useIsAdmin } from '../../../hooks/useIsAdmin';
-
-
-
 
 
 
@@ -45,23 +42,19 @@ function useContainerWidth() {
     return [ref, width] as const;
 }
 
-const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, handleStartFreeSubscription: () => void }> = ({ subscriptionData, handleStartFreeSubscription }) => {
-
-    console.log(subscriptionData)
+const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined }> = ({ subscriptionData }) => {
 
     const freeSubscription = subscriptionData?.GetCurrentUserSubscription?.Payments
-    console.log(freeSubscription)
-
     const endFreeDate = subscriptionData?.GetCurrentUserSubscription?.EndDate
-
+    const { canAccessMultipleTables, isFreeTrial } = useSubscription();
 
     useQueryParamsCleanup();
 
     const { betResult } = useBetStatusStore();
 
-    const { isAdmin } = useIsAdmin();
+    // const { isAdmin } = useIsAdmin();
 
-    const isBlocked = !subscriptionData?.GetCurrentUserSubscription && !isAdmin;
+    // const isBlocked = !subscriptionData?.GetCurrentUserSubscription && !isAdmin;
 
 
     const {
@@ -91,9 +84,7 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
         state.marketPage
     );
 
-    console.log(chartFormattedData)
 
-    console.log(formattedNumbers)
 
     const {
         handleChartReady,
@@ -111,7 +102,18 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
                 handleTableChange(state.selectedTable, tableOption.label);
             }
         }
-    }, [tableOptions, state.selectedTable, state.selectedTableLabel]);
+    }, [tableOptions, state.selectedTable, state.selectedTableLabel, handleTableChange]);
+
+
+    useEffect(() => {
+        if (isFreeTrial && !canAccessMultipleTables && tableOptions.length > 0) {
+            const firstTable = tableOptions[0];
+
+            if (!state.selectedTable || state.selectedTable !== firstTable.value) {
+                handleTableChange(firstTable.value, firstTable.label);
+            }
+        }
+    }, [isFreeTrial, canAccessMultipleTables, tableOptions, state.selectedTable, handleTableChange]);
 
     const onZoomIn = () => handleZoomIn(state.selectedType);
     const onZoomOut = () => handleZoomOut(state.selectedType);
@@ -122,7 +124,7 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
 
         <section className="bg-[#121418F2] py-6 lg:pt-10 lg:pb-6 px-6 lg:px-24 relative">
             {/* <BetModal open={isOpen} onClose={() => setIsOpen(false)} /> */}
-            {freeSubscription?.length === 0 && (
+            {/* {freeSubscription?.length === 0 && (
                 <div className="flex justify-end w-full">
                     <div className="bg-[#121418F2] border-2 border-black px-6 py-2 rounded-2xl lg:hidden block mb-2">
 
@@ -134,7 +136,7 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
                     </div>
                 </div>
 
-            )}
+            )} */}
 
             {/* header */}
             <ChartHeader
@@ -146,14 +148,14 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
 
 
             <div className="relative">
-                {isBlocked && (
+                {/* {isBlocked && (
                     <div className="absolute inset-0 z-[999999] flex items-center justify-center bg-[#121418CC] pointer-events-auto">
                         <div className='max-w-[900px] w-full'>
                             <h1 className='font-bold text-white text-[20px] md:text-[40px] text-center font-sans'>Para disfrutar de Roulettes View accede a  nuestros <a href='/subscription' className='text-[#D9A425] underline'>planes de suscripción</a> o <span onClick={handleStartFreeSubscription} className='text-[#D9A425] underline cursor-pointer'>activa tu prueba gratuita</span></h1>
                         </div>
 
                     </div>
-                )}
+                )} */}
                 <section className="my-10">
                     <div className="flex flex-col gap-9 lg:gap-2">
                         <ChartStatus
@@ -235,11 +237,15 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
                                                 <SliderComponent />
                                             </div>
 
-                                            <BetSection
-                                                tableId={state.selectedTable}
-                                                gameType={state.gameType}
-                                                probabilities={probabilities}
-                                            />
+                                            {
+                                                canAccessMultipleTables && (
+                                                    <BetSection
+                                                        tableId={state.selectedTable}
+                                                        gameType={state.gameType}
+                                                        probabilities={probabilities}
+                                                    />
+                                                )
+                                            }
                                         </div>
 
                                         <NumbersDisplay
@@ -257,11 +263,17 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
                                 </div>
                                 <div className="hidden lg:flex">
 
-                                    <BetSection
-                                        tableId={state.selectedTable}
-                                        gameType={state.gameType}
-                                        probabilities={probabilities}
-                                    />
+
+                                    {
+                                        canAccessMultipleTables && (
+                                            <BetSection
+                                                tableId={state.selectedTable}
+                                                gameType={state.gameType}
+                                                probabilities={probabilities}
+                                            />
+                                        )
+                                    }
+
                                 </div>
                             </div>
 
@@ -286,6 +298,7 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined, han
                         />
                     )}
                 </div>
+
                 <ChartRenderer
                     selectedType={state.selectedType}
                     gameType={state.gameType}

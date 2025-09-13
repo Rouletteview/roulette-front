@@ -10,7 +10,7 @@ interface Props {
 export const useBetData = ({ rouletteTableId, amount, gameType, value }: Props) => {
 
 
-    const [createBet, { data, loading: createBetLoading, error: createBetError }] = useMutation(CREATE_BET_MUTATION, {
+    const [createBet, { loading: createBetLoading, error: createBetError }] = useMutation(CREATE_BET_MUTATION, {
         variables: {
             input: {
                 rouletteTableId: rouletteTableId,
@@ -21,7 +21,7 @@ export const useBetData = ({ rouletteTableId, amount, gameType, value }: Props) 
         }
     });
 
-    console.log(data);
+
 
     return {
         createBet,

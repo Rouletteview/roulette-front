@@ -40,6 +40,7 @@ interface CustomDropdownProps {
     bgPagination?: string;
     textPagination?: string;
     borderPagination?: string;
+    disabled?: boolean;
 }
 
 const CustomDropdown: React.FC<CustomDropdownProps> = ({
@@ -73,6 +74,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
     bgPagination = 'bg-[#181818]',
     textPagination = 'text-[#D9A425]',
     borderPagination = 'border-[#333]',
+    disabled = false,
 }) => {
     const [open, setOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -104,11 +106,12 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
             {label && <span className="block mb-1 text-xs sm:text-sm md:text-base text-white font-medium">{label}</span>}
             <button
                 type="button"
-                className={`w-full flex justify-between items-center text-xs sm:text-sm md:text-base ${bgButton} border-2 ${borderButton} rounded-lg px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-left ${textColor} font-medium focus:outline-none focus:ring-2 focus:ring-[#D9A425] transition`}
-                onClick={() => setOpen((prev) => !prev)}
-                onKeyDown={handleKeyDown}
+                className={`w-full flex justify-between items-center text-xs sm:text-sm md:text-base ${bgButton} border-2 ${borderButton} rounded-lg px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-left ${textColor} font-medium focus:outline-none focus:ring-2 focus:ring-[#D9A425] transition ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                onClick={() => !disabled && setOpen((prev) => !prev)}
+                onKeyDown={disabled ? undefined : handleKeyDown}
                 aria-haspopup="listbox"
                 aria-expanded={open}
+                disabled={disabled}
             >
                 <span className="truncate">{selectedOption ? selectedOption.label : defaultLabel}</span>
                 <svg className={`ml-1 sm:ml-2 w-3 h-3 sm:w-4 sm:h-4 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -169,7 +172,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
                             )}
                         </ul>
                     </div>
-                   
+
                     {paginated && (
                         <div className={`flex items-center justify-center gap-2 sm:gap-4 px-2 sm:px-3 md:px-4 pb-2 w-full border-t ${borderPagination}`}>
                             <button
@@ -183,7 +186,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
                                 type="button"
                                 aria-label="Anterior"
                             >
-                                
+
                                 <svg width="20" height="20" className="sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M15 19L8 12L15 5" stroke="#D9A425" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
@@ -202,7 +205,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
                                 type="button"
                                 aria-label="Siguiente"
                             >
-                               
+
                                 <svg width="20" height="20" className="sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M9 5L16 12L9 19" stroke="#D9A425" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
