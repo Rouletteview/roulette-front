@@ -11,6 +11,7 @@ import userIcon from '../../assets/icon/user-icon.svg'
 // import notiIcon from '../../assets/icon/notification-icon.svg'
 import { useAuthStore } from '../../stores/authStore';
 import { useUserInfo } from '../../hooks/useUserInfo';
+import { useSubscription } from '../../hooks/useSubscription';
 
 
 
@@ -21,13 +22,14 @@ const NavBar = () => {
     const logout = useAuthStore((state) => state.logout);
     const isBlankPage = location.pathname === '/subscription' || location.pathname === '/usuarios';
     const { data: userInfo } = useUserInfo();
+    const { canViewHistory } = useSubscription();
     const isAdmin = userInfo?.GetUserInfo?.IsAdmin || false;
 
     const allNavLinks = [
         { name: "Inicio", path: "/home", icon: homeIcon },
         // { name: "Probar Gráficos", path: "/graficos", icon: chartIcon },
         { name: "Subscripción", path: "/subscription", icon: subIcon },
-        { name: "Historial", path: "/historial", icon: historyIcon },
+        ...(canViewHistory ? [{ name: "Historial", path: "/historial", icon: historyIcon }] : []),
         // { name: "Notificaciones", path: "/notificaciones", icon: notiIcon },
     ];
 

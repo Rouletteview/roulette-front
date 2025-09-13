@@ -25,7 +25,7 @@ const errorLink = onError(({ graphQLErrors }) => {
   if (graphQLErrors) {
     for (const err of graphQLErrors) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if ((err as any).code === "UNAUTHORIZED_ERROR") {
+      if ((err as any).message === "UNAUTHORIZED_ERROR") {
         const { logout } = useAuthStore.getState();
         logout();
         window.location.replace("/iniciar-sesion");

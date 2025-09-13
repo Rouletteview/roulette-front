@@ -37,7 +37,11 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ isVisible, onClose 
         skip: !userId
     })
 
+
+
     const user = data?.GetUser;
+
+    console.log(user);
 
 
     const handleApprovePayment = async () => {
@@ -230,6 +234,18 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ isVisible, onClose 
                                         <input
                                             type="email"
                                             value={user?.Email || ''}
+                                            readOnly
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 bg-gray-50"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Numero de telefono
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={user?.PhoneNumber || ''}
                                             readOnly
                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 bg-gray-50"
                                         />

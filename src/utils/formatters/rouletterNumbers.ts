@@ -75,6 +75,14 @@ export const translateRouletteTag = (tag: string): string => {
         'Weekly': ' Semanal',
         'Monthly': ' Mensual',
         'Annual': ' Anual',
+
+        'RedAndBlack': 'Rojo y negro',
+        'OddAndEven': 'Par e impar',
+        'HighAndLow': 'Bajo y alto',
+        'Dozen': 'Docena',
+        'Column': 'Columna',
+        'StraightUp': 'Pleno',
+        
         'default': tag
     };
 

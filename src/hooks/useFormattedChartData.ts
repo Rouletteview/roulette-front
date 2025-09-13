@@ -39,6 +39,8 @@ export const useFormattedChartData = ({
   gameType?: GameType;
 }): MultiSeries[] => {
 
+  console.log('data', data)
+
 
 
   const formatted = useMemo(() => {

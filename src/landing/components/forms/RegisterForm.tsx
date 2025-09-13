@@ -1,21 +1,17 @@
 import { useForm } from "react-hook-form"
-
 import { zodResolver } from "@hookform/resolvers/zod"
-
 import Input from "./Input";
-
 import arrowIcon from "../../../assets/icon/arrow-down-white.svg"
 import { useState } from "react";
 import { useNavigate } from "react-router";
-
 import eyeOff from '../../../assets/icon/eye-off.svg'
-
-
 import LoadingOverlay from "../../../components/LoadingOverlay";
 import { useRegister } from "../../../hooks/useRegister";
 import { useCountries } from "../../../hooks/useCountries";
 import { RegisterFormData, registerSchema } from "../../schemas/registerSchema";
 import { getGraphQLErrorMessage } from "../../../utils/errorMessages";
+import { START_FREE_SUBSCRIPTION_MUTATION } from "../../../graphql/mutations/subscription/startFreeSubscription";
+import { useMutation } from "@apollo/client";
 
 
 
@@ -42,6 +38,8 @@ const RegisterForm = () => {
     const { registerUser, loading } = useRegister();
     const { data } = useCountries();
 
+    const [startFreeSubscription] = useMutation(START_FREE_SUBSCRIPTION_MUTATION);
+
 
 
 
@@ -53,12 +51,10 @@ const RegisterForm = () => {
     const onSubmit = async (data: RegisterFormData) => {
 
         try {
-
             const [day, month, year] = data.birthDate.split("-");
             const birthDate = new Date(`${year}-${month}-${day}`);
 
             if (isNaN(birthDate.getTime())) throw new Error("Fecha inválida");
-
             const phoneNumber = data.countryCode + data.phone;
 
 
@@ -75,6 +71,7 @@ const RegisterForm = () => {
                 },
             });
 
+            await startFreeSubscription();
 
             navigate("/confirmar-correo", { state: { message: "Email confirmado con éxito", ok: true } });
 

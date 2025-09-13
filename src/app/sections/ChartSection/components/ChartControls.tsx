@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import CustomDropdown from '../../../components/CustomDropdown';
 import HistoryIcon from '../../../components/icon/HistoryIcon';
 import { ChartType } from '../../../../types/chart/types';
 import { GameType } from '../../../../hooks/useFormattedChartData';
 import { selectChartTypes, selectChartZoneTypes } from '../../../../types/chart/types';
 import { Payment } from '../../../../graphql/generated/types';
+import HistoryModal from '../../../components/Modal/HistoryModal';
+import { useSubscription } from '../../../../hooks/useSubscription';
 
 interface ChartControlsProps {
     selectedType: ChartType | '';
@@ -40,9 +42,11 @@ export const ChartControls: React.FC<ChartControlsProps> = ({
     onTableChange,
     onMarketSearch,
     onMarketPageChange,
-    freeSubscription,
-    endFreeDate,
+    // freeSubscription,
+    // endFreeDate,
 }) => {
+    const [showHistoryModal, setShowHistoryModal] = useState(false);
+    const { canAccessMultipleTables, canViewHistory } = useSubscription();
     const chartTypeOptions = selectChartTypes.map(type => ({
         label: type.label,
         value: type.type,
@@ -77,39 +81,50 @@ export const ChartControls: React.FC<ChartControlsProps> = ({
 
                     <CustomDropdown
                         defaultLabel="Mercado a operar"
-                        paginated
-                        searchable
-                        options={tableOptions}
+                        paginated={canAccessMultipleTables}
+                        searchable={canAccessMultipleTables}
+                        options={canAccessMultipleTables ? tableOptions : (tableOptions.length > 0 ? [tableOptions[0]] : [])}
                         value={selectedTable}
-                        onChange={onTableChange}
+                        onChange={canAccessMultipleTables ? onTableChange : () => { }}
                         searchQuery={marketSearch}
-                        onSearchQueryChange={onMarketSearch}
+                        onSearchQueryChange={canAccessMultipleTables ? onMarketSearch : () => { }}
                         page={marketPage}
-                        onPageChange={onMarketPageChange}
+                        onPageChange={canAccessMultipleTables ? onMarketPageChange : () => { }}
                         hasNextPage={marketHasNextPage}
                         hasPrevPage={marketHasPrevPage}
                         loading={marketLoading}
+                        disabled={!canAccessMultipleTables}
                         className="mr-2"
                     />
 
-                    <div className="ml-4">
-                        <a href="/historial" className="flex items-baseline gap-x-1.5">
-                            <HistoryIcon />
-                            <span className="text-white text-sm font-medium underline underline-offset-1">
-                                ver historial
-                            </span>
-                        </a>
-                    </div>
+                    {canViewHistory && (
+                        <div className="ml-4">
+                            <button
+                                onClick={() => setShowHistoryModal(true)}
+                                className="flex items-baseline gap-x-1.5 hover:opacity-80 transition-opacity cursor-pointer"
+                            >
+                                <HistoryIcon />
+                                <span className="text-white text-sm font-medium underline underline-offset-1">
+                                    ver historial
+                                </span>
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 
-            {Array.isArray(freeSubscription) && freeSubscription.length === 0 && (
+            {/* {Array.isArray(freeSubscription) && freeSubscription.length === 0 && (
                 <div className="bg-[#121418F2] border-2 border-black px-6 py-2 rounded-2xl hidden lg:block">
                     <h1 className="text-white text-lg font-medium">
                         Tu periodo de prueba termina el: <span className="text-[#D9A425]">{endFreeDate}</span>
                     </h1>
                 </div>
-            )}
+            )} */}
+
+            <HistoryModal
+                open={showHistoryModal}
+                onClose={() => setShowHistoryModal(false)}
+            />
         </div>
     );
 }; 

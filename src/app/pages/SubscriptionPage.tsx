@@ -18,11 +18,11 @@ const SubscriptionPage: React.FC = () => {
     const price = searchParams.get('price');
     const { data: subscriptionData, loading: getCurrentUserSubscriptionLoading } = useQuery(GET_CURRENT_USER_SUBSCRIPTION_QUERY);
 
- 
+
 
     const subscriptionsStatus = subscriptionData?.GetCurrentUserSubscription.Payments.status
- 
-   
+
+
     const priceToPlan: Record<string, string> = {
         "1.5": "Daily",
         "3.0": "Weekly",
@@ -60,17 +60,17 @@ const SubscriptionPage: React.FC = () => {
     ];
 
 
-    if(getCurrentUserSubscriptionLoading) return <LoadingOverlay />
+    if (getCurrentUserSubscriptionLoading) return <LoadingOverlay />
 
     return (
         <AppLayout>
             <HeroSection className=' lg:px-20' heroBackground={false} backgroundColor='#FFF'>
                 <div className='px-4 lg:px-0'>
                     <div className='flex items-center gap-2'>
-                    <h1 className="text-xl lg:text-3xl text-[#121418F2] font-bold mb-2">Métodos de pago <span className='text-sm lg:text-xl font-semibold'>{step === 2 ? '| Transferencia bancaria' : ''}</span></h1>
-                   {subscriptionsStatus === 'pending' && <span className='text-sm text-[#F0B700] lg:text-[12px] font-semibold bg-[#414041] px-2 py-1 rounded-full'>Tu pago aún esta siendo procesado</span>}
+                        <h1 className="text-xl lg:text-3xl text-[#121418F2] font-bold mb-2">Métodos de pago <span className='text-sm lg:text-xl font-semibold'>{step === 2 ? '| Transferencia bancaria' : ''}</span></h1>
+                        {subscriptionsStatus === 'pending' && <span className='text-sm text-[#F0B700] lg:text-[12px] font-semibold bg-[#414041] px-2 py-1 rounded-full'>Tu pago aún esta siendo procesado</span>}
                     </div>
-                   
+
                     <div className="flex gap-4  text-green-600 text-sm">
                         <span>✓ Transacciones seguras con nosotros</span>
                         <span>✓ Protegemos tus datos personales</span>

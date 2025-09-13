@@ -1,8 +1,8 @@
 
-import { useMutation } from "@apollo/client";
+// import { useMutation } from "@apollo/client";
 import PriceCard from "../../../../components/pre-footer/PriceCard"
-import { START_FREE_SUBSCRIPTION_MUTATION } from "../../../../graphql/mutations/subscription/startFreeSubscription";
-import { showErrorToast } from "../../Toast";
+// import { START_FREE_SUBSCRIPTION_MUTATION } from "../../../../graphql/mutations/subscription/startFreeSubscription";
+// import { showErrorToast } from "../../Toast";
 
 
 const pricingData = [
@@ -36,16 +36,16 @@ const pricingData = [
 
 const PricingContent = () => {
 
-    const [startFreeSubscription, { loading }] = useMutation(START_FREE_SUBSCRIPTION_MUTATION);
+    // const [startFreeSubscription, { loading }] = useMutation(START_FREE_SUBSCRIPTION_MUTATION);
 
-    const handleStartFreeSubscription = async () => {
-        try {
-            await startFreeSubscription()
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (error: any) {
-            showErrorToast(error.message)
-        }
-    }
+    // const handleStartFreeSubscription = async () => {
+    //     try {
+    //         await startFreeSubscription()
+    //         // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //     } catch (error: any) {
+    //         showErrorToast(error.message)
+    //     }
+    // }
 
 
     return (
@@ -54,8 +54,8 @@ const PricingContent = () => {
                 <h3 className="text-xl md:text-3xl">Prueba nuestra plataforma</h3>
                 <span className="uppercase text-[#D9A425] text-[50px] font-extrabold">Gratis</span>
 
-                <h3 className="text-base md:text-[26px]">Por 7 días te <span className="text-[#D9A425]">regalamos acceso </span> para experimentar nuestros análisis en vivo</h3>
-                <button onClick={handleStartFreeSubscription} disabled={loading} className="bg-[#D9A425] hover:bg-[#B3831D] disabled:bg-[#4D4D51] disabled:cursor-not-allowed  transition-all w-[330px] md:w-[400px] text-lg font-bold rounded-[10px] py-3 cursor-pointer">Prueba gratuita</button>
+                <h3 className="text-base md:text-[26px] mb-12">Te <span className="text-[#D9A425]">regalamos acceso </span> para experimentar nuestros análisis en vivo en 1 ruleta</h3>
+                {/* <button onClick={handleStartFreeSubscription} disabled={loading} className="bg-[#D9A425] hover:bg-[#B3831D] disabled:bg-[#4D4D51] disabled:cursor-not-allowed  transition-all w-[330px] md:w-[400px] text-lg font-bold rounded-[10px] py-3 cursor-pointer">Prueba gratuita</button> */}
 
 
                 <div className="mt-10 flex flex-col gap-y-4">

@@ -19,7 +19,9 @@ query GetCurrentUserSubscription {
             Status
             PaymentMethod
             CreatedAt
+            ReviewComment
         }
+            FreeTrial
     }
 }
 

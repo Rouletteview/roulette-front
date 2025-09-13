@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import Pagination from "../components/Pagination";
 import { usePagination } from "../../hooks/usePagination";
 import HistorySkeleton from "../components/HistorySkeleton";
+import { translateRouletteTag } from "../../utils/formatters/rouletterNumbers";
 
 interface UserBet {
   id: string;
@@ -118,7 +119,7 @@ const HistoryPage = () => {
                       </td>
                       <td className="px-4 sm:px-4 md:px-8 py-2 sm:py-3 md:py-4">
                         <div className="font-medium">{bet.table.Name}</div>
-                        <div className="text-xs text-gray-400">{bet.gameType}</div>
+                        <div className="text-xs text-gray-400">{translateRouletteTag(bet.gameType)}</div>
                       </td>
                       <td className={`px-2 sm:px-4 md:px-8 py-2 sm:py-3 md:py-4 ${bet.status === 'Won' ? 'text-green-600' : bet.status === 'Lost' ? 'text-red-600' : 'text-gray-600'} font-light`}>
                         {bet.status === 'Won' ? '+' : bet.status === 'Lost' ? '-' : ''}${bet.amount}

@@ -117,6 +117,7 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
         value: betValue || ""
     });
 
+
     const { addActiveBet } = useBetStatusStore();
 
     if (!open) return null;
@@ -126,7 +127,7 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
             const response = await createBet();
             const betId = response.data.CreateBet.id;
 
-            // Agregar la apuesta al estado global si es Columna o Docena
+        
             if (gameType === 'Column' || gameType === 'Dozen') {
                 addActiveBet({
                     id: betId,
@@ -136,23 +137,23 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
                 });
             }
 
-            // Obtener el array actual de betIds del localStorage
+          
             const existingBetIds = localStorage.getItem('betId');
             let betIdsArray: string[] = [];
 
             if (existingBetIds) {
                 try {
                     betIdsArray = JSON.parse(existingBetIds);
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 } catch (error) {
-                    // Si no es un array válido, crear uno nuevo
                     betIdsArray = [];
                 }
             }
 
-            // Agregar el nuevo betId al array
+         
             betIdsArray.push(betId);
 
-            // Guardar el array actualizado en localStorage
+        
             localStorage.setItem('betId', JSON.stringify(betIdsArray));
 
             showPlacedToast(translateRouletteTag(betValue));
@@ -160,6 +161,7 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
             onClose();
         } catch (error) {
             const errorMessage = getGraphQLErrorMessage(error);
+            console.log(errorMessage);
             showErrorToast(errorMessage);
         }
     };
