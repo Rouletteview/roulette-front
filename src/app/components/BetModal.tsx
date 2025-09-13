@@ -144,6 +144,7 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
             if (existingBetIds) {
                 try {
                     betIdsArray = JSON.parse(existingBetIds);
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 } catch (error) {
                     betIdsArray = [];
                 }
