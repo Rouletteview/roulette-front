@@ -12,10 +12,10 @@ const faqs = [
         question: "¿La plataforma es apta para principiantes?",
         answer: "¡Por supuesto! Está diseñada para ser intuitiva y fácil de usar, sin importar tu nivel de experiencia",
     },
-    {
-        question: "¿Cómo puedo cancelar mi suscripción?",
-        answer: "Puedes hacerlo en cualquier momento desde la configuración de tu cuenta, sin complicaciones.",
-    },
+    // {
+    //     question: "¿Cómo puedo cancelar mi suscripción?",
+    //     answer: "Puedes hacerlo en cualquier momento desde la configuración de tu cuenta, sin complicaciones.",
+    // },
 ];
 
 
@@ -30,7 +30,7 @@ const FAQAccordion = () => {
         <div className="w-full mx-auto space-y-[25px] mt-9 leading-[20px] text-left">
             {faqs.map((faq, index) => (
                 <div key={index} className="bg-white text-black rounded-[20px] mx-8 lg:mx-72">
-                    {/* Botón de Pregunta */}
+            
                     <button
                         onClick={() => toggleFAQ(index)}
                         className={clsx(

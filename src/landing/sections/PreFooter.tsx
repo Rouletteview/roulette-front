@@ -3,7 +3,7 @@ import chartsIcon from "../../assets/icon/charts-icon.svg"
 import seo from "../../assets/icon/seo.svg"
 import chartIcon2 from "../../assets/icon/chart-icon2.svg"
 import HeroCard from "../../components/hero-section/HeroCard"
-import PriceCard from "../../components/pre-footer/PriceCard"
+// import PriceCard from "../../components/pre-footer/PriceCard"
 import QASection from "./QASection"
 
 
@@ -59,7 +59,7 @@ const PreFooter = () => {
                 </section>
 
 
-                <section className="flex flex-col gap-y-3 md:gap-y-14 text-center mt-8 sm:mt-12 lg:mt-16 mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl xl:max-w-7xl 2xl:max-w-8xl text-white">
+                {/* <section className="flex flex-col gap-y-3 md:gap-y-14 text-center mt-8 sm:mt-12 lg:mt-16 mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl xl:max-w-7xl 2xl:max-w-8xl text-white">
                 <section className="mt-10  md:mt-24 text-center text-white">
                         <h2 className="text-[26px] md:text-[50px] font-medium">Prueba nuestra plataforma </h2>
                         <h1 className="uppercase text-[#D9A425] text-[50px] md:text-7xl font-extrabold">Gratis</h1>
@@ -105,7 +105,7 @@ const PreFooter = () => {
                            
                         />
                     </div>
-                </section>
+                </section> */}
 
 
                 <QASection />
