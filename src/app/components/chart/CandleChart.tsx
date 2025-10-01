@@ -37,7 +37,7 @@ const CandleChart: React.FC<ChartProps> = ({
   const chartType = urlParams.get('chartType') || 'Candlestick';
   const selectedTable = urlParams.get('table') || '';
 
-  console.log('🔄 CandleChart - chartType:', chartType, 'gameType:', gameType, 'selectedTable:', selectedTable);
+  // console.log('🔄 CandleChart - chartType:', chartType, 'gameType:', gameType, 'selectedTable:', selectedTable);
 
   const { setChartRef, getInitialRange } = useChartPosition(chartType, gameType || '', selectedTable);
 

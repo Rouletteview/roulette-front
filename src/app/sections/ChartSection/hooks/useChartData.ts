@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useQuery, useSubscription } from '@apollo/client';
 import { useSearchParams } from 'react-router';
 import { GET_ROULETTE_TABLES } from '../../../../graphql/query/getRouletteTables';
 import { GET_ROULETTE_TABLES_PROBABILITIES } from '../../../../graphql/query/getRouletteTableProbabilities';
@@ -7,6 +7,7 @@ import { useFormattedChartData, GameType } from '../../../../hooks/useFormattedC
 import { useRouletteNumbers } from '../../../../utils/formatters/rouletterNumbers';
 import { chartTypes } from '../../../../types/types';
 import { ChartType } from '../../../../types/chart/types';
+import { ON_ROULETTE_NUMBER_UPDATE_SUBSCRIPTION } from '../../../../graphql/subscriptions/onRouletteNumberUpdate';
 
 interface RouletteTable {
     Id: string;
@@ -83,7 +84,17 @@ export const useChartData = (
         skip: !selectedTable,
     });
 
+    const { data: chartNumbersDataSubscription, error: errorSubscription } = useSubscription(ON_ROULETTE_NUMBER_UPDATE_SUBSCRIPTION, {
+        variables: {
+            gameType: gameType,
+            tableId: selectedTable || undefined,
+            probabilitiesResultLimit: probabilitiesResultLimit,
+        },
+        skip: !gameType || !selectedTable || !probabilitiesResultLimit,
+    });
 
+    console.log("chartNumbersDataSubscription", chartNumbersDataSubscription);
+    console.log("errorSubscription", errorSubscription)
 
 
 

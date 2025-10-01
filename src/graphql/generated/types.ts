@@ -237,6 +237,11 @@ export type MutationSendResetPasswordEmailArgs = {
 };
 
 
+export type MutationStartFreeSubscriptionArgs = {
+  input: StartFreeSubscriptionRequest;
+};
+
+
 export type MutationUpdatePaymentStatusArgs = {
   input: UpdatePaymentStatusRequest;
 };
@@ -394,6 +399,14 @@ export enum Role {
   User = 'USER'
 }
 
+export type RouletteNumberUpdate = {
+  __typename?: 'RouletteNumberUpdate';
+  Probabilities: Array<RouletteTableProbability>;
+  Result: RouletteTableResult;
+  TableId: Scalars['String']['output'];
+  Timestamp: Scalars['DateTime']['output'];
+};
+
 export type RouletteTable = {
   __typename?: 'RouletteTable';
   Id: Scalars['String']['output'];
@@ -426,6 +439,22 @@ export type RouletteTableResult = {
   Date: Scalars['DateTime']['output'];
   Number: Scalars['Int']['output'];
   Tag: Scalars['String']['output'];
+};
+
+export type StartFreeSubscriptionRequest = {
+  rouletteTableId: Scalars['String']['input'];
+};
+
+export type Subscription = {
+  __typename?: 'Subscription';
+  OnRouletteNumberUpdate: RouletteNumberUpdate;
+};
+
+
+export type SubscriptionOnRouletteNumberUpdateArgs = {
+  gameType: GameType;
+  probabilitiesResultLimit?: InputMaybe<Scalars['Int']['input']>;
+  tableId?: InputMaybe<Scalars['String']['input']>;
 };
 
 export enum SubscriptionFrequency {
@@ -487,6 +516,7 @@ export type UserSubscription = {
   CreatedAt: Scalars['DateTime']['output'];
   EndDate: Scalars['DateTime']['output'];
   FreeTrial: Scalars['Boolean']['output'];
+  FreeTrialTableId?: Maybe<Scalars['String']['output']>;
   Frequency: SubscriptionFrequency;
   Id: Scalars['String']['output'];
   IsActive: Scalars['Boolean']['output'];
@@ -513,4 +543,4 @@ export type GetUsersQueryVariables = Exact<{
 }>;
 
 
-export type GetUsersQuery = { __typename?: 'Query', GetUsers: { __typename?: 'GetUsersResponse', Users: Array<{ __typename?: 'User', Id: string, Name: string, Email: string, Country: string, BirthDate: any, PhoneNumber: string, Subscription?: { __typename?: 'UserSubscription', Id: string, UserId: string, IsActive: boolean, Frequency: SubscriptionFrequency, EndDate: any, StartDate: any, LastPay?: any | null, CreatedAt: any, Payments: Array<{ __typename?: 'Payment', Id: string, PhotoUrl: string, Reference: string, Status: PaymentStatus, PaymentMethod: PaymentMethod, CreatedAt: any }> } | null }> } };
+export type GetUsersQuery = { __typename?: 'Query', GetUsers: { __typename?: 'GetUsersResponse', Users: Array<{ __typename?: 'User', Id: string, Name: string, Email: string, Country: string, BirthDate: any, PhoneNumber: string, IsActive: boolean, Subscription?: { __typename?: 'UserSubscription', Id: string, UserId: string, IsActive: boolean, Frequency: SubscriptionFrequency, EndDate: any, StartDate: any, LastPay?: any | null, CreatedAt: any, Payments: Array<{ __typename?: 'Payment', Id: string, PhotoUrl: string, Reference: string, Status: PaymentStatus, PaymentMethod: PaymentMethod, CreatedAt: any }> } | null }> } };
