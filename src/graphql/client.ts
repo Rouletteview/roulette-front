@@ -1,3 +1,13 @@
+<<<<<<< HEAD
+import { ApolloClient, InMemoryCache, HttpLink, split } from "@apollo/client";
+import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
+import { createClient as createWsClient } from "graphql-ws";
+import { getMainDefinition } from "@apollo/client/utilities";
+import { setContext } from "@apollo/client/link/context";
+import { useAuthStore } from "../stores/authStore";
+import { onError } from "@apollo/client/link/error";
+
+=======
 import { ApolloClient, InMemoryCache, split } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { useAuthStore } from "../stores/authStore";
