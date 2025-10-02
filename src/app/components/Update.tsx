@@ -37,7 +37,7 @@ const Update = ({ selectedType, gameType, selectedTable, loading }: UpdateProps)
 
     if (countdown === 0) {
       window.dispatchEvent(new CustomEvent('saveChartPosition'));
-      window.location.reload();
+      // window.location.reload();
     }
 
     const timer = setInterval(() => {

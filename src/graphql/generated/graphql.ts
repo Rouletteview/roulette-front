@@ -241,6 +241,11 @@ export type MutationSendResetPasswordEmailArgs = {
 };
 
 
+export type MutationStartFreeSubscriptionArgs = {
+  input: StartFreeSubscriptionRequest;
+};
+
+
 export type MutationUpdatePaymentStatusArgs = {
   input: UpdatePaymentStatusRequest;
 };
@@ -398,6 +403,14 @@ export enum Role {
   User = 'USER'
 }
 
+export type RouletteNumberUpdate = {
+  __typename?: 'RouletteNumberUpdate';
+  Probabilities: Array<RouletteTableProbability>;
+  Result: RouletteTableResult;
+  TableId: Scalars['String']['output'];
+  Timestamp: Scalars['DateTime']['output'];
+};
+
 export type RouletteTable = {
   __typename?: 'RouletteTable';
   Id: Scalars['String']['output'];
@@ -430,6 +443,22 @@ export type RouletteTableResult = {
   Date: Scalars['DateTime']['output'];
   Number: Scalars['Int']['output'];
   Tag: Scalars['String']['output'];
+};
+
+export type StartFreeSubscriptionRequest = {
+  rouletteTableId: Scalars['String']['input'];
+};
+
+export type Subscription = {
+  __typename?: 'Subscription';
+  OnRouletteNumberUpdate: RouletteNumberUpdate;
+};
+
+
+export type SubscriptionOnRouletteNumberUpdateArgs = {
+  gameType: GameType;
+  probabilitiesResultLimit?: InputMaybe<Scalars['Int']['input']>;
+  tableId?: InputMaybe<Scalars['String']['input']>;
 };
 
 export enum SubscriptionFrequency {
@@ -491,6 +520,7 @@ export type UserSubscription = {
   CreatedAt: Scalars['DateTime']['output'];
   EndDate: Scalars['DateTime']['output'];
   FreeTrial: Scalars['Boolean']['output'];
+  FreeTrialTableId?: Maybe<Scalars['String']['output']>;
   Frequency: SubscriptionFrequency;
   Id: Scalars['String']['output'];
   IsActive: Scalars['Boolean']['output'];
@@ -517,7 +547,7 @@ export type GetUsersQueryVariables = Exact<{
 }>;
 
 
-export type GetUsersQuery = { __typename?: 'Query', GetUsers: { __typename?: 'GetUsersResponse', Users: Array<{ __typename?: 'User', Id: string, Name: string, Email: string, Country: string, BirthDate: any, PhoneNumber: string, Subscription?: { __typename?: 'UserSubscription', Id: string, UserId: string, IsActive: boolean, Frequency: SubscriptionFrequency, EndDate: any, StartDate: any, LastPay?: any | null, CreatedAt: any, Payments: Array<{ __typename?: 'Payment', Id: string, PhotoUrl: string, Reference: string, Status: PaymentStatus, PaymentMethod: PaymentMethod, CreatedAt: any }> } | null }> } };
+export type GetUsersQuery = { __typename?: 'Query', GetUsers: { __typename?: 'GetUsersResponse', Users: Array<{ __typename?: 'User', Id: string, Name: string, Email: string, Country: string, BirthDate: any, PhoneNumber: string, IsActive: boolean, Subscription?: { __typename?: 'UserSubscription', Id: string, UserId: string, IsActive: boolean, Frequency: SubscriptionFrequency, EndDate: any, StartDate: any, LastPay?: any | null, CreatedAt: any, Payments: Array<{ __typename?: 'Payment', Id: string, PhotoUrl: string, Reference: string, Status: PaymentStatus, PaymentMethod: PaymentMethod, CreatedAt: any }> } | null }> } };
 
 
-export const GetUsersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUsers"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"request"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GetUsersRequest"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"GetUsers"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"request"},"value":{"kind":"Variable","name":{"kind":"Name","value":"request"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"Users"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"Id"}},{"kind":"Field","name":{"kind":"Name","value":"Name"}},{"kind":"Field","name":{"kind":"Name","value":"Email"}},{"kind":"Field","name":{"kind":"Name","value":"Country"}},{"kind":"Field","name":{"kind":"Name","value":"BirthDate"}},{"kind":"Field","name":{"kind":"Name","value":"PhoneNumber"}},{"kind":"Field","name":{"kind":"Name","value":"Subscription"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"Id"}},{"kind":"Field","name":{"kind":"Name","value":"UserId"}},{"kind":"Field","name":{"kind":"Name","value":"IsActive"}},{"kind":"Field","name":{"kind":"Name","value":"Frequency"}},{"kind":"Field","name":{"kind":"Name","value":"EndDate"}},{"kind":"Field","name":{"kind":"Name","value":"StartDate"}},{"kind":"Field","name":{"kind":"Name","value":"LastPay"}},{"kind":"Field","name":{"kind":"Name","value":"CreatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"Payments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"Id"}},{"kind":"Field","name":{"kind":"Name","value":"PhotoUrl"}},{"kind":"Field","name":{"kind":"Name","value":"Reference"}},{"kind":"Field","name":{"kind":"Name","value":"Status"}},{"kind":"Field","name":{"kind":"Name","value":"PaymentMethod"}},{"kind":"Field","name":{"kind":"Name","value":"CreatedAt"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetUsersQuery, GetUsersQueryVariables>;
+export const GetUsersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUsers"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"request"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GetUsersRequest"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"GetUsers"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"request"},"value":{"kind":"Variable","name":{"kind":"Name","value":"request"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"Users"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"Id"}},{"kind":"Field","name":{"kind":"Name","value":"Name"}},{"kind":"Field","name":{"kind":"Name","value":"Email"}},{"kind":"Field","name":{"kind":"Name","value":"Country"}},{"kind":"Field","name":{"kind":"Name","value":"BirthDate"}},{"kind":"Field","name":{"kind":"Name","value":"PhoneNumber"}},{"kind":"Field","name":{"kind":"Name","value":"IsActive"}},{"kind":"Field","name":{"kind":"Name","value":"Subscription"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"Id"}},{"kind":"Field","name":{"kind":"Name","value":"UserId"}},{"kind":"Field","name":{"kind":"Name","value":"IsActive"}},{"kind":"Field","name":{"kind":"Name","value":"Frequency"}},{"kind":"Field","name":{"kind":"Name","value":"EndDate"}},{"kind":"Field","name":{"kind":"Name","value":"StartDate"}},{"kind":"Field","name":{"kind":"Name","value":"LastPay"}},{"kind":"Field","name":{"kind":"Name","value":"CreatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"Payments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"Id"}},{"kind":"Field","name":{"kind":"Name","value":"PhotoUrl"}},{"kind":"Field","name":{"kind":"Name","value":"Reference"}},{"kind":"Field","name":{"kind":"Name","value":"Status"}},{"kind":"Field","name":{"kind":"Name","value":"PaymentMethod"}},{"kind":"Field","name":{"kind":"Name","value":"CreatedAt"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetUsersQuery, GetUsersQueryVariables>;

@@ -7,10 +7,10 @@ import {
   AreaSeries,
   MouseEventParams,
   ISeriesApi,
+  UTCTimestamp,
 } from 'lightweight-charts';
 import { MultiSeriesData } from '../../../types/chart/types';
 import { translateRouletteTag, getYAxisTicks } from '../../../utils/formatters/rouletterNumbers';
-import { useChartPosition } from '../../../hooks/useChartPosition';
 
 type ChartProps = {
   data: MultiSeriesData[];
@@ -31,12 +31,14 @@ const AreaChart: React.FC<ChartProps> = ({
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
+  const seriesMapRef = useRef<Map<string, ISeriesApi<'Area'>>>(new Map());
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [tooltipData, setTooltipData] = useState<{
     time: string;
     series: { id: string; value: number; color: string; tag?: string; originalValue?: number }[];
   } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
+  const [hasNewData, setHasNewData] = useState(false);
 
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -45,21 +47,22 @@ const AreaChart: React.FC<ChartProps> = ({
 
   console.log('🔄 AreaChart - chartType:', chartType, 'gameType:', gameType, 'selectedTable:', selectedTable);
 
-  const { setChartRef, getInitialRange, restorePosition } = useChartPosition(chartType, gameType || '', selectedTable);
+
 
   const seriesColors = [
     { line: 'rgba(217, 164, 37)', top: 'rgba(217, 164, 37, 0.28)', bottom: 'rgba(217, 164, 37, 0.05)' },
 
   ];
 
+  // Initialize chart once
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
 
     const yTicks = getYAxisTicks(gameType, chartType);
-    const initialRange = getInitialRange();
 
-    console.log('📊 AreaChart - initialRange:', initialRange);
+
+
 
     const chart = createChart(chartContainerRef.current, {
       width: width || chartContainerRef.current.clientWidth,
@@ -113,7 +116,6 @@ const AreaChart: React.FC<ChartProps> = ({
     });
 
     chartRef.current = chart;
-    setChartRef(chart);
 
 
     if (onChartReady) {
@@ -146,13 +148,15 @@ const AreaChart: React.FC<ChartProps> = ({
       }
     });
 
+    seriesMapRef.current = seriesMap;
+
 
     if (seriesMap.size > 0) {
-
-      chart.timeScale().setVisibleRange(initialRange);
-      setTimeout(() => {
-        restorePosition();
-      }, 100);
+      chart.timeScale().setVisibleRange({
+        from: Math.floor(Date.now() / 1000) - (30 * 60) as UTCTimestamp,
+        to: Math.floor(Date.now() / 1000) as UTCTimestamp,
+      });
+      setHasNewData(false);
     }
 
 
@@ -260,7 +264,73 @@ const AreaChart: React.FC<ChartProps> = ({
       resizeObserver.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, height, width, gameType]);
+  }, [height, width, gameType]);
+
+  // Update data and preserve/decide position without recreating chart
+  useEffect(() => {
+    if (!chartRef.current) return;
+    if (!data || data.length === 0) return;
+
+    const chart = chartRef.current;
+    const seriesMap = seriesMapRef.current;
+
+    const prevRange = chart.timeScale().getVisibleRange();
+    let latestTime: number | null = null;
+    data.forEach(series => {
+      const maxTime = series.data.reduce((max, d) => Math.max(max, Number(d.time)), -Infinity);
+      if (latestTime === null || maxTime > latestTime) latestTime = maxTime;
+    });
+
+    data.forEach((series, index) => {
+      if (!('value' in series.data[0])) return;
+      let s = seriesMap.get(series.id);
+      if (!s) {
+        const colorSet = seriesColors[index % seriesColors.length];
+        s = chart.addSeries(AreaSeries, {
+          lineColor: colorSet.line,
+          topColor: colorSet.top,
+          bottomColor: colorSet.bottom,
+          lastValueVisible: false,
+          priceLineVisible: false,
+        });
+        seriesMap.set(series.id, s);
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const validData = series.data.filter(item => item && typeof item.time === 'number' && !isNaN((item as any).value))
+        .sort((a, b) => Number(a.time) - Number(b.time));
+      if (validData.length > 0) {
+        (s as unknown as ISeriesApi<'Area'>).setData(validData as AreaData[]);
+      }
+    });
+
+    if (prevRange && latestTime !== null) {
+      const tolerance = 60; // seconds
+      const prevTo = typeof prevRange.to === 'number' ? prevRange.to : Number(prevRange.to);
+      const shouldStick = prevTo >= (latestTime - tolerance);
+      if (shouldStick) {
+        chart.timeScale().scrollToRealTime();
+        setHasNewData(false);
+      } else {
+        chart.timeScale().setVisibleRange(prevRange);
+        setHasNewData(true);
+      }
+    }
+
+    const onRangeChange = () => {
+      const vr = chart.timeScale().getVisibleRange();
+      if (vr && latestTime !== null) {
+        const to = typeof vr.to === 'number' ? vr.to : Number(vr.to);
+        if (to >= latestTime - 1) {
+          setHasNewData(false);
+        }
+      }
+    };
+    chart.timeScale().subscribeVisibleTimeRangeChange(onRangeChange);
+
+    return () => {
+      chart.timeScale().unsubscribeVisibleTimeRangeChange(onRangeChange);
+    };
+  }, [data]);
 
   return (
     <div style={{ position: 'relative', width: '100%' }}>
@@ -286,6 +356,31 @@ const AreaChart: React.FC<ChartProps> = ({
         </div>
       )}
       <div ref={chartContainerRef} style={{ width: '100%' }} />
+      {hasNewData && (
+        <button
+          onClick={() => {
+            if (!chartRef.current) return;
+            chartRef.current.timeScale().scrollToRealTime();
+            setHasNewData(false);
+          }}
+          style={{
+            position: 'absolute',
+            bottom: 16,
+            right: 16,
+            padding: '8px 12px',
+            background: '#D9A425',
+            color: '#0d1b2a',
+            borderRadius: 8,
+            border: 'none',
+            fontSize: 12,
+            fontWeight: 700,
+            cursor: 'pointer',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.4)'
+          }}
+        >
+          Nueva data
+        </button>
+      )}
       {tooltipData && tooltipPosition && (
         <div
           ref={tooltipRef}
