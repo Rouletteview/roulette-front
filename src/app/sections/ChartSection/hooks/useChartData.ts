@@ -1,4 +1,5 @@
 import { useQuery, useSubscription } from "@apollo/client";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { GET_ROULETTE_TABLES } from "../../../../graphql/query/getRouletteTables";
 import { GET_ROULETTE_TABLES_PROBABILITIES } from "../../../../graphql/query/getRouletteTableProbabilities";
@@ -83,6 +84,38 @@ export const useChartData = (
     console.log("chartNumbersDataSubscription", chartNumbersDataSubscription);
     console.log("errorSubscription", errorSubscription);
 
+    type ResultEntry = { Date: string; Tag: string; Number: number };
+    const [liveResults, setLiveResults] = useState<ResultEntry[]>([]);
+
+    // Seed live results when the base query loads or selection changes
+    useEffect(() => {
+        if (rouletteProbData?.GetRouletteTableProbabilities?.Results) {
+            setLiveResults(rouletteProbData.GetRouletteTableProbabilities.Results as ResultEntry[]);
+        } else {
+            setLiveResults([]);
+        }
+    }, [selectedTable, gameType, rouletteProbData?.GetRouletteTableProbabilities?.Results]);
+
+    // Apply incoming subscription updates to the live results buffer
+    useEffect(() => {
+        const payload = chartNumbersDataSubscription?.OnRouletteNumberUpdate;
+        if (!payload) return;
+
+        // If a table is selected, ensure updates match it
+        if (selectedTable && payload.TableId && payload.TableId !== selectedTable) return;
+
+        const result = payload.Result as ResultEntry | undefined;
+        if (!result) return;
+
+        setLiveResults((prev) => {
+            const next = [...prev, result];
+            if (next.length > probabilitiesResultLimit) {
+                next.splice(0, next.length - probabilitiesResultLimit);
+            }
+            return next;
+        });
+    }, [chartNumbersDataSubscription, selectedTable, probabilitiesResultLimit]);
+
     const { data: chartNumbersData } = useQuery(GET_LAST_ROULETTE_TABLE_NUMBERS, {
         variables: {
             TableId: selectedTable,
@@ -98,8 +131,12 @@ export const useChartData = (
             value: table.Id,
         })) || [];
 
+    const sourceResults = (liveResults && liveResults.length > 0)
+        ? liveResults
+        : (rouletteProbData?.GetRouletteTableProbabilities.Results || []);
+
     const chartFormattedData = useFormattedChartData({
-        data: rouletteProbData?.GetRouletteTableProbabilities.Results || [],
+        data: sourceResults,
         chartType: selectedType
             ? chartTypes[selectedType as keyof typeof chartTypes]
             : chartTypes.Candlestick,
@@ -119,6 +156,7 @@ export const useChartData = (
         chartFormattedData,
         formattedNumbers,
         probabilities:
+            chartNumbersDataSubscription?.OnRouletteNumberUpdate?.Probabilities ??
             rouletteProbData?.GetRouletteTableProbabilities.Probabilities,
 
         // loading

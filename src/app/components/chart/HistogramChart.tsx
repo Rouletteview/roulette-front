@@ -10,7 +10,7 @@ import {
 } from 'lightweight-charts';
 import { MultiSeriesData } from '../../../types/chart/types';
 import { translateRouletteTag, getYAxisTicks } from '../../../utils/formatters/rouletterNumbers';
-import { useChartPosition } from '../../../hooks/useChartPosition';
+import { UTCTimestamp } from 'lightweight-charts';
 
 type ChartProps = {
   data: MultiSeriesData[];
@@ -31,25 +31,33 @@ const HistogramChart: React.FC<ChartProps> = ({
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
+  const seriesMapRef = useRef<Map<string, ISeriesApi<'Histogram'>>>(new Map());
   const [tooltipData, setTooltipData] = useState<{
     time: string;
     series: { id: string; value: number; color: string; tag?: string; originalValue?: number }[];
   } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
+  const [hasNewData, setHasNewData] = useState(false);
 
 
   const urlParams = new URLSearchParams(window.location.search);
   const chartType = urlParams.get('chartType') || 'VerticalColumn';
-  const selectedTable = urlParams.get('table') || '';
 
-  const { setChartRef, getInitialRange } = useChartPosition(chartType, gameType || '', selectedTable);
+
+
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
 
     const yTicks = getYAxisTicks(gameType, chartType);
-    const initialRange = getInitialRange();
+    let latestTime: number | null = null;
+    if (data && data.length > 0) {
+      data.forEach(series => {
+        const maxTime = series.data.reduce((max, d) => Math.max(max, Number(d.time)), -Infinity);
+        if (latestTime === null || maxTime > latestTime) latestTime = maxTime;
+      });
+    }
 
     const chart = createChart(chartContainerRef.current, {
       width: width || chartContainerRef.current.clientWidth,
@@ -93,7 +101,7 @@ const HistogramChart: React.FC<ChartProps> = ({
     });
 
     chartRef.current = chart;
-    setChartRef(chart);
+
 
 
     if (onChartReady) {
@@ -512,9 +520,14 @@ const HistogramChart: React.FC<ChartProps> = ({
 
 
     if (seriesMap.size > 0) {
-
-      chart.timeScale().setVisibleRange(initialRange);
+      chart.timeScale().setVisibleRange({
+        from: Math.floor(Date.now() / 1000) - (30 * 60) as UTCTimestamp,
+        to: Math.floor(Date.now() / 1000) as UTCTimestamp,
+      });
+      setHasNewData(false);
     }
+
+    seriesMapRef.current = seriesMap;
 
 
 
@@ -663,7 +676,162 @@ const HistogramChart: React.FC<ChartProps> = ({
       chart.remove();
       resizeObserver.disconnect();
     };
-  }, [data, height, width, gameType]);
+  }, [height, width, gameType, chartType, onChartReady]);
+
+  // Update data and preserve/decide position without recreating chart
+  useEffect(() => {
+    if (!chartRef.current) return;
+    if (!data || data.length === 0) return;
+
+    const chart = chartRef.current;
+    const seriesMap = seriesMapRef.current;
+
+    const prevRange = chart.timeScale().getVisibleRange();
+    let latestTime: number | null = null;
+    data.forEach(series => {
+      const maxTime = series.data.reduce((max, d) => Math.max(max, Number(d.time)), -Infinity);
+      if (latestTime === null || maxTime > latestTime) latestTime = maxTime;
+    });
+
+    // Rebuild categories depending on gameType
+    seriesMap.clear();
+
+    if (gameType === 'RedAndBlack') {
+      data.forEach((series) => {
+        if (!('value' in series.data[0] && 'color' in series.data[0])) return;
+        const s = chart.addSeries(HistogramSeries, { color: 'rgba(32, 178, 108, 1)', lastValueVisible: false, priceLineVisible: false });
+        seriesMap.set(series.id, s);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const validData = series.data.filter(item => item && typeof item.time === 'number' && !isNaN((item as any).value)).sort((a, b) => Number(a.time) - Number(b.time));
+        if (validData.length > 0) (s as unknown as ISeriesApi<'Histogram'>).setData(validData as HistogramData[]);
+      });
+    } else if (gameType === 'OddAndEven') {
+      const even = chart.addSeries(HistogramSeries, { color: '#25A79B', lastValueVisible: false, priceLineVisible: false });
+      const odd = chart.addSeries(HistogramSeries, { color: '#EE5351', lastValueVisible: false, priceLineVisible: false });
+      seriesMap.set('even', even); seriesMap.set('odd', odd);
+      const evenData: HistogramData[] = []; const oddData: HistogramData[] = [];
+      data.forEach(series => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const validData = series.data.filter(item => item && typeof item.time === 'number' && !isNaN((item as any).value)).sort((a, b) => Number(a.time) - Number(b.time));
+        validData.forEach((item) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const value = (item as any).originalValue !== undefined ? (item as any).originalValue : (item as any).value;
+          const isEven = value % 2 === 0;
+          const point: HistogramData = { time: item.time, value, color: isEven ? '#25A79B' : '#EE5351' };
+          if (isEven) evenData.push(point); else oddData.push(point);
+        });
+      });
+      even.setData(evenData); odd.setData(oddData);
+    } else if (gameType === 'HighAndLow') {
+      const high = chart.addSeries(HistogramSeries, { color: '#25A79B', lastValueVisible: false, priceLineVisible: false });
+      const low = chart.addSeries(HistogramSeries, { color: '#EE5351', lastValueVisible: false, priceLineVisible: false });
+      seriesMap.set('high', high); seriesMap.set('low', low);
+      const highData: HistogramData[] = []; const lowData: HistogramData[] = [];
+      data.forEach(series => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const validData = series.data.filter(item => item && typeof item.time === 'number' && !isNaN((item as any).value)).sort((a, b) => Number(a.time) - Number(b.time));
+        validData.forEach((item) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const value = (item as any).originalValue !== undefined ? (item as any).originalValue : (item as any).value;
+          const isHigh = value >= 19 && value <= 36;
+          const point: HistogramData = { time: item.time, value, color: isHigh ? '#25A79B' : '#EE5351' };
+          if (isHigh) highData.push(point); else lowData.push(point);
+        });
+      });
+      high.setData(highData); low.setData(lowData);
+    } else if (gameType === 'Dozen') {
+      const red = chart.addSeries(HistogramSeries, { color: '#FF0000', lastValueVisible: false, priceLineVisible: false });
+      const white = chart.addSeries(HistogramSeries, { color: '#FFFFFF', lastValueVisible: false, priceLineVisible: false });
+      const green = chart.addSeries(HistogramSeries, { color: '#00FF00', lastValueVisible: false, priceLineVisible: false });
+      seriesMap.set('red', red); seriesMap.set('white', white); seriesMap.set('green', green);
+      const redData: HistogramData[] = []; const whiteData: HistogramData[] = []; const greenData: HistogramData[] = [];
+      data.forEach(series => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const validData = series.data.filter(item => item && typeof item.time === 'number' && !isNaN((item as any).value)).sort((a, b) => Number(a.time) - Number(b.time));
+        validData.forEach((item) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const value = (item as any).originalValue !== undefined ? (item as any).originalValue : (item as any).value;
+          const point: HistogramData = { time: item.time, value, color: value <= 12 ? '#FF0000' : value <= 24 ? '#FFFFFF' : '#00FF00' };
+          if (value <= 12) redData.push(point); else if (value <= 24) whiteData.push(point); else greenData.push(point);
+        });
+      });
+      red.setData(redData); white.setData(whiteData); green.setData(greenData);
+    } else if (gameType === 'Column') {
+      const up = chart.addSeries(HistogramSeries, { color: '#25A69A', lastValueVisible: false, priceLineVisible: false });
+      const down = chart.addSeries(HistogramSeries, { color: '#ef5350', lastValueVisible: false, priceLineVisible: false });
+      seriesMap.set('up', up); seriesMap.set('down', down);
+      const upData: HistogramData[] = []; const downData: HistogramData[] = [];
+      data.forEach(series => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const validData = series.data.filter(item => item && typeof item.time === 'number' && !isNaN((item as any).value)).sort((a, b) => Number(a.time) - Number(b.time));
+        validData.forEach((item, idx) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const value = (item as any).originalValue !== undefined ? (item as any).originalValue : (item as any).value;
+          let isUp = true;
+          if (idx > 0) {
+            const prev = validData[idx - 1];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const prevValue = (prev as any).originalValue !== undefined ? (prev as any).originalValue : (prev as any).value;
+            isUp = value >= prevValue;
+          }
+          const point: HistogramData = { time: item.time, value, color: isUp ? '#25A69A' : '#ef5350' };
+          if (isUp) upData.push(point); else downData.push(point);
+        });
+      });
+      up.setData(upData); down.setData(downData);
+    } else {
+      const up = chart.addSeries(HistogramSeries, { color: '#25A69A', lastValueVisible: false, priceLineVisible: false });
+      const down = chart.addSeries(HistogramSeries, { color: '#ef5350', lastValueVisible: false, priceLineVisible: false });
+      seriesMap.set('up', up); seriesMap.set('down', down);
+      const upData: HistogramData[] = []; const downData: HistogramData[] = [];
+      data.forEach(series => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const validData = series.data.filter(item => item && typeof item.time === 'number' && !isNaN((item as any).value)).sort((a, b) => Number(a.time) - Number(b.time));
+        validData.forEach((item, idx) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const value = (item as any).originalValue !== undefined ? (item as any).originalValue : (item as any).value;
+          let isUp = true;
+          if (idx > 0) {
+            const prev = validData[idx - 1];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const prevValue = (prev as any).originalValue !== undefined ? (prev as any).originalValue : (prev as any).value;
+            isUp = value >= prevValue;
+          }
+          const point: HistogramData = { time: item.time, value, color: isUp ? '#25A69A' : '#ef5350' };
+          if (isUp) upData.push(point); else downData.push(point);
+        });
+      });
+      up.setData(upData); down.setData(downData);
+    }
+
+    if (prevRange && latestTime !== null) {
+      const tolerance = 60;
+      const prevTo = typeof prevRange.to === 'number' ? prevRange.to : Number(prevRange.to);
+      const shouldStick = prevTo >= (latestTime - tolerance);
+      if (shouldStick) {
+        chart.timeScale().scrollToRealTime();
+        setHasNewData(false);
+      } else {
+        chart.timeScale().setVisibleRange(prevRange);
+        setHasNewData(true);
+      }
+    }
+
+    const onRangeChange = () => {
+      const vr = chart.timeScale().getVisibleRange();
+      if (vr && latestTime !== null) {
+        const to = typeof vr.to === 'number' ? vr.to : Number(vr.to);
+        if (to >= latestTime - 1) {
+          setHasNewData(false);
+        }
+      }
+    };
+    chart.timeScale().subscribeVisibleTimeRangeChange(onRangeChange);
+
+    return () => {
+      chart.timeScale().unsubscribeVisibleTimeRangeChange(onRangeChange);
+    };
+  }, [data, gameType]);
 
   return (
     <div style={{ position: 'relative', width: '100%' }}>
@@ -689,6 +857,31 @@ const HistogramChart: React.FC<ChartProps> = ({
         </div>
       )}
       <div ref={chartContainerRef} style={{ width: '100%' }} />
+      {hasNewData && (
+        <button
+          onClick={() => {
+            if (!chartRef.current) return;
+            chartRef.current.timeScale().scrollToRealTime();
+            setHasNewData(false);
+          }}
+          style={{
+            position: 'absolute',
+            bottom: 16,
+            right: 16,
+            padding: '8px 12px',
+            background: '#D9A425',
+            color: '#0d1b2a',
+            borderRadius: 8,
+            border: 'none',
+            fontSize: 12,
+            fontWeight: 700,
+            cursor: 'pointer',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.4)'
+          }}
+        >
+          Nueva data
+        </button>
+      )}
       {tooltipData && tooltipPosition && (
         <div
           style={{

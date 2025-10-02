@@ -9,7 +9,7 @@ import {
 
 } from 'lightweight-charts';
 import { translateRouletteTag, getYAxisTicks, isVoisinDuZero, isOrphelins, isTiersDuCylindre, isPlayZero } from '../../../utils/formatters/rouletterNumbers';
-import { useChartPosition } from '../../../hooks/useChartPosition';
+
 
 type ChartProps = {
   data: { time: UTCTimestamp; open: number; high: number; low: number; close: number; openTag?: string; closeTag?: string; isRedAndBlack?: boolean }[];
@@ -30,16 +30,16 @@ const CandleChart: React.FC<ChartProps> = ({
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
+
   const tooltipRef = useRef<HTMLDivElement>(null);
+  const [hasNewData, setHasNewData] = useState(false);
 
 
   const urlParams = new URLSearchParams(window.location.search);
   const chartType = urlParams.get('chartType') || 'Candlestick';
-  const selectedTable = urlParams.get('table') || '';
+
 
   // console.log('🔄 CandleChart - chartType:', chartType, 'gameType:', gameType, 'selectedTable:', selectedTable);
-
-  const { setChartRef, getInitialRange } = useChartPosition(chartType, gameType || '', selectedTable);
 
   const [tooltipData, setTooltipData] = useState<{
     time: string;
@@ -58,46 +58,10 @@ const CandleChart: React.FC<ChartProps> = ({
     if (!chartContainerRef.current) return;
 
     const yTicks = getYAxisTicks(gameType, chartType);
-
-
-    const debugKey = `chartPosition_${chartType}_${gameType || ''}_${selectedTable}`;
-    let savedPosition = sessionStorage.getItem(debugKey);
-
-
-
-
-    if (!savedPosition) {
-      const allChartPositionKeys = Object.keys(sessionStorage).filter(key =>
-        key.startsWith('chartPosition_') &&
-        key.includes(gameType || '') &&
-        key.includes(selectedTable)
-      );
-
-      for (const key of allChartPositionKeys) {
-        const position = sessionStorage.getItem(key);
-        if (position) {
-          console.log('📊 CandleChart - found position with key:', key, position);
-          savedPosition = position;
-          break;
-        }
-      }
-    }
-
-    let initialRange;
-    if (savedPosition) {
-      try {
-        const position = JSON.parse(savedPosition);
-        initialRange = {
-          from: position.from,
-          to: position.to,
-        };
-
-      } catch (error) {
-        console.warn('📊 CandleChart - error parsing saved position:', error);
-        initialRange = getInitialRange();
-      }
-    } else {
-      initialRange = getInitialRange();
+    const prevRange = chartRef.current?.timeScale().getVisibleRange();
+    let latestTime: number | null = null;
+    if (data && data.length > 0) {
+      latestTime = data.reduce((max, d) => Math.max(max, Number(d.time)), -Infinity);
     }
 
 
@@ -154,7 +118,7 @@ const CandleChart: React.FC<ChartProps> = ({
     });
 
     chartRef.current = chart;
-    setChartRef(chart);
+
 
     if (onChartReady) {
       onChartReady(chart);
@@ -474,33 +438,7 @@ const CandleChart: React.FC<ChartProps> = ({
         }
       }
 
-      if (gameType === '') {
-        const seriesToUse = redSeries || whiteSeries || greenSeries || defaultSeries;
-        if (seriesToUse) {
-          seriesToUse.createPriceLine({
-            price: 18,
-            color: '#D9A425',
-            lineWidth: 3,
-            lineStyle: 1,
-            axisLabelVisible: true,
-            title: '',
-          });
-        }
-      }
 
-      if (gameType === '') {
-        const seriesToUse = redSeries || whiteSeries || greenSeries || defaultSeries;
-        if (seriesToUse) {
-          seriesToUse.createPriceLine({
-            price: 18,
-            color: '#D9A425',
-            lineWidth: 3,
-            lineStyle: 1,
-            axisLabelVisible: true,
-            title: '',
-          });
-        }
-      }
 
 
       const universalSeriesToUse = redSeries || whiteSeries || greenSeries || blackSeries || defaultSeries;
@@ -539,7 +477,38 @@ const CandleChart: React.FC<ChartProps> = ({
         }
       }
 
-      chart.timeScale().setVisibleRange(initialRange);
+      if (prevRange && latestTime !== null && latestTime !== -Infinity) {
+        const tolerance = 60;
+        const prevTo = typeof prevRange.to === 'number' ? prevRange.to : Number(prevRange.to);
+        const shouldStick = prevTo >= (latestTime - tolerance);
+        if (shouldStick) {
+          chart.timeScale().scrollToRealTime();
+          setHasNewData(false);
+        } else {
+          chart.timeScale().setVisibleRange(prevRange);
+          setHasNewData(true);
+        }
+      } else {
+        if (prevRange && latestTime !== null && latestTime !== -Infinity) {
+          const tolerance = 60;
+          const prevTo = typeof prevRange.to === 'number' ? prevRange.to : Number(prevRange.to);
+          const shouldStick = prevTo >= (latestTime - tolerance);
+          if (shouldStick) {
+            chart.timeScale().scrollToRealTime();
+            setHasNewData(false);
+          } else {
+            chart.timeScale().setVisibleRange(prevRange);
+            setHasNewData(true);
+          }
+        } else {
+          chart.timeScale().setVisibleRange({
+            from: Math.floor(Date.now() / 1000) - (30 * 60) as UTCTimestamp,
+            to: Math.floor(Date.now() / 1000) as UTCTimestamp,
+          });
+          setHasNewData(false);
+        }
+        setHasNewData(false);
+      }
     }
 
     chart.subscribeCrosshairMove((param: MouseEventParams) => {
@@ -645,6 +614,31 @@ const CandleChart: React.FC<ChartProps> = ({
         </div>
       )}
       <div ref={chartContainerRef} style={{ width: '100%', overflow: 'hidden' }} />
+      {hasNewData && (
+        <button
+          onClick={() => {
+            if (!chartRef.current) return;
+            chartRef.current.timeScale().scrollToRealTime();
+            setHasNewData(false);
+          }}
+          style={{
+            position: 'absolute',
+            bottom: 16,
+            right: 16,
+            padding: '8px 12px',
+            background: '#D9A425',
+            color: '#0d1b2a',
+            borderRadius: 8,
+            border: 'none',
+            fontSize: 12,
+            fontWeight: 700,
+            cursor: 'pointer',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.4)'
+          }}
+        >
+          Nueva data
+        </button>
+      )}
       {tooltipData && tooltipPosition && (
         <div
           ref={tooltipRef}
