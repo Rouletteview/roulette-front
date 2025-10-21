@@ -34,14 +34,18 @@ const LineChart: React.FC<ChartProps> = ({
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesMapRef = useRef<Map<string, ISeriesApi<'Line'>>>(new Map());
+  const lastPointTimeRef = useRef<Map<string, number>>(new Map());
+  const animTokenRef = useRef<Map<string, { frameId: number | null; targetTime: number }>>(new Map());
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const [hasNewData, setHasNewData] = useState(false);
   const [tooltipData, setTooltipData] = useState<{
     time: string;
     series: { id: string; value: number; color: string; tag?: string; originalValue?: number }[];
   } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
 
+  // Keep latest data for tooltip to avoid stale closures
+  const dataRef = useRef(data);
+  useEffect(() => { dataRef.current = data; }, [data]);
 
   const urlParams = new URLSearchParams(window.location.search);
   const chartType = urlParams.get('chartType') || 'Lineal';
@@ -150,6 +154,8 @@ const LineChart: React.FC<ChartProps> = ({
         if (validData.length > 0) {
           lineSeries.setData(validData as LineData[]);
           seriesMap.set(series.id, lineSeries);
+          const last = validData[validData.length - 1] as LineData;
+          lastPointTimeRef.current.set(series.id, Number(last.time));
         }
       }
     });
@@ -161,7 +167,6 @@ const LineChart: React.FC<ChartProps> = ({
         from: Math.floor(Date.now() / 1000) - (30 * 60) as UTCTimestamp,
         to: Math.floor(Date.now() / 1000) as UTCTimestamp,
       });
-      setHasNewData(false);
     }
 
 
@@ -200,8 +205,9 @@ const LineChart: React.FC<ChartProps> = ({
       const seriesData: { id: string; value: number; color: string; tag?: string; originalValue?: number }[] = [];
 
 
+      const currentData = dataRef.current || [];
       seriesMap.forEach((_series, seriesId) => {
-        const originalPoint = data.find(s => s.id === seriesId)?.data.find(
+        const originalPoint = currentData.find(s => s.id === seriesId)?.data.find(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (d: any) => d.time === time
         );
@@ -268,6 +274,11 @@ const LineChart: React.FC<ChartProps> = ({
     return () => {
       chart.remove();
       resizeObserver.disconnect();
+      // cancel any running per-series animations
+      animTokenRef.current.forEach(token => {
+        if (token.frameId) cancelAnimationFrame(token.frameId);
+      });
+      animTokenRef.current.clear();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [height, width, gameType]);
@@ -287,7 +298,7 @@ const LineChart: React.FC<ChartProps> = ({
       if (latestTime === null || maxTime > latestTime) latestTime = maxTime;
     });
 
-    // ensure series exist and set data
+    // ensure series exist and set data with animation on new last point
     data.forEach((series, index) => {
       if (!('value' in series.data[0])) return;
       let s = seriesMap.get(series.id);
@@ -303,7 +314,60 @@ const LineChart: React.FC<ChartProps> = ({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const validData = series.data.filter(item => item && typeof item.time === 'number' && !isNaN((item as any).value))
         .sort((a, b) => Number(a.time) - Number(b.time));
-      if (validData.length > 0) {
+      if (validData.length === 0) return;
+
+      const lastPoint = validData[validData.length - 1] as LineData;
+      const prevLastTime = lastPointTimeRef.current.get(series.id);
+
+      // If no previous time recorded, set data normally
+      if (prevLastTime === undefined) {
+        (s as unknown as ISeriesApi<'Line'>).setData(validData as LineData[]);
+        lastPointTimeRef.current.set(series.id, Number(lastPoint.time));
+        return;
+      }
+
+      // If the last time increased, animate the new point drawing in
+      const currentLastTime = Number(lastPoint.time);
+      // If an animation is already running for this series to the same target, skip re-triggering
+      const running = animTokenRef.current.get(series.id);
+      if (running && running.targetTime === currentLastTime) {
+        return;
+      }
+
+      if (currentLastTime > prevLastTime) {
+        // Set up to the previous last point immediately
+        const preData = validData.slice(0, validData.length - 1) as LineData[];
+        (s as unknown as ISeriesApi<'Line'>).setData(preData);
+
+        // Determine starting value from previous point
+        const prevPoint = preData[preData.length - 1] as LineData | undefined;
+        const startValue = prevPoint && 'value' in prevPoint ? (prevPoint as unknown as { value: number }).value : (lastPoint as unknown as { value: number }).value;
+        const endValue = (lastPoint as unknown as { value: number }).value;
+
+        const durationMs = 600;
+        const startTs = performance.now();
+
+        const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+        const step = (now: number) => {
+          const t = Math.min(1, (now - startTs) / durationMs);
+          const eased = easeOutCubic(t);
+          const interp = startValue + (endValue - startValue) * eased;
+          (s as unknown as ISeriesApi<'Line'>).update({ time: currentLastTime as UTCTimestamp, value: interp } as unknown as LineData);
+          if (t < 1) {
+            const frameId = requestAnimationFrame(step);
+            animTokenRef.current.set(series.id, { frameId, targetTime: currentLastTime });
+          } else {
+            lastPointTimeRef.current.set(series.id, currentLastTime);
+            // finalize to ensure exact data set (avoids drift)
+            (s as unknown as ISeriesApi<'Line'>).setData(validData as LineData[]);
+            animTokenRef.current.delete(series.id);
+          }
+        };
+        const frameId = requestAnimationFrame(step);
+        animTokenRef.current.set(series.id, { frameId, targetTime: currentLastTime });
+      } else {
+        // No new point, just set full data
         (s as unknown as ISeriesApi<'Line'>).setData(validData as LineData[]);
       }
     });
@@ -315,10 +379,8 @@ const LineChart: React.FC<ChartProps> = ({
       const shouldStick = prevTo >= (latestTime - tolerance);
       if (shouldStick) {
         chart.timeScale().scrollToRealTime();
-        setHasNewData(false);
       } else {
         chart.timeScale().setVisibleRange(prevRange);
-        setHasNewData(true);
       }
     }
 
@@ -328,7 +390,7 @@ const LineChart: React.FC<ChartProps> = ({
       if (vr && latestTime !== null) {
         const to = typeof vr.to === 'number' ? vr.to : Number(vr.to);
         if (to >= latestTime - 1) {
-          setHasNewData(false);
+          // Auto-scroll to latest data
         }
       }
     };
@@ -363,31 +425,6 @@ const LineChart: React.FC<ChartProps> = ({
         </div>
       )}
       <div ref={chartContainerRef} style={{ width: '100%' }} />
-      {hasNewData && (
-        <button
-          onClick={() => {
-            if (!chartRef.current) return;
-            chartRef.current.timeScale().scrollToRealTime();
-            setHasNewData(false);
-          }}
-          style={{
-            position: 'absolute',
-            bottom: 16,
-            right: 16,
-            padding: '8px 12px',
-            background: '#D9A425',
-            color: '#0d1b2a',
-            borderRadius: 8,
-            border: 'none',
-            fontSize: 12,
-            fontWeight: 700,
-            cursor: 'pointer',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.4)'
-          }}
-        >
-          Nueva data
-        </button>
-      )}
       {tooltipData && tooltipPosition && (
         <div
           ref={tooltipRef}

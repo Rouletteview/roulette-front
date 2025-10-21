@@ -11,6 +11,7 @@ import { showWinToast, showLoseToast, showInfoToast } from '../../components/Toa
 import StraightUpButton from "../../components/bet/StraightUpBetButton";
 import { GameType } from "../../../graphql/generated/types";
 import { chartTypes } from "../../../types/types";
+import { useBetUpdates } from "../../../hooks/useBetUpdates";
 // import { useSubscription } from "../../../hooks/useSubscription";
 
 interface BetData {
@@ -74,9 +75,15 @@ const BetSection: React.FC<Props> = ({ gameType, probabilities, tableId }) => {
     }
   }
 
+
+  useBetUpdates(tableId);
+
+
+
   const { data: betData } = useGetBet(betIdsArray, { skip: betIdsArray.length === 0 });
   const { setBetResult } = useBetStatusStore();
   const processedBetsRef = useRef<Set<string>>(new Set());
+
 
   useEffect(() => {
     if (countdown === 29 && betIdsArray.length > 0 && betData && betData.GetBetsBatch) {
@@ -86,7 +93,6 @@ const BetSection: React.FC<Props> = ({ gameType, probabilities, tableId }) => {
         const status = bet.status;
         const value = bet.value;
         const betId = bet.id;
-
 
         if (processedBetsRef.current.has(betId)) {
           return;
@@ -111,7 +117,6 @@ const BetSection: React.FC<Props> = ({ gameType, probabilities, tableId }) => {
           processedBetsRef.current.add(betId);
         }
       });
-
 
       if (completedBets.length > 0) {
         const remainingBets = betIdsArray.filter(id => !completedBets.includes(id));
@@ -167,6 +172,15 @@ const BetSection: React.FC<Props> = ({ gameType, probabilities, tableId }) => {
           </div>
         )
       }
+
+      {/* WebSocket Status
+      <div className="mb-4">
+        <WebSocketStatus
+          isConnected={isWebSocketConnected}
+          error={betUpdateError?.message}
+        />
+      </div> */}
+
       <div className="w-full flex flex-col items-center">
         {
           tableId &&

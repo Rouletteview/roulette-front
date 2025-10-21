@@ -55,6 +55,13 @@ export enum BetStatus {
   Won = 'Won'
 }
 
+export type BetUpdate = {
+  __typename?: 'BetUpdate';
+  Bet: Bet;
+  PreviousStatus: BetStatus;
+  UpdatedAt: Scalars['DateTime']['output'];
+};
+
 export type Country = {
   __typename?: 'Country';
   Country: Scalars['String']['output'];
@@ -451,7 +458,13 @@ export type StartFreeSubscriptionRequest = {
 
 export type Subscription = {
   __typename?: 'Subscription';
+  OnBetUpdate: BetUpdate;
   OnRouletteNumberUpdate: RouletteNumberUpdate;
+};
+
+
+export type SubscriptionOnBetUpdateArgs = {
+  tableId: Scalars['String']['input'];
 };
 
 

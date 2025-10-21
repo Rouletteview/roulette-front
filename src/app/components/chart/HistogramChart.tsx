@@ -32,12 +32,18 @@ const HistogramChart: React.FC<ChartProps> = ({
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesMapRef = useRef<Map<string, ISeriesApi<'Histogram'>>>(new Map());
+  const lastPointTimeRef = useRef<Map<string, number>>(new Map());
+  const animTokenRef = useRef<Map<string, { frameId: number | null; targetTime: number }>>(new Map());
   const [tooltipData, setTooltipData] = useState<{
     time: string;
     series: { id: string; value: number; color: string; tag?: string; originalValue?: number }[];
   } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
   const [hasNewData, setHasNewData] = useState(false);
+
+  // Keep latest data for tooltip to avoid stale closures
+  const dataRef = useRef(data);
+  useEffect(() => { dataRef.current = data; }, [data]);
 
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -112,6 +118,8 @@ const HistogramChart: React.FC<ChartProps> = ({
     const allValidData: HistogramData[] = [];
 
 
+    // removed unused animateUpdateLocal helper
+
     if (gameType === 'RedAndBlack') {
       data.forEach((series) => {
         if ('value' in series.data[0] && 'color' in series.data[0]) {
@@ -130,6 +138,8 @@ const HistogramChart: React.FC<ChartProps> = ({
             histogramSeries.setData(validData as HistogramData[]);
             seriesMap.set(series.id, histogramSeries);
             allValidData.push(...(validData as HistogramData[]));
+            const last = validData[validData.length - 1] as HistogramData;
+            lastPointTimeRef.current.set(series.id, Number(last.time));
           }
         }
       });
@@ -565,7 +575,8 @@ const HistogramChart: React.FC<ChartProps> = ({
       const seriesData: { id: string; value: number; color: string; tag?: string; originalValue?: number }[] = [];
 
 
-      data.forEach((series) => {
+      const currentData = dataRef.current || [];
+      currentData.forEach((series) => {
         const dataAtTime = series.data.find(d => d.time === time);
         if (dataAtTime && 'value' in dataAtTime && 'color' in dataAtTime) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -675,6 +686,8 @@ const HistogramChart: React.FC<ChartProps> = ({
     return () => {
       chart.remove();
       resizeObserver.disconnect();
+      animTokenRef.current.forEach(token => { if (token.frameId) cancelAnimationFrame(token.frameId); });
+      animTokenRef.current.clear();
     };
   }, [height, width, gameType, chartType, onChartReady]);
 
@@ -703,7 +716,63 @@ const HistogramChart: React.FC<ChartProps> = ({
         seriesMap.set(series.id, s);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const validData = series.data.filter(item => item && typeof item.time === 'number' && !isNaN((item as any).value)).sort((a, b) => Number(a.time) - Number(b.time));
-        if (validData.length > 0) (s as unknown as ISeriesApi<'Histogram'>).setData(validData as HistogramData[]);
+        if (validData.length === 0) return;
+        (function runAnim(key: string, pts: HistogramData[], seriesInst: ISeriesApi<'Histogram'>) {
+          if (pts.length === 0) return;
+          const last = pts[pts.length - 1];
+          const prevTime = lastPointTimeRef.current.get(key);
+          if (prevTime === undefined) {
+            seriesInst.setData(pts);
+            lastPointTimeRef.current.set(key, Number(last.time));
+            return;
+          }
+          const currentTime = Number(last.time);
+          const pre = pts.slice(0, -1);
+          const durationMs = 450;
+          const startTs = performance.now();
+          const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+          if (currentTime > prevTime) {
+            seriesInst.setData(pre);
+            const startValue = pre.length > 0 ? pre[pre.length - 1].value : last.value;
+            const endValue = last.value;
+            const step = (now: number) => {
+              const t = Math.min(1, (now - startTs) / durationMs);
+              const v = startValue + (endValue - startValue) * ease(t);
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              seriesInst.update({ time: currentTime as UTCTimestamp, value: v, color: (last as any).color } as HistogramData);
+              if (t < 1) {
+                const id = requestAnimationFrame(step);
+                animTokenRef.current.set(key, { frameId: id, targetTime: currentTime });
+              } else {
+                lastPointTimeRef.current.set(key, currentTime);
+                seriesInst.setData(pts);
+                animTokenRef.current.delete(key);
+              }
+            };
+            const id = requestAnimationFrame(step);
+            animTokenRef.current.set(key, { frameId: id, targetTime: currentTime });
+          } else {
+            const running = animTokenRef.current.get(key);
+            if (running && running.targetTime === currentTime) return;
+            const startValue = pre.length > 0 ? pre[pre.length - 1].value : last.value;
+            const endValue = last.value;
+            const step = (now: number) => {
+              const t = Math.min(1, (now - startTs) / durationMs);
+              const v = startValue + (endValue - startValue) * ease(t);
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              seriesInst.update({ time: currentTime as UTCTimestamp, value: v, color: (last as any).color } as HistogramData);
+              if (t < 1) {
+                const id = requestAnimationFrame(step);
+                animTokenRef.current.set(key, { frameId: id, targetTime: currentTime });
+              } else {
+                seriesInst.setData(pts);
+                animTokenRef.current.delete(key);
+              }
+            };
+            const id = requestAnimationFrame(step);
+            animTokenRef.current.set(key, { frameId: id, targetTime: currentTime });
+          }
+        })(series.id, validData as HistogramData[], s as unknown as ISeriesApi<'Histogram'>);
       });
     } else if (gameType === 'OddAndEven') {
       const even = chart.addSeries(HistogramSeries, { color: '#25A79B', lastValueVisible: false, priceLineVisible: false });
@@ -722,6 +791,45 @@ const HistogramChart: React.FC<ChartProps> = ({
         });
       });
       even.setData(evenData); odd.setData(oddData);
+      // animate both series' last bar
+      const animEven = evenData.length > 0 ? evenData : [];
+      const animOdd = oddData.length > 0 ? oddData : [];
+      if (animEven.length > 0) {
+        (function run(key: string, pts: HistogramData[], s: ISeriesApi<'Histogram'>) {
+          const last = pts[pts.length - 1]; const pre = pts.slice(0, -1);
+          const prev = lastPointTimeRef.current.get(key);
+          s.setData(pre);
+          const start = pre.length > 0 ? pre[pre.length - 1].value : last.value;
+          const end = last.value; const startTs = performance.now(); const dur = 450;
+          const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+          const step = (now: number) => {
+            const t = Math.min(1, (now - startTs) / dur);
+            const v = start + (end - start) * ease(t);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            s.update({ time: Number(last.time) as UTCTimestamp, value: v, color: (last as any).color } as HistogramData);
+            if (t < 1) requestAnimationFrame(step); else { lastPointTimeRef.current.set(key, Number(last.time)); s.setData(pts); }
+          };
+          if (prev === undefined || Number(last.time) >= prev) requestAnimationFrame(step);
+        })('even', animEven, even);
+      }
+      if (animOdd.length > 0) {
+        (function run(key: string, pts: HistogramData[], s: ISeriesApi<'Histogram'>) {
+          const last = pts[pts.length - 1]; const pre = pts.slice(0, -1);
+          const prev = lastPointTimeRef.current.get(key);
+          s.setData(pre);
+          const start = pre.length > 0 ? pre[pre.length - 1].value : last.value;
+          const end = last.value; const startTs = performance.now(); const dur = 450;
+          const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+          const step = (now: number) => {
+            const t = Math.min(1, (now - startTs) / dur);
+            const v = start + (end - start) * ease(t);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            s.update({ time: Number(last.time) as UTCTimestamp, value: v, color: (last as any).color } as HistogramData);
+            if (t < 1) requestAnimationFrame(step); else { lastPointTimeRef.current.set(key, Number(last.time)); s.setData(pts); }
+          };
+          if (prev === undefined || Number(last.time) >= prev) requestAnimationFrame(step);
+        })('odd', animOdd, odd);
+      }
     } else if (gameType === 'HighAndLow') {
       const high = chart.addSeries(HistogramSeries, { color: '#25A79B', lastValueVisible: false, priceLineVisible: false });
       const low = chart.addSeries(HistogramSeries, { color: '#EE5351', lastValueVisible: false, priceLineVisible: false });
@@ -739,6 +847,47 @@ const HistogramChart: React.FC<ChartProps> = ({
         });
       });
       high.setData(highData); low.setData(lowData);
+      // animate both series
+      const animHigh = highData.length > 0 ? highData : [];
+      const animLow = lowData.length > 0 ? lowData : [];
+      if (animHigh.length > 0) {
+        (function run(key: string, pts: HistogramData[], s: ISeriesApi<'Histogram'>) {
+          const last = pts[pts.length - 1]; const pre = pts.slice(0, -1);
+          const prev = lastPointTimeRef.current.get(key);
+          s.setData(pre);
+          const start = pre.length > 0 ? pre[pre.length - 1].value : last.value;
+          const end = last.value; const startTs = performance.now(); const dur = 450;
+          const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+          const step = (now: number) => {
+            const t = Math.min(1, (now - startTs) / dur);
+            const v = start + (end - start) * ease(t);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            s.update({ time: Number(last.time) as UTCTimestamp, value: v, color: (last as any).color } as HistogramData);
+            if (t < 1) requestAnimationFrame(step); else { lastPointTimeRef.current.set(key, Number(last.time)); s.setData(pts); }
+          };
+          if (prev === undefined || Number(last.time) >= prev) requestAnimationFrame(step);
+        })('high', animHigh, high);
+      }
+      if (animLow.length > 0) {
+        (function run(key: string, pts: HistogramData[], s: ISeriesApi<'Histogram'>) {
+          const last = pts[pts.length - 1]; const pre = pts.slice(0, -1);
+          const prev = lastPointTimeRef.current.get(key);
+          s.setData(pre);
+          const start = pre.length > 0 ? pre[pre.length - 1].value : last.value;
+          const end = last.value; const startTs = performance.now(); const dur = 450;
+          const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+          const step = (now: number) => {
+            const t = Math.min(1, (now - startTs) / dur);
+            const v = start + (end - start) * ease(t);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            s.update({ time: Number(last.time) as UTCTimestamp, value: v, color: (last as any).color } as HistogramData);
+            if (t < 1) requestAnimationFrame(step); else { lastPointTimeRef.current.set(key, Number(last.time)); s.setData(pts); }
+          };
+          if (prev === undefined || Number(last.time) >= prev) requestAnimationFrame(step);
+        })('low', animLow, low);
+      }
+      const lastTime = Math.max(highData[highData.length - 1]?.time as number || 0, lowData[lowData.length - 1]?.time as number || 0);
+      if (lastTime) lastPointTimeRef.current.set('high_low_composite', Number(lastTime));
     } else if (gameType === 'Dozen') {
       const red = chart.addSeries(HistogramSeries, { color: '#FF0000', lastValueVisible: false, priceLineVisible: false });
       const white = chart.addSeries(HistogramSeries, { color: '#FFFFFF', lastValueVisible: false, priceLineVisible: false });
@@ -756,6 +905,29 @@ const HistogramChart: React.FC<ChartProps> = ({
         });
       });
       red.setData(redData); white.setData(whiteData); green.setData(greenData);
+      // animate all three
+      const anim = [['red', redData, red], ['white', whiteData, white], ['green', greenData, green]] as const;
+      anim.forEach(([key, pts, s]) => {
+        if (pts.length === 0) return;
+        (function run(k: string, arr: HistogramData[], seriesInst: ISeriesApi<'Histogram'>) {
+          const last = arr[arr.length - 1]; const pre = arr.slice(0, -1);
+          const prev = lastPointTimeRef.current.get(k);
+          seriesInst.setData(pre);
+          const start = pre.length > 0 ? pre[pre.length - 1].value : last.value;
+          const end = last.value; const startTs = performance.now(); const dur = 450;
+          const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+          const step = (now: number) => {
+            const t = Math.min(1, (now - startTs) / dur);
+            const v = start + (end - start) * ease(t);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            seriesInst.update({ time: Number(last.time) as UTCTimestamp, value: v, color: (last as any).color } as HistogramData);
+            if (t < 1) requestAnimationFrame(step); else { lastPointTimeRef.current.set(k, Number(last.time)); seriesInst.setData(arr); }
+          };
+          if (prev === undefined || Number(last.time) >= prev) requestAnimationFrame(step);
+        })(key as string, pts as HistogramData[], s as ISeriesApi<'Histogram'>);
+      });
+      const lastTime = Math.max(redData[redData.length - 1]?.time as number || 0, whiteData[whiteData.length - 1]?.time as number || 0, greenData[greenData.length - 1]?.time as number || 0);
+      if (lastTime) lastPointTimeRef.current.set('dozen_composite', Number(lastTime));
     } else if (gameType === 'Column') {
       const up = chart.addSeries(HistogramSeries, { color: '#25A69A', lastValueVisible: false, priceLineVisible: false });
       const down = chart.addSeries(HistogramSeries, { color: '#ef5350', lastValueVisible: false, priceLineVisible: false });
@@ -779,6 +951,47 @@ const HistogramChart: React.FC<ChartProps> = ({
         });
       });
       up.setData(upData); down.setData(downData);
+      // animate both up/down
+      const animUp = upData.length > 0 ? upData : [];
+      const animDown = downData.length > 0 ? downData : [];
+      if (animUp.length > 0) {
+        (function run(key: string, pts: HistogramData[], s: ISeriesApi<'Histogram'>) {
+          const last = pts[pts.length - 1]; const pre = pts.slice(0, -1);
+          const prev = lastPointTimeRef.current.get(key);
+          s.setData(pre);
+          const start = pre.length > 0 ? pre[pre.length - 1].value : last.value;
+          const end = last.value; const startTs = performance.now(); const dur = 450;
+          const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+          const step = (now: number) => {
+            const t = Math.min(1, (now - startTs) / dur);
+            const v = start + (end - start) * ease(t);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            s.update({ time: Number(last.time) as UTCTimestamp, value: v, color: (last as any).color } as HistogramData);
+            if (t < 1) requestAnimationFrame(step); else { lastPointTimeRef.current.set(key, Number(last.time)); s.setData(pts); }
+          };
+          if (prev === undefined || Number(last.time) >= prev) requestAnimationFrame(step);
+        })('up', animUp, up);
+      }
+      if (animDown.length > 0) {
+        (function run(key: string, pts: HistogramData[], s: ISeriesApi<'Histogram'>) {
+          const last = pts[pts.length - 1]; const pre = pts.slice(0, -1);
+          const prev = lastPointTimeRef.current.get(key);
+          s.setData(pre);
+          const start = pre.length > 0 ? pre[pre.length - 1].value : last.value;
+          const end = last.value; const startTs = performance.now(); const dur = 450;
+          const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+          const step = (now: number) => {
+            const t = Math.min(1, (now - startTs) / dur);
+            const v = start + (end - start) * ease(t);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            s.update({ time: Number(last.time) as UTCTimestamp, value: v, color: (last as any).color } as HistogramData);
+            if (t < 1) requestAnimationFrame(step); else { lastPointTimeRef.current.set(key, Number(last.time)); s.setData(pts); }
+          };
+          if (prev === undefined || Number(last.time) >= prev) requestAnimationFrame(step);
+        })('down', animDown, down);
+      }
+      const lastTime = Math.max(upData[upData.length - 1]?.time as number || 0, downData[downData.length - 1]?.time as number || 0);
+      if (lastTime) lastPointTimeRef.current.set('column_composite', Number(lastTime));
     } else {
       const up = chart.addSeries(HistogramSeries, { color: '#25A69A', lastValueVisible: false, priceLineVisible: false });
       const down = chart.addSeries(HistogramSeries, { color: '#ef5350', lastValueVisible: false, priceLineVisible: false });
@@ -805,7 +1018,7 @@ const HistogramChart: React.FC<ChartProps> = ({
     }
 
     if (prevRange && latestTime !== null) {
-      const tolerance = 60;
+      const tolerance = 1;
       const prevTo = typeof prevRange.to === 'number' ? prevRange.to : Number(prevRange.to);
       const shouldStick = prevTo >= (latestTime - tolerance);
       if (shouldStick) {
