@@ -8,10 +8,10 @@ import {
     useFormattedChartData,
     GameType,
 } from "../../../../hooks/useFormattedChartData";
-import { useRouletteNumbers } from "../../../../utils/formatters/rouletterNumbers";
 import { chartTypes } from "../../../../types/types";
 import { ChartType } from "../../../../types/chart/types";
 import { ON_ROULETTE_NUMBER_UPDATE_SUBSCRIPTION } from "../../../../graphql/subscriptions/onRouletteNumberUpdate";
+import { useNumbersMemory } from "../../../../hooks/useNumbersMemory";
 
 
 interface RouletteTable {
@@ -37,6 +37,8 @@ export const useChartData = (
     startDate.setHours(0, 0, 0, 0);
     const endDate = new Date();
     endDate.setHours(23, 59, 59, 999);
+    console.log("startDate", startDate);
+    console.log("endDate", endDate);
 
     const {
         data: tablesData,
@@ -144,30 +146,28 @@ export const useChartData = (
     });
 
     const numeros = chartNumbersData?.GetLastRouletteTableNumbers;
-    const formattedNumbers = useRouletteNumbers(numeros || []);
+    const httpNumbers = numeros || [];
+    const {
+        numbers: formattedNumbers,
+        probabilities: realTimeProbabilities
+    } = useNumbersMemory(selectedTable, gameType, httpNumbers);
 
     const totalCount = tablesData?.GetRouletteTables.Total || 0;
     const marketHasNextPage = totalCount > 0 && marketPage * limit < totalCount;
     const marketHasPrevPage = marketPage > 1;
 
     return {
-        // data
         tableOptions,
         chartFormattedData,
         formattedNumbers,
         probabilities:
-            chartNumbersDataSubscription?.OnRouletteNumberUpdate?.Probabilities ??
-            rouletteProbData?.GetRouletteTableProbabilities.Probabilities,
-
-        // loading
+            realTimeProbabilities.length > 0 ? realTimeProbabilities :
+                chartNumbersDataSubscription?.OnRouletteNumberUpdate?.Probabilities ??
+                rouletteProbData?.GetRouletteTableProbabilities.Probabilities,
         marketLoading,
         chartLoading,
-
-        // errors
         errorTables,
         errorProbabilities,
-
-        // pagination
         marketHasNextPage,
         marketHasPrevPage,
     };

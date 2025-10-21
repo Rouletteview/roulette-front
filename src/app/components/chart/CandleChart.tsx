@@ -6,6 +6,7 @@ import {
   CandlestickSeries,
   MouseEventParams,
   UTCTimestamp,
+  ISeriesApi,
 
 } from 'lightweight-charts';
 import { translateRouletteTag, getYAxisTicks, isVoisinDuZero, isOrphelins, isTiersDuCylindre, isPlayZero } from '../../../utils/formatters/rouletterNumbers';
@@ -30,6 +31,14 @@ const CandleChart: React.FC<ChartProps> = ({
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
+  // Animation control similar to AreaChart
+  const defaultSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
+  const seriesMapRef = useRef<Map<string, ISeriesApi<'Candlestick'>>>(new Map());
+  const lastCandleTimeRef = useRef<Map<string, number>>(new Map());
+  const animFrameRef = useRef<number | null>(null);
+  const lastRenderedCandleRef = useRef<Map<string, { time: number; open: number; high: number; low: number; close: number }>>(new Map());
+  // keep latest data for tooltip (init effect doesn't depend on data)
+  const dataRef = useRef<typeof data>(data);
 
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [hasNewData, setHasNewData] = useState(false);
@@ -39,7 +48,7 @@ const CandleChart: React.FC<ChartProps> = ({
   const chartType = urlParams.get('chartType') || 'Candlestick';
 
 
-  // console.log('🔄 CandleChart - chartType:', chartType, 'gameType:', gameType, 'selectedTable:', selectedTable);
+ 
 
   const [tooltipData, setTooltipData] = useState<{
     time: string;
@@ -53,6 +62,10 @@ const CandleChart: React.FC<ChartProps> = ({
     closeTag?: string;
   } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    dataRef.current = data;
+  }, [data]);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -234,7 +247,16 @@ const CandleChart: React.FC<ChartProps> = ({
         lastValueVisible: false,
         priceLineVisible: false,
       });
+      // expose default series for animation updates
+      defaultSeriesRef.current = defaultSeries;
     }
+    // store all created series
+    seriesMapRef.current.clear();
+    if (defaultSeries) seriesMapRef.current.set('default', defaultSeries);
+    if (redSeries) seriesMapRef.current.set('red', redSeries);
+    if (blackSeries) seriesMapRef.current.set('black', blackSeries);
+    if (greenSeries) seriesMapRef.current.set('green', greenSeries);
+    if (whiteSeries) seriesMapRef.current.set('white', whiteSeries);
 
     if (!data || !Array.isArray(data)) {
       console.log('CandleChart: No valid data');
@@ -400,6 +422,15 @@ const CandleChart: React.FC<ChartProps> = ({
       } else {
 
         defaultSeries.setData(validData.map(stripCandle));
+        // remember last candle time for animation logic
+        lastCandleTimeRef.current.set('default', Number(validData[validData.length - 1].time));
+        lastRenderedCandleRef.current.set('default', {
+          time: Number(validData[validData.length - 1].time),
+          open: validData[validData.length - 1].open,
+          high: validData[validData.length - 1].high,
+          low: validData[validData.length - 1].low,
+          close: validData[validData.length - 1].close,
+        });
 
         if (yTicks && yTicks.length > 0 && chartType !== 'Candlestick') {
           yTicks.forEach(tick => {
@@ -477,8 +508,23 @@ const CandleChart: React.FC<ChartProps> = ({
         }
       }
 
+      // Set a sensible initial time position to show recent candles
+      const latestUnix = (() => {
+        const arr = dataRef.current || [];
+        if (arr.length === 0) return Math.floor(Date.now() / 1000);
+        return arr.reduce((max, d) => Math.max(max, Number(d.time)), -Infinity);
+      })();
+      if (Number.isFinite(latestUnix)) {
+        chart.timeScale().setVisibleRange({
+          from: (latestUnix - 30 * 60) as UTCTimestamp,
+          to: latestUnix as UTCTimestamp,
+        });
+      } else {
+        chart.timeScale().scrollToRealTime();
+      }
+
       if (prevRange && latestTime !== null && latestTime !== -Infinity) {
-        const tolerance = 60;
+        const tolerance = 1;
         const prevTo = typeof prevRange.to === 'number' ? prevRange.to : Number(prevRange.to);
         const shouldStick = prevTo >= (latestTime - tolerance);
         if (shouldStick) {
@@ -488,26 +534,6 @@ const CandleChart: React.FC<ChartProps> = ({
           chart.timeScale().setVisibleRange(prevRange);
           setHasNewData(true);
         }
-      } else {
-        if (prevRange && latestTime !== null && latestTime !== -Infinity) {
-          const tolerance = 60;
-          const prevTo = typeof prevRange.to === 'number' ? prevRange.to : Number(prevRange.to);
-          const shouldStick = prevTo >= (latestTime - tolerance);
-          if (shouldStick) {
-            chart.timeScale().scrollToRealTime();
-            setHasNewData(false);
-          } else {
-            chart.timeScale().setVisibleRange(prevRange);
-            setHasNewData(true);
-          }
-        } else {
-          chart.timeScale().setVisibleRange({
-            from: Math.floor(Date.now() / 1000) - (30 * 60) as UTCTimestamp,
-            to: Math.floor(Date.now() / 1000) as UTCTimestamp,
-          });
-          setHasNewData(false);
-        }
-        setHasNewData(false);
       }
     }
 
@@ -526,7 +552,8 @@ const CandleChart: React.FC<ChartProps> = ({
       }
 
       const time = param.time as number;
-      const candleData = data.find(d => d.time === time);
+      const currentData = dataRef.current || [];
+      const candleData = currentData.find(d => d.time === time);
 
       if (candleData && typeof candleData === 'object' && 'close' in candleData && candleData.close !== null) {
         const timestamp = typeof time === 'number' ? time : Number(time);
@@ -585,9 +612,113 @@ const CandleChart: React.FC<ChartProps> = ({
     return () => {
       chart.remove();
       resizeObserver.disconnect();
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, height, width, gameType]);
+  }, [height, width, gameType]);
+
+  // Animate last candle on new data for all modes (per-series)
+  useEffect(() => {
+    if (!data || data.length === 0) return;
+
+    // build per-series buckets
+    const isRedAndBlack = gameType === 'RedAndBlack';
+    const isDozen = gameType === 'Dozen';
+    const isSpecialGame = gameType === 'VoisinsDuZero' || gameType === 'Orphelins' || gameType === 'TiersDuCylindre' || gameType === 'PlayZero';
+
+    const sorted = [...data].sort((a, b) => Number(a.time) - Number(b.time));
+
+    type Candle = { time: number; open: number; high: number; low: number; close: number };
+
+    const seriesBuckets = new Map<string, Candle[]>();
+    if (isRedAndBlack) {
+      seriesBuckets.set('red', []); seriesBuckets.set('black', []); seriesBuckets.set('green', []);
+      sorted.forEach(c => {
+        const s: Candle = { time: Number(c.time), open: c.open, high: c.high, low: c.low, close: c.close };
+        if (c.closeTag === 'Red') seriesBuckets.get('red')!.push(s);
+        else if (c.closeTag === 'Black') seriesBuckets.get('black')!.push(s);
+        else if (c.closeTag === 'Green' || c.closeTag === 'Zero') seriesBuckets.get('green')!.push(s);
+      });
+    } else if (isDozen) {
+      seriesBuckets.set('red', []); seriesBuckets.set('white', []); seriesBuckets.set('green', []);
+      sorted.forEach(c => {
+        const v = c.close; const s: Candle = { time: Number(c.time), open: c.open, high: c.high, low: c.low, close: c.close };
+        if (v >= 1 && v <= 12) seriesBuckets.get('red')!.push(s);
+        else if (v >= 13 && v <= 24) seriesBuckets.get('white')!.push(s);
+        else if (v >= 25 && v <= 36) seriesBuckets.get('green')!.push(s);
+      });
+    } else if (isSpecialGame) {
+      seriesBuckets.set('green', []); seriesBuckets.set('red', []);
+      sorted.forEach(c => {
+        const v = c.close; const s: Candle = { time: Number(c.time), open: c.open, high: c.high, low: c.low, close: c.close };
+        const belongs = (gameType === 'VoisinsDuZero' && isVoisinDuZero(v)) ||
+          (gameType === 'Orphelins' && isOrphelins(v)) ||
+          (gameType === 'TiersDuCylindre' && isTiersDuCylindre(v)) ||
+          (gameType === 'PlayZero' && isPlayZero(v));
+        if (belongs || v === 0) seriesBuckets.get('green')!.push(s); else seriesBuckets.get('red')!.push(s);
+      });
+    } else {
+      seriesBuckets.set('default', sorted.map(c => ({ time: Number(c.time), open: c.open, high: c.high, low: c.low, close: c.close })));
+    }
+
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+    const animateSeries = (key: string, candles: Candle[], durationMs: number) => {
+      const s = seriesMapRef.current.get(key);
+      if (!s || candles.length === 0) return;
+      const prevTime = lastCandleTimeRef.current.get(key) ?? null;
+      const last = candles[candles.length - 1];
+      const currentTime = last.time;
+
+      // seed if first time
+      if (prevTime === null) {
+        s.setData(candles.map(c => ({ time: c.time as UTCTimestamp, open: c.open, high: c.high, low: c.low, close: c.close })));
+        lastCandleTimeRef.current.set(key, currentTime);
+        lastRenderedCandleRef.current.set(key, { time: currentTime, open: last.open, high: last.high, low: last.low, close: last.close });
+        return;
+      }
+
+      const pre = candles.slice(0, -1);
+      const end = last;
+      const startSeed = currentTime > prevTime
+        ? (pre[pre.length - 1] ? { open: pre[pre.length - 1].close, high: pre[pre.length - 1].close, low: pre[pre.length - 1].close, close: pre[pre.length - 1].close } : { open: end.open, high: end.high, low: end.low, close: end.open })
+        : (lastRenderedCandleRef.current.get(key) && lastRenderedCandleRef.current.get(key)!.time === currentTime
+          ? lastRenderedCandleRef.current.get(key)!
+          : { time: currentTime, open: end.open, high: end.high, low: end.low, close: end.close });
+
+      s.setData(pre.map(c => ({ time: c.time as UTCTimestamp, open: c.open, high: c.high, low: c.low, close: c.close })));
+
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+      const startTs = performance.now();
+      const step = (now: number) => {
+        const t = Math.min(1, (now - startTs) / durationMs);
+        const e = easeOutCubic(t);
+        const lerp = (a: number, b: number) => a + (b - a) * e;
+        const startOpen = (startSeed as { open: number }).open;
+        const startHigh = (startSeed as { high: number }).high;
+        const startLow = (startSeed as { low: number }).low;
+        const startClose = (startSeed as { close: number }).close;
+        s.update({
+          time: currentTime as UTCTimestamp,
+          open: lerp(startOpen, end.open),
+          high: lerp(startHigh, end.high),
+          low: lerp(startLow, end.low),
+          close: lerp(startClose, end.close),
+        });
+        if (t < 1) {
+          animFrameRef.current = requestAnimationFrame(step);
+        } else {
+          lastCandleTimeRef.current.set(key, currentTime);
+          lastRenderedCandleRef.current.set(key, { time: currentTime, open: end.open, high: end.high, low: end.low, close: end.close });
+          s.setData(candles.map(c => ({ time: c.time as UTCTimestamp, open: c.open, high: c.high, low: c.low, close: c.close })));
+          animFrameRef.current = null;
+        }
+      };
+      animFrameRef.current = requestAnimationFrame(step);
+    };
+
+    // run per series with same duration
+    seriesBuckets.forEach((candles, key) => animateSeries(key, candles, 1000));
+  }, [data]);
 
 
   return (

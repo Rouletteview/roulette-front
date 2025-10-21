@@ -32,13 +32,18 @@ const AreaChart: React.FC<ChartProps> = ({
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesMapRef = useRef<Map<string, ISeriesApi<'Area'>>>(new Map());
+  const lastPointTimeRef = useRef<Map<string, number>>(new Map());
+  const animTokenRef = useRef<Map<string, { frameId: number | null; targetTime: number }>>(new Map());
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [tooltipData, setTooltipData] = useState<{
     time: string;
     series: { id: string; value: number; color: string; tag?: string; originalValue?: number }[];
   } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
-  const [hasNewData, setHasNewData] = useState(false);
+
+  // Keep latest data for tooltip to avoid stale closures
+  const dataRef = useRef(data);
+  useEffect(() => { dataRef.current = data; }, [data]);
 
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -144,6 +149,8 @@ const AreaChart: React.FC<ChartProps> = ({
         if (validData.length > 0) {
           areaSeries.setData(validData as AreaData[]);
           seriesMap.set(series.id, areaSeries);
+          const last = validData[validData.length - 1] as AreaData;
+          lastPointTimeRef.current.set(series.id, Number(last.time));
         }
       }
     });
@@ -151,13 +158,7 @@ const AreaChart: React.FC<ChartProps> = ({
     seriesMapRef.current = seriesMap;
 
 
-    if (seriesMap.size > 0) {
-      chart.timeScale().setVisibleRange({
-        from: Math.floor(Date.now() / 1000) - (30 * 60) as UTCTimestamp,
-        to: Math.floor(Date.now() / 1000) as UTCTimestamp,
-      });
-      setHasNewData(false);
-    }
+
 
 
     if (seriesMap.size > 0 && yTicks && yTicks.length > 0) {
@@ -194,8 +195,9 @@ const AreaChart: React.FC<ChartProps> = ({
       const seriesData: { id: string; value: number; color: string, tag?: string; originalValue?: number }[] = [];
 
 
+      const currentData = dataRef.current || [];
       seriesMap.forEach((_series, seriesId) => {
-        const originalPoint = data.find(s => s.id === seriesId)?.data.find(
+        const originalPoint = currentData.find(s => s.id === seriesId)?.data.find(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (d: any) => d.time === time
         );
@@ -262,6 +264,10 @@ const AreaChart: React.FC<ChartProps> = ({
     return () => {
       chart.remove();
       resizeObserver.disconnect();
+      animTokenRef.current.forEach(token => {
+        if (token.frameId) cancelAnimationFrame(token.frameId);
+      });
+      animTokenRef.current.clear();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [height, width, gameType]);
@@ -298,7 +304,47 @@ const AreaChart: React.FC<ChartProps> = ({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const validData = series.data.filter(item => item && typeof item.time === 'number' && !isNaN((item as any).value))
         .sort((a, b) => Number(a.time) - Number(b.time));
-      if (validData.length > 0) {
+      if (validData.length === 0) return;
+
+      const lastPoint = validData[validData.length - 1] as AreaData;
+      const prevLastTime = lastPointTimeRef.current.get(series.id);
+      if (prevLastTime === undefined) {
+        (s as unknown as ISeriesApi<'Area'>).setData(validData as AreaData[]);
+        lastPointTimeRef.current.set(series.id, Number(lastPoint.time));
+        return;
+      }
+
+      const currentLastTime = Number(lastPoint.time);
+      const running = animTokenRef.current.get(series.id);
+      if (running && running.targetTime === currentLastTime) return;
+      if (currentLastTime > prevLastTime) {
+        const preData = validData.slice(0, validData.length - 1) as AreaData[];
+        (s as unknown as ISeriesApi<'Area'>).setData(preData);
+
+        const prevPoint = preData[preData.length - 1] as AreaData | undefined;
+        const startValue = prevPoint && 'value' in prevPoint ? (prevPoint as unknown as { value: number }).value : (lastPoint as unknown as { value: number }).value;
+        const endValue = (lastPoint as unknown as { value: number }).value;
+
+        const durationMs = 1000;
+        const startTs = performance.now();
+        const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+        const step = (now: number) => {
+          const t = Math.min(1, (now - startTs) / durationMs);
+          const eased = easeOutCubic(t);
+          const interp = startValue + (endValue - startValue) * eased;
+          (s as unknown as ISeriesApi<'Area'>).update({ time: currentLastTime as UTCTimestamp, value: interp } as unknown as AreaData);
+          if (t < 1) {
+            const frameId = requestAnimationFrame(step);
+            animTokenRef.current.set(series.id, { frameId, targetTime: currentLastTime });
+          } else {
+            lastPointTimeRef.current.set(series.id, currentLastTime);
+            (s as unknown as ISeriesApi<'Area'>).setData(validData as AreaData[]);
+            animTokenRef.current.delete(series.id);
+          }
+        };
+        const frameId = requestAnimationFrame(step);
+        animTokenRef.current.set(series.id, { frameId, targetTime: currentLastTime });
+      } else {
         (s as unknown as ISeriesApi<'Area'>).setData(validData as AreaData[]);
       }
     });
@@ -309,27 +355,14 @@ const AreaChart: React.FC<ChartProps> = ({
       const shouldStick = prevTo >= (latestTime - tolerance);
       if (shouldStick) {
         chart.timeScale().scrollToRealTime();
-        setHasNewData(false);
+
       } else {
         chart.timeScale().setVisibleRange(prevRange);
-        setHasNewData(true);
+
       }
     }
 
-    const onRangeChange = () => {
-      const vr = chart.timeScale().getVisibleRange();
-      if (vr && latestTime !== null) {
-        const to = typeof vr.to === 'number' ? vr.to : Number(vr.to);
-        if (to >= latestTime - 1) {
-          setHasNewData(false);
-        }
-      }
-    };
-    chart.timeScale().subscribeVisibleTimeRangeChange(onRangeChange);
 
-    return () => {
-      chart.timeScale().unsubscribeVisibleTimeRangeChange(onRangeChange);
-    };
   }, [data]);
 
   return (
@@ -356,31 +389,6 @@ const AreaChart: React.FC<ChartProps> = ({
         </div>
       )}
       <div ref={chartContainerRef} style={{ width: '100%' }} />
-      {hasNewData && (
-        <button
-          onClick={() => {
-            if (!chartRef.current) return;
-            chartRef.current.timeScale().scrollToRealTime();
-            setHasNewData(false);
-          }}
-          style={{
-            position: 'absolute',
-            bottom: 16,
-            right: 16,
-            padding: '8px 12px',
-            background: '#D9A425',
-            color: '#0d1b2a',
-            borderRadius: 8,
-            border: 'none',
-            fontSize: 12,
-            fontWeight: 700,
-            cursor: 'pointer',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.4)'
-          }}
-        >
-          Nueva data
-        </button>
-      )}
       {tooltipData && tooltipPosition && (
         <div
           ref={tooltipRef}

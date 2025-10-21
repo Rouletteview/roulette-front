@@ -15,18 +15,21 @@ interface ActiveBet {
 interface BetStatusState {
     betResult: BetResult | null;
     activeBets: ActiveBet[];
+    realTimeUpdates: boolean;
     setBetResult: (result: BetResult | null) => void;
     clearBetResult: () => void;
     addActiveBet: (bet: ActiveBet) => void;
     removeActiveBet: (betId: string) => void;
     clearActiveBets: () => void;
     getActiveBetsByGameType: (gameType: string) => ActiveBet[];
+    setRealTimeUpdates: (enabled: boolean) => void;
     canPlaceBet: (gameType: string, tag: string) => boolean;
 }
 
 export const useBetStatusStore = create<BetStatusState>((set, get) => ({
     betResult: null,
     activeBets: [],
+    realTimeUpdates: true,
     setBetResult: (result) => set({ betResult: result }),
     clearBetResult: () => set({ betResult: null }),
     addActiveBet: (bet) => set((state) => ({
@@ -36,6 +39,7 @@ export const useBetStatusStore = create<BetStatusState>((set, get) => ({
         activeBets: state.activeBets.filter(bet => bet.id !== betId)
     })),
     clearActiveBets: () => set({ activeBets: [] }),
+    setRealTimeUpdates: (enabled) => set({ realTimeUpdates: enabled }),
     getActiveBetsByGameType: (gameType) => {
         const state = get();
         return state.activeBets.filter(bet => bet.gameType === gameType);
