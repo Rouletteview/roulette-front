@@ -41,7 +41,6 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ isVisible, onClose 
 
     const user = data?.GetUser;
 
-    console.log(user);
 
 
     const handleApprovePayment = async () => {
@@ -54,7 +53,6 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ isVisible, onClose 
                 return;
             }
 
-            console.log(payment.Id, subscription.Id)
             await updatePaymentStatus({
                 variables: {
                     input: {
@@ -65,7 +63,6 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ isVisible, onClose 
                 }
             });
 
-            console.log('Pago aprobado exitosamente');
             onClose();
         } catch (error) {
             console.error('Error approving payment:', error);
@@ -80,8 +77,7 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ isVisible, onClose 
         setIsRejectionModalVisible(false);
     };
 
-    const handleSubmitRejection = (comment: string) => {
-        console.log('Rechazar pago con comentario:', comment);
+    const handleSubmitRejection = (_comment: string) => {
         onClose();
     };
 
@@ -100,7 +96,6 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ isVisible, onClose 
                 }
             });
 
-            console.log('Usuario eliminado exitosamente');
             setShowDeleteConfirmModal(false);
             onClose();
         } catch (error) {

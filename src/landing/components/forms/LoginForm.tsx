@@ -30,7 +30,6 @@ const LoginForm = () => {
     const { Login, loading } = useLogin();
 
     const { refetch: getUserInfo } = useQuery(GET_USER_INFO, { skip: true });
-    console.log(getUserInfo)
     if (loading) return <LoadingOverlay />;
 
 
@@ -63,7 +62,6 @@ const LoginForm = () => {
             navigate('/home');
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: unknown) {
-            console.log(error)
             setErrorMessage(getGraphQLErrorMessage(error));
         }
     };

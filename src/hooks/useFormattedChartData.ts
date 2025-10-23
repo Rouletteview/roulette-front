@@ -39,7 +39,6 @@ export const useFormattedChartData = ({
   gameType?: GameType;
 }): MultiSeries[] => {
 
-  console.log('data', data)
 
 
 
@@ -198,8 +197,6 @@ const formatCandleChart = (grouped: GroupedData[], gameType?: GameType) => {
   let prevClose: number | undefined = undefined;
   let prevCloseTag: string | undefined = undefined;
   let prevCloseOriginal: number | undefined = undefined;
-  let prevCloseOriginalTag: string | undefined = undefined;
-  console.log(prevCloseOriginalTag)
 
 
   const candles = Array.from(map.entries()).sort((a, b) => a[0] - b[0]).map(([interval, entries]) => {
@@ -221,7 +218,6 @@ const formatCandleChart = (grouped: GroupedData[], gameType?: GameType) => {
     prevClose = close;
     prevCloseTag = closeTag;
     prevCloseOriginal = closeOriginal;
-    prevCloseOriginalTag = closeTag;
     const isRedAndBlack = gameType === 'RedAndBlack';
     return {
       time,

@@ -10,8 +10,6 @@ import { useRegister } from "../../../hooks/useRegister";
 import { useCountries } from "../../../hooks/useCountries";
 import { RegisterFormData, registerSchema } from "../../schemas/registerSchema";
 import { getGraphQLErrorMessage } from "../../../utils/errorMessages";
-import { START_FREE_SUBSCRIPTION_MUTATION } from "../../../graphql/mutations/subscription/startFreeSubscription";
-import { useMutation } from "@apollo/client";
 
 
 
@@ -38,14 +36,11 @@ const RegisterForm = () => {
     const { registerUser, loading } = useRegister();
     const { data } = useCountries();
 
-    const [startFreeSubscription] = useMutation(START_FREE_SUBSCRIPTION_MUTATION);
 
 
 
 
     if (loading) return <LoadingOverlay />;
-
-
 
 
     const onSubmit = async (data: RegisterFormData) => {
@@ -70,8 +65,6 @@ const RegisterForm = () => {
                     }
                 },
             });
-
-            await startFreeSubscription();
 
             navigate("/confirmar-correo", { state: { message: "Email confirmado con éxito", ok: true } });
 

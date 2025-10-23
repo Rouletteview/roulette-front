@@ -37,34 +37,44 @@ const HomePage = () => {
 
   const hasLoggedIn = userData?.GetUserInfo.LastLogin
 
-  const { isFreeTrial } = useSubscription();
+  const { isFreeTrial, hasPremium } = useSubscription();
 
 
 
-  const payments = subscriptionData?.GetCurrentUserSubscription.Payments
 
   const handleStartFreeSubscription = useCallback(async () => {
     try {
       setHasTriedToActivateSubscription(true);
-      await startFreeSubscription()
+      await startFreeSubscription({
+        variables: {
+          input: {
+            rouletteTableId: "67fd3865f3b913ee91c31526",
+          }
+        }
+      })
     } catch (error: unknown) {
-
       const errorMessage = getGraphQLErrorMessage(error);
-      if (!errorMessage.includes("ya tiene una suscripción")) {
+      if (!errorMessage.includes("ya tiene una suscripción") &&
+        !errorMessage.includes("subscription already exists")) {
         showErrorToast(errorMessage);
       }
     }
   }, [startFreeSubscription]);
 
   useEffect(() => {
-    if (!isAdmin &&
+
+    const shouldCreateSubscription = !isAdmin &&
       !subscriptionData?.GetCurrentUserSubscription &&
       !loading &&
       !getCurrentUserSubscriptionLoading &&
-      !hasTriedToActivateSubscription) {
+      !hasTriedToActivateSubscription &&
+      userData?.GetUserInfo;
+
+
+    if (shouldCreateSubscription) {
       handleStartFreeSubscription();
     }
-  }, [isAdmin, subscriptionData, loading, getCurrentUserSubscriptionLoading, hasTriedToActivateSubscription, handleStartFreeSubscription]);
+  }, [isAdmin, subscriptionData, loading, getCurrentUserSubscriptionLoading, hasTriedToActivateSubscription, handleStartFreeSubscription, userData]);
 
   if (getCurrentUserSubscriptionLoading || userDataLoading) return <LoadingOverlay />
 
@@ -82,8 +92,8 @@ const HomePage = () => {
                 <h1 className='text-xl lg:text-7xl font-semibold leading-7 lg:leading-20'><span className='text-[#D9A425]'>¡Analiza y gana! </span>con nuestros gráficos en tiempo real del juego de la <span className='text-[#D9A425]'>ruleta de casino</span> </h1>
 
               </div>
-             
-              {isFreeTrial ? (
+
+              {!isAdmin && !hasPremium && isFreeTrial ? (
                 <button
                   onClick={() => navigate('/subscription')}
                   className="w-full lg:w-[390px]   bg-[#D9A425] hover:bg-[#B3831D] 
@@ -95,10 +105,10 @@ const HomePage = () => {
                   yellow-button-shadow
                   cursor-pointer
                   disabled:cursor-not-allowed">
-                  {payments?.length === 0 ? "Obtener mas ruletas" : ''}
+                  Obtener mas ruletas
                 </button>
               ) : null}
-              
+
             </div>
           </div>
         </HeroSection>

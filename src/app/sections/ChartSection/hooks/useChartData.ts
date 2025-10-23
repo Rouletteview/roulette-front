@@ -37,8 +37,6 @@ export const useChartData = (
     startDate.setHours(0, 0, 0, 0);
     const endDate = new Date();
     endDate.setHours(23, 59, 59, 999);
-    console.log("startDate", startDate);
-    console.log("endDate", endDate);
 
     const {
         data: tablesData,
@@ -73,7 +71,7 @@ export const useChartData = (
         skip: !selectedTable || !gameType,
     });
 
-    const { data: chartNumbersDataSubscription, error: errorSubscription } =
+    const { data: chartNumbersDataSubscription } =
         useSubscription(ON_ROULETTE_NUMBER_UPDATE_SUBSCRIPTION, {
             variables: {
                 gameType: gameType,
@@ -83,13 +81,11 @@ export const useChartData = (
             skip: !gameType,
         });
 
-    console.log("chartNumbersDataSubscription", chartNumbersDataSubscription);
-    console.log("errorSubscription", errorSubscription);
 
     type ResultEntry = { Date: string; Tag: string; Number: number };
     const [liveResults, setLiveResults] = useState<ResultEntry[]>([]);
 
-    // Seed live results when the base query loads or selection changes
+
     useEffect(() => {
         if (rouletteProbData?.GetRouletteTableProbabilities?.Results) {
             setLiveResults(rouletteProbData.GetRouletteTableProbabilities.Results as ResultEntry[]);
@@ -98,7 +94,7 @@ export const useChartData = (
         }
     }, [selectedTable, gameType, rouletteProbData?.GetRouletteTableProbabilities?.Results]);
 
-    // Apply incoming subscription updates to the live results buffer
+
     useEffect(() => {
         const payload = chartNumbersDataSubscription?.OnRouletteNumberUpdate;
         if (!payload) return;

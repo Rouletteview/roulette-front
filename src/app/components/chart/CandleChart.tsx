@@ -48,7 +48,7 @@ const CandleChart: React.FC<ChartProps> = ({
   const chartType = urlParams.get('chartType') || 'Candlestick';
 
 
- 
+
 
   const [tooltipData, setTooltipData] = useState<{
     time: string;
@@ -259,7 +259,6 @@ const CandleChart: React.FC<ChartProps> = ({
     if (whiteSeries) seriesMapRef.current.set('white', whiteSeries);
 
     if (!data || !Array.isArray(data)) {
-      console.log('CandleChart: No valid data');
       return;
     }
 
