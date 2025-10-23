@@ -62,23 +62,24 @@ export const useChartData = (
         variables: {
             request: {
                 TableId: selectedTable,
-                GameType: gameType,
+                GameType: gameType || 'RedAndBlack',
                 StartDate: startDate.toISOString(),
                 EndDate: endDate.toISOString(),
                 ProbabilitiesResultLimit: probabilitiesResultLimit,
             },
         },
-        skip: !selectedTable || !gameType,
+        skip: !selectedTable,
+        fetchPolicy: 'cache-and-network',
     });
 
     const { data: chartNumbersDataSubscription } =
         useSubscription(ON_ROULETTE_NUMBER_UPDATE_SUBSCRIPTION, {
             variables: {
-                gameType: gameType,
+                gameType: gameType || 'RedAndBlack',
                 tableId: selectedTable || undefined,
                 probabilitiesResultLimit: probabilitiesResultLimit,
             },
-            skip: !gameType,
+            skip: !selectedTable,
         });
 
 
@@ -99,7 +100,7 @@ export const useChartData = (
         const payload = chartNumbersDataSubscription?.OnRouletteNumberUpdate;
         if (!payload) return;
 
-        // If a table is selected, ensure updates match it
+     
         if (selectedTable && payload.TableId && payload.TableId !== selectedTable) return;
 
         const result = payload.Result as ResultEntry | undefined;
@@ -138,7 +139,7 @@ export const useChartData = (
         chartType: selectedType
             ? chartTypes[selectedType as keyof typeof chartTypes]
             : chartTypes.Candlestick,
-        gameType: gameType || undefined,
+        gameType: gameType || 'RedAndBlack',
     });
 
     const numeros = chartNumbersData?.GetLastRouletteTableNumbers;

@@ -65,6 +65,7 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined }> =
         handleMarketSearch,
         handleMarketPageChange,
         setFullscreen,
+        resetState,
     } = useChartSectionState();
 
     const {
@@ -84,7 +85,7 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined }> =
         state.marketPage
     );
 
-  
+
     const {
         handleChartReady,
         handleZoomIn,
@@ -113,6 +114,48 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined }> =
             }
         }
     }, [isFreeTrial, canAccessMultipleTables, tableOptions, state.selectedTable, handleTableChange]);
+
+
+    useEffect(() => {
+        if (isFreeTrial && !canAccessMultipleTables) {
+            //
+        }
+    }, [isFreeTrial, canAccessMultipleTables]);
+
+
+    useEffect(() => {
+        if (subscriptionData !== undefined) {
+
+            const hasSubscription = subscriptionData?.GetCurrentUserSubscription;
+            if (!hasSubscription && (state.selectedTable || state.selectedType || state.gameType)) {
+                resetState();
+            }
+        }
+    }, [subscriptionData, state.selectedTable, state.selectedType, state.gameType, resetState]);
+
+
+    useEffect(() => {
+
+        if (subscriptionData !== undefined && !state.selectedTable && !state.selectedType && !state.gameType) {
+
+            const currentParams = new URLSearchParams(window.location.search);
+            if (currentParams.has('chartType') || currentParams.has('chartZone') || currentParams.has('table')) {
+                window.history.replaceState({}, '', window.location.pathname);
+            }
+        }
+    }, [subscriptionData, state.selectedTable, state.selectedType, state.gameType]);
+
+
+    useEffect(() => {
+
+        if (subscriptionData?.GetCurrentUserSubscription && !state.selectedTable && !state.selectedType && !state.gameType) {
+            const currentParams = new URLSearchParams(window.location.search);
+            if (currentParams.has('chartType') || currentParams.has('chartZone') || currentParams.has('table')) {
+
+                window.history.replaceState({}, '', window.location.pathname);
+            }
+        }
+    }, [subscriptionData, state.selectedTable, state.selectedType, state.gameType]);
 
     const onZoomIn = () => handleZoomIn(state.selectedType);
     const onZoomOut = () => handleZoomOut(state.selectedType);
