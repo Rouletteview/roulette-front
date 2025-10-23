@@ -20,7 +20,7 @@ const SubscriptionPage: React.FC = () => {
 
 
 
-    const subscriptionsStatus = subscriptionData?.GetCurrentUserSubscription.Payments.status
+    const subscriptionsStatus = subscriptionData?.GetCurrentUserSubscription?.Payments?.[0]?.Status
 
 
     const priceToPlan: Record<string, string> = {

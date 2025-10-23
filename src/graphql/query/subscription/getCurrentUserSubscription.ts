@@ -12,16 +12,8 @@ query GetCurrentUserSubscription {
         StartDate
         LastPay
         CreatedAt
-        Payments {
-            Id
-            PhotoUrl
-            Reference
-            Status
-            PaymentMethod
-            CreatedAt
-            ReviewComment
-        }
-            FreeTrial
+        FreeTrial
+        FreeTrialTableId
     }
 }
 

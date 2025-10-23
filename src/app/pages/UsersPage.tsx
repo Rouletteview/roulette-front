@@ -115,8 +115,7 @@ const UsersPage: React.FC = () => {
         setIsModalVisible(true);
     };
 
-    const handleDeleteUser = async (userId: string) => {
-        console.log('Deactivating user:', userId);
+    const handleDeleteUser = async (_userId: string) => {
         await refetch();
     };
 

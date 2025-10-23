@@ -37,7 +37,6 @@ const ActivateUserRedirect = () => {
             state: { message: "Email confirmado con éxito", ok: true },
           });
         } catch (error: unknown) {
-          console.log(error);
           navigate("/iniciar-sesion", {
             state: { message: getGraphQLErrorMessage(error), ok: false },
           });

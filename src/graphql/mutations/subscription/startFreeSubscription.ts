@@ -2,8 +2,8 @@ import { gql } from "@apollo/client";
 
 
 export const START_FREE_SUBSCRIPTION_MUTATION = gql`
-mutation StartFreeSubscription {
-    StartFreeSubscription {
+mutation StartFreeSubscription($input: StartFreeSubscriptionRequest!) {
+    StartFreeSubscription(input: $input) {
         Id
         UserId
         IsActive

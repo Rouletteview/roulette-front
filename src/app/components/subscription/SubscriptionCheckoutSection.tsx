@@ -37,12 +37,10 @@ const SubscriptionCheckoutSection = ({ selectedPlan, selectedMethod }: Props) =>
         PhotoFile: null
     })
 
-    console.log('subscriptionState', subscriptionState)
 
     const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-    const [createSubscription, { error: createSubscriptionError }] = useMutation(CREATE_SUBSCRIPTION_MUTATION);
-    console.log('createSubscriptionError', createSubscriptionError)
+    const [createSubscription] = useMutation(CREATE_SUBSCRIPTION_MUTATION);
 
     const handleCreateSubscription = async () => {
         const subscriptionData = {

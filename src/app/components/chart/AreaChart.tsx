@@ -48,9 +48,7 @@ const AreaChart: React.FC<ChartProps> = ({
 
   const urlParams = new URLSearchParams(window.location.search);
   const chartType = urlParams.get('chartType') || 'Area';
-  const selectedTable = urlParams.get('table') || '';
 
-  console.log('🔄 AreaChart - chartType:', chartType, 'gameType:', gameType, 'selectedTable:', selectedTable);
 
 
 

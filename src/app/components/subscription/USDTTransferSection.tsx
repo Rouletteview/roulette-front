@@ -13,14 +13,11 @@ interface Props {
 
 const USDTTransferSection = ({ setSubscriptionState, subscriptionState, handleCreateSubscription }: Props) => {
     const [uploadedImage, setUploadedImage] = useState<File | null>(null)
-    console.log(uploadedImage)
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleFileUpload = (file: File) => {
         if (file && file.type.startsWith('image/')) {
             setUploadedImage(file)
-            console.log(file)
-            console.log(subscriptionState)
             setSubscriptionState({ ...subscriptionState, PhotoFile: file })
         }
     }

@@ -31,7 +31,6 @@ const BankTransferSection = ({ setSubscriptionState, subscriptionState, handleCr
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true)
     try {
-      console.log('Form data:', data)
 
       const { referenceNumber } = data
       setSubscriptionState({ ...subscriptionState, Reference: referenceNumber })

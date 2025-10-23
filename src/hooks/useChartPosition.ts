@@ -82,22 +82,18 @@ export const useChartPosition = (chartType: string, gameType: string, selectedTa
 
     const restorePosition = useCallback(() => {
         if (!chartRef.current) {
-            console.log('📊 No chart reference available');
             return;
         }
 
         try {
             const key = getStorageKey();
-            console.log('📊 Looking for saved position with key:', key);
 
             const savedPosition = sessionStorage.getItem(key);
-            console.log('📊 Saved position found:', savedPosition);
 
             if (savedPosition) {
                 const position: ChartPosition = JSON.parse(savedPosition);
                 const timeScale = chartRef.current.timeScale();
 
-                console.log('📊 Attempting to restore position:', position);
 
                 isRestoring.current = true;
                 currentKey.current = key;
@@ -108,7 +104,6 @@ export const useChartPosition = (chartType: string, gameType: string, selectedTa
                         from: position.from,
                         to: position.to,
                     });
-                    console.log('✅ Position restored successfully');
                 } catch (setRangeError) {
                     console.warn('⚠️ Could not set visible range, chart may not have data yet:', setRangeError);
                     // Don't throw, just log the warning
@@ -118,7 +113,6 @@ export const useChartPosition = (chartType: string, gameType: string, selectedTa
                     isRestoring.current = false;
                 }, 200);
             } else {
-                console.log('📊 No saved position found, setting default range');
                 isRestoring.current = true;
 
                 setDefaultRange();
@@ -158,7 +152,6 @@ export const useChartPosition = (chartType: string, gameType: string, selectedTa
         if (currentKey.current && currentKey.current !== newKey) {
 
             sessionStorage.removeItem(currentKey.current);
-            console.log('🗑️ Cleared old chart position for:', currentKey.current);
 
             const keysToRemove = Object.keys(sessionStorage).filter(key =>
                 key.startsWith('chartPosition_') &&
@@ -168,7 +161,6 @@ export const useChartPosition = (chartType: string, gameType: string, selectedTa
             keysToRemove.forEach(key => {
                 if (key !== newKey) {
                     sessionStorage.removeItem(key);
-                    console.log('🗑️ Cleared related position:', key);
                 }
             });
         }
@@ -179,17 +171,14 @@ export const useChartPosition = (chartType: string, gameType: string, selectedTa
 
     useEffect(() => {
         const handleBeforeUnload = () => {
-            console.log('🔄 Before unload - saving position');
             savePosition();
         };
 
         const handleSaveChartPosition = () => {
-            console.log('💾 Save chart position event triggered');
             savePosition();
         };
 
         const handleSetDefaultRange = () => {
-            console.log('📊 Set default range event triggered');
             setDefaultRange();
         };
 
@@ -219,7 +208,6 @@ export const useChartPosition = (chartType: string, gameType: string, selectedTa
         keys.forEach(key => {
             if (key.startsWith('chartPosition_')) {
                 sessionStorage.removeItem(key);
-                console.log('🗑️ Cleared position:', key);
             }
         });
     }, []);

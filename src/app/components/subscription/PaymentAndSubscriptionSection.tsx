@@ -30,8 +30,7 @@ const plans = [
 
 const PaymentAndSubscriptionSection = ({ selectedMethod, setSelectedMethod, selectedPlan, setSelectedPlan, setStep }: Props) => {
     const { data: userInfo } = useUserInfo();
-    const { data: currentUserSubscription, loading: getCurrentUserSubscriptionLoading } = useQuery(GET_CURRENT_USER_SUBSCRIPTION_QUERY);
-  console.log(currentUserSubscription?.GetCurrentUserSubscription);
+    const { loading: getCurrentUserSubscriptionLoading } = useQuery(GET_CURRENT_USER_SUBSCRIPTION_QUERY);
     const country = userInfo?.GetUserInfo?.Country;
 
     if (!country || getCurrentUserSubscriptionLoading) return <LoadingOverlay />;

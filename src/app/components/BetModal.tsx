@@ -127,7 +127,7 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
             const response = await createBet();
             const betId = response.data.CreateBet.id;
 
-        
+
             if (gameType === 'Column' || gameType === 'Dozen') {
                 addActiveBet({
                     id: betId,
@@ -137,23 +137,23 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
                 });
             }
 
-          
+
             const existingBetIds = localStorage.getItem('betId');
             let betIdsArray: string[] = [];
 
             if (existingBetIds) {
                 try {
                     betIdsArray = JSON.parse(existingBetIds);
-               
+
                 } catch (error) {
                     betIdsArray = [];
                 }
             }
 
-         
+
             betIdsArray.push(betId);
 
-        
+
             localStorage.setItem('betId', JSON.stringify(betIdsArray));
 
             showPlacedToast(translateRouletteTag(betValue));
@@ -161,7 +161,6 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
             onClose();
         } catch (error) {
             const errorMessage = getGraphQLErrorMessage(error);
-            console.log(errorMessage);
             showErrorToast(errorMessage);
         }
     };

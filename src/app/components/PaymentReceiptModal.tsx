@@ -13,7 +13,6 @@ const PaymentReceiptModal: React.FC<PaymentReceiptModalProps> = ({
     onClose,
     paymentReference,
 }) => {
-    console.log(paymentReference);
     return (
         <Modal
             open={isVisible}

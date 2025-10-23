@@ -58,7 +58,6 @@ const PaymentHistoryModal: React.FC<PaymentHistoryModalProps> = ({
 
     const handleViewReceipt = (paymentReference: string, paymentMethod: string, photoUrl?: string) => {
 
-        console.log(paymentMethod, photoUrl);
         const referenceToPass = paymentMethod === 'Crypto' ? photoUrl : paymentReference;
         setSelectedPaymentReference(referenceToPass || paymentReference);
         setIsReceiptModalVisible(true);

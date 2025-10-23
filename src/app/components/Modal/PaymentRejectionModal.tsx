@@ -43,7 +43,6 @@ const PaymentRejectionModal: React.FC<PaymentRejectionModalProps> = ({
                 }
             });
 
-            console.log('Pago rechazado exitosamente');
             onSubmit(comment);
             onClose();
         } catch (error) {

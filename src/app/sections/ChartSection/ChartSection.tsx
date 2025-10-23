@@ -84,10 +84,7 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined }> =
         state.marketPage
     );
 
-    console.log('chartFormattedData', chartFormattedData);
-
-
-
+  
     const {
         handleChartReady,
         handleZoomIn,
