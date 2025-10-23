@@ -6,32 +6,42 @@ export const useQueryParamsCleanup = () => {
     useEffect(() => {
         const currentParams = window.location.search;
 
-
+   
         if (previousParams.current && previousParams.current !== currentParams) {
-      
-
-      
             const oldParams = new URLSearchParams(previousParams.current);
+            const newParams = new URLSearchParams(currentParams);
+
             const oldChartType = oldParams.get('chartType');
             const oldGameType = oldParams.get('chartZone');
             const oldTable = oldParams.get('table');
 
-          
-            const keysToRemove = Object.keys(sessionStorage).filter(key => {
-                if (!key.startsWith('chartPosition_')) return false;
+            const newChartType = newParams.get('chartType');
+            const newGameType = newParams.get('chartZone');
+            const newTable = newParams.get('table');
 
-            
-                return (
-                    (oldChartType && key.includes(oldChartType)) ||
-                    (oldGameType && key.includes(oldGameType)) ||
-                    (oldTable && key.includes(oldTable))
+            if (!newChartType && !newGameType && !newTable && (oldChartType || oldGameType || oldTable)) {
+                const keysToRemove = Object.keys(sessionStorage).filter(key =>
+                    key.startsWith('chartPosition_')
                 );
-            });
+                keysToRemove.forEach(key => {
+                    sessionStorage.removeItem(key);
+                });
+            } else {
+              
+                const keysToRemove = Object.keys(sessionStorage).filter(key => {
+                    if (!key.startsWith('chartPosition_')) return false;
 
-            keysToRemove.forEach(key => {
-                sessionStorage.removeItem(key);
-             
-            });
+                    return (
+                        (oldChartType && key.includes(oldChartType)) ||
+                        (oldGameType && key.includes(oldGameType)) ||
+                        (oldTable && key.includes(oldTable))
+                    );
+                });
+
+                keysToRemove.forEach(key => {
+                    sessionStorage.removeItem(key);
+                });
+            }
         }
 
         previousParams.current = currentParams;

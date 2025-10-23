@@ -56,6 +56,7 @@ export const useChartSectionState = () => {
 
         const updates: Partial<ChartSectionState> = {};
 
+
         if (chartType && selectChartTypes.some(type => type.type === chartType)) {
             updates.selectedType = chartType;
         }
@@ -119,6 +120,20 @@ export const useChartSectionState = () => {
         updateState({ isChartFullscreen: isFullscreen });
     };
 
+    const resetState = () => {
+        setState({
+            selectedType: '',
+            gameType: '',
+            selectedTable: '',
+            selectedTableLabel: '',
+            marketSearch: '',
+            marketPage: 1,
+            debouncedSearch: '',
+            isChartFullscreen: false,
+        });
+        setSearchParams({});
+    };
+
     return {
         state,
         updateState,
@@ -128,5 +143,6 @@ export const useChartSectionState = () => {
         handleMarketSearch,
         handleMarketPageChange,
         setFullscreen,
+        resetState,
     };
 }; 
