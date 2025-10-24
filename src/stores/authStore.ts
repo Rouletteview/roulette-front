@@ -24,7 +24,7 @@ export const useAuthStore = create<AuthState>()(
         set({ token: null, isAuthenticated: false });
       },
     }),
-    
+
     {
       name: 'auth-storage',
       storage: {
