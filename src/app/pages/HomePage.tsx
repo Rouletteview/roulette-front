@@ -6,79 +6,107 @@ import { useMutation, useQuery } from "@apollo/client"
 import LoadingOverlay from "../../components/LoadingOverlay"
 import { showErrorToast } from '../components/Toast';
 import { GET_CURRENT_USER_SUBSCRIPTION_QUERY } from "../../graphql/query/subscription/getCurrentUserSubscription"
+import { GET_ROULETTE_TABLES } from "../../graphql/query/getRouletteTables"
 import { START_FREE_SUBSCRIPTION_MUTATION } from "../../graphql/mutations/subscription/startFreeSubscription"
+import { UPDATE_FREE_SUBSCRIPTION_TABLE_MUTATION } from "../../graphql/mutations/subscription/updateFreeSubscriptionTable"
 import { useUserInfo } from "../../hooks/useUserInfo"
 import { getGraphQLErrorMessage } from "../../utils/errorMessages";
 import { useNavigate } from "react-router"
-import { useEffect, useCallback, useState } from "react"
+import { useEffect, useCallback, useRef } from "react"
 import { useSubscription } from "../../hooks/useSubscription"
 
-
-
-
-
 const HomePage = () => {
-
   const navigate = useNavigate();
-  const [hasTriedToActivateSubscription, setHasTriedToActivateSubscription] = useState(false);
+  const hasUpdatedSubscription = useRef(false);
 
+  const { data: rouletteTablesData, loading: rouletteTablesLoading } = useQuery(GET_ROULETTE_TABLES, {
+    variables: {
+      request: {
+        IsOnline: true,
+        Limit: 10,
+        Providers: ["evolution", "pragmatic", "ezugi"],
+        Query: "",
+        Skip: 0,
+      },
+    },
+  });
 
-
-  const [startFreeSubscription, { loading }] = useMutation(START_FREE_SUBSCRIPTION_MUTATION, {
+  const [startFreeSubscription, { loading: startLoading }] = useMutation(START_FREE_SUBSCRIPTION_MUTATION, {
     refetchQueries: [{ query: GET_CURRENT_USER_SUBSCRIPTION_QUERY }],
   });
 
+  const [updateFreeSubscriptionTable, { loading: updateLoading }] = useMutation(UPDATE_FREE_SUBSCRIPTION_TABLE_MUTATION, {
+    refetchQueries: [{ query: GET_CURRENT_USER_SUBSCRIPTION_QUERY }],
+  });
 
   const { data: subscriptionData, loading: getCurrentUserSubscriptionLoading } = useQuery(GET_CURRENT_USER_SUBSCRIPTION_QUERY);
   const { data: userData, loading: userDataLoading } = useUserInfo();
 
-
-  const isAdmin = userData?.GetUserInfo.IsAdmin
-
-  const hasLoggedIn = userData?.GetUserInfo.LastLogin
-
+  const isAdmin = userData?.GetUserInfo.IsAdmin;
+  const hasLoggedIn = userData?.GetUserInfo.LastLogin;
   const { isFreeTrial, hasPremium } = useSubscription();
 
+  const firstAvailableTableId = rouletteTablesData?.GetRouletteTables?.Tables?.[0]?.Id;
+  const hasSubscription = !!subscriptionData?.GetCurrentUserSubscription;
 
+  const handleSubscriptionUpdate = useCallback(async () => {
+    if (!firstAvailableTableId) {
+      showErrorToast("No hay mesas de ruleta disponibles");
+      return;
+    }
 
-
-  const handleStartFreeSubscription = useCallback(async () => {
     try {
-      setHasTriedToActivateSubscription(true);
-      await startFreeSubscription({
-        variables: {
-          input: {
-            rouletteTableId: "67fd3865f3b913ee91c31526",
+      if (hasSubscription) {
+        await updateFreeSubscriptionTable({
+          variables: {
+            input: {
+              rouletteTableId: firstAvailableTableId,
+            }
           }
-        }
-      })
+        });
+      } else {
+        await startFreeSubscription({
+          variables: {
+            input: {
+              rouletteTableId: firstAvailableTableId,
+            }
+          }
+        });
+      }
     } catch (error: unknown) {
       const errorMessage = getGraphQLErrorMessage(error);
       if (!errorMessage.includes("ya tiene una suscripción") &&
         !errorMessage.includes("subscription already exists")) {
-        showErrorToast(errorMessage);
+        console.error("Error en suscripción:", errorMessage);
       }
     }
-  }, [startFreeSubscription]);
+  }, [startFreeSubscription, updateFreeSubscriptionTable, firstAvailableTableId, hasSubscription]);
 
   useEffect(() => {
-
-    const shouldCreateSubscription = !isAdmin &&
-      !subscriptionData?.GetCurrentUserSubscription &&
-      !loading &&
-      !getCurrentUserSubscriptionLoading &&
-      !hasTriedToActivateSubscription &&
-      userData?.GetUserInfo;
-
-
-    if (shouldCreateSubscription) {
-      handleStartFreeSubscription();
+    if (userData?.GetUserInfo?.Id) {
+      hasUpdatedSubscription.current = false;
     }
-  }, [isAdmin, subscriptionData, loading, getCurrentUserSubscriptionLoading, hasTriedToActivateSubscription, handleStartFreeSubscription, userData]);
+  }, [userData?.GetUserInfo?.Id]);
 
-  if (getCurrentUserSubscriptionLoading || userDataLoading) return <LoadingOverlay />
+  useEffect(() => {
+    const shouldUpdateSubscription = isFreeTrial &&
+      !startLoading &&
+      !updateLoading &&
+      !getCurrentUserSubscriptionLoading &&
+      !rouletteTablesLoading &&
+      userData?.GetUserInfo &&
+      firstAvailableTableId &&
+      !hasUpdatedSubscription.current;
 
+    if (shouldUpdateSubscription) {
+      hasUpdatedSubscription.current = true;
+      handleSubscriptionUpdate();
+    }
+  }, [isFreeTrial, startLoading, updateLoading, getCurrentUserSubscriptionLoading, rouletteTablesLoading, handleSubscriptionUpdate, userData, firstAvailableTableId]);
 
+  if (getCurrentUserSubscriptionLoading || userDataLoading || rouletteTablesLoading || startLoading || updateLoading) {
+    return <LoadingOverlay />;
+  }
 
   return (
     <>
@@ -113,10 +141,7 @@ const HomePage = () => {
           </div>
         </HeroSection>
 
-        <ChartSection
-          subscriptionData={subscriptionData}
-        // handleStartFreeSubscription={handleStartFreeSubscription}
-        />
+        <ChartSection subscriptionData={subscriptionData} />
       </AppLayout>
 
     </>

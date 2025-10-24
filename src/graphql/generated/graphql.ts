@@ -196,6 +196,7 @@ export type Mutation = {
   ResetPassword: ResetPasswordResponse;
   SendResetPasswordEmail: Scalars['Boolean']['output'];
   StartFreeSubscription: UserSubscription;
+  UpdateFreeSubscriptionTable: UserSubscription;
   UpdatePaymentStatus: Scalars['Boolean']['output'];
   UpdateSubscriptionStatus: Scalars['Boolean']['output'];
   UpdateUserActiveStatus: Scalars['Boolean']['output'];
@@ -250,6 +251,11 @@ export type MutationSendResetPasswordEmailArgs = {
 
 export type MutationStartFreeSubscriptionArgs = {
   input: StartFreeSubscriptionRequest;
+};
+
+
+export type MutationUpdateFreeSubscriptionTableArgs = {
+  input: UpdateFreeSubscriptionTableRequest;
 };
 
 
@@ -480,6 +486,10 @@ export enum SubscriptionFrequency {
   Monthly = 'Monthly',
   Weekly = 'Weekly'
 }
+
+export type UpdateFreeSubscriptionTableRequest = {
+  rouletteTableId: Scalars['String']['input'];
+};
 
 export type UpdatePaymentStatusRequest = {
   PaymentId: Scalars['String']['input'];

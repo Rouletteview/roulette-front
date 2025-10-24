@@ -79,7 +79,8 @@ export const useChartData = (
                 tableId: selectedTable || undefined,
                 probabilitiesResultLimit: probabilitiesResultLimit,
             },
-            skip: !selectedTable,
+            skip: !selectedTable || !gameType,
+            fetchPolicy: 'no-cache',
         });
 
 
@@ -100,7 +101,7 @@ export const useChartData = (
         const payload = chartNumbersDataSubscription?.OnRouletteNumberUpdate;
         if (!payload) return;
 
-     
+
         if (selectedTable && payload.TableId && payload.TableId !== selectedTable) return;
 
         const result = payload.Result as ResultEntry | undefined;
