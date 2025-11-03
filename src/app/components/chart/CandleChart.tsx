@@ -31,13 +31,13 @@ const CandleChart: React.FC<ChartProps> = ({
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
-  // Animation control similar to AreaChart
+
   const defaultSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
   const seriesMapRef = useRef<Map<string, ISeriesApi<'Candlestick'>>>(new Map());
   const lastCandleTimeRef = useRef<Map<string, number>>(new Map());
   const animFrameRef = useRef<number | null>(null);
   const lastRenderedCandleRef = useRef<Map<string, { time: number; open: number; high: number; low: number; close: number }>>(new Map());
-  // keep latest data for tooltip (init effect doesn't depend on data)
+
   const dataRef = useRef<typeof data>(data);
 
   const tooltipRef = useRef<HTMLDivElement>(null);
@@ -158,7 +158,9 @@ const CandleChart: React.FC<ChartProps> = ({
       redSeries = chart.addSeries(CandlestickSeries, {
         upColor: '#FF0000',
         downColor: '#FF0000',
-        borderVisible: false,
+        borderVisible: true,
+        borderUpColor: '#FFFFFF',
+        borderDownColor: '#FFFFFF',
         wickUpColor: '#FF0000',
         wickDownColor: '#FF0000',
         lastValueVisible: false,
@@ -247,10 +249,9 @@ const CandleChart: React.FC<ChartProps> = ({
         lastValueVisible: false,
         priceLineVisible: false,
       });
-      // expose default series for animation updates
+
       defaultSeriesRef.current = defaultSeries;
     }
-    // store all created series
     seriesMapRef.current.clear();
     if (defaultSeries) seriesMapRef.current.set('default', defaultSeries);
     if (redSeries) seriesMapRef.current.set('red', redSeries);
@@ -421,7 +422,6 @@ const CandleChart: React.FC<ChartProps> = ({
       } else {
 
         defaultSeries.setData(validData.map(stripCandle));
-        // remember last candle time for animation logic
         lastCandleTimeRef.current.set('default', Number(validData[validData.length - 1].time));
         lastRenderedCandleRef.current.set('default', {
           time: Number(validData[validData.length - 1].time),
@@ -507,7 +507,6 @@ const CandleChart: React.FC<ChartProps> = ({
         }
       }
 
-      // Set a sensible initial time position to show recent candles
       const latestUnix = (() => {
         const arr = dataRef.current || [];
         if (arr.length === 0) return Math.floor(Date.now() / 1000);
@@ -616,11 +615,9 @@ const CandleChart: React.FC<ChartProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [height, width, gameType]);
 
-  // Animate last candle on new data for all modes (per-series)
   useEffect(() => {
     if (!data || data.length === 0) return;
 
-    // build per-series buckets
     const isRedAndBlack = gameType === 'RedAndBlack';
     const isDozen = gameType === 'Dozen';
     const isSpecialGame = gameType === 'VoisinsDuZero' || gameType === 'Orphelins' || gameType === 'TiersDuCylindre' || gameType === 'PlayZero';
@@ -715,7 +712,6 @@ const CandleChart: React.FC<ChartProps> = ({
       animFrameRef.current = requestAnimationFrame(step);
     };
 
-    // run per series with same duration
     seriesBuckets.forEach((candles, key) => animateSeries(key, candles, 1000));
   }, [data]);
 
@@ -804,8 +800,7 @@ const CandleChart: React.FC<ChartProps> = ({
           <div style={{ margin: '8px 0', fontSize: '13px' }}>
             <div>Abre: <b>{tooltipData.open}</b> {tooltipData.openTag && `(${translateRouletteTag(tooltipData.openTag)})`}</div>
             <div>Cierra: <b>{tooltipData.close}</b> {tooltipData.closeTag && `(${translateRouletteTag(tooltipData.closeTag)})`}</div>
-            {/* <div>Máximo: <b>{tooltipData.high}</b></div>
-            <div>Mínimo: <b>{tooltipData.low}</b></div> */}
+
           </div>
           <div style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '10px', marginTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.2)', paddingTop: '6px' }}>
             {tooltipData.time}
