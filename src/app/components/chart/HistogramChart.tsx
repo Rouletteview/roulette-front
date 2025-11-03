@@ -7,6 +7,8 @@ import {
   HistogramData,
   MouseEventParams,
   ISeriesApi,
+  CandlestickSeries,
+  UTCTimestamp as LwTimestamp,
 } from 'lightweight-charts';
 import { MultiSeriesData } from '../../../types/chart/types';
 import { translateRouletteTag, getYAxisTicks } from '../../../utils/formatters/rouletterNumbers';
@@ -115,34 +117,78 @@ const HistogramChart: React.FC<ChartProps> = ({
     }
 
     const seriesMap = new Map<string, ISeriesApi<'Histogram'>>();
-    const allValidData: HistogramData[] = [];
-
-
-    // removed unused animateUpdateLocal helper
 
     if (gameType === 'RedAndBlack') {
+      const redSeries = chart.addSeries(CandlestickSeries, {
+        upColor: '#FF0000',
+        downColor: '#FF0000',
+        borderVisible: true,
+        borderUpColor: '#FFFFFF',
+        borderDownColor: '#FFFFFF',
+        wickUpColor: '#FF0000',
+        wickDownColor: '#FF0000',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+      const blackSeries = chart.addSeries(CandlestickSeries, {
+        upColor: '#000000',
+        downColor: '#000000',
+        borderVisible: false,
+        wickUpColor: '#000000',
+        wickDownColor: '#000000',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+      const greenSeries = chart.addSeries(CandlestickSeries, {
+        upColor: '#00FF00',
+        downColor: '#00FF00',
+        borderVisible: false,
+        wickUpColor: '#00FF00',
+        wickDownColor: '#00FF00',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+
+      const redData: { time: LwTimestamp; open: number; high: number; low: number; close: number }[] = [];
+      const blackData: { time: LwTimestamp; open: number; high: number; low: number; close: number }[] = [];
+      const greenData: { time: LwTimestamp; open: number; high: number; low: number; close: number }[] = [];
+
       data.forEach((series) => {
         if ('value' in series.data[0] && 'color' in series.data[0]) {
-          const histogramSeries = chart.addSeries(HistogramSeries, {
-            color: 'rgba(32, 178, 108, 1)',
-            lastValueVisible: false,
-            priceLineVisible: false,
-          });
-
           const validData = series.data
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .filter(item => item && typeof item.time === 'number' && !isNaN((item as any).value))
             .sort((a, b) => Number(a.time) - Number(b.time));
 
-          if (validData.length > 0) {
-            histogramSeries.setData(validData as HistogramData[]);
-            seriesMap.set(series.id, histogramSeries);
-            allValidData.push(...(validData as HistogramData[]));
-            const last = validData[validData.length - 1] as HistogramData;
-            lastPointTimeRef.current.set(series.id, Number(last.time));
-          }
+          validData.forEach(item => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const value = (item as any).originalValue !== undefined ? (item as any).originalValue : (item as any).value;
+            const candle = { time: item.time as LwTimestamp, open: 0, high: value, low: 0, close: value };
+            const color = (item as { color?: string }).color?.toLowerCase();
+            if (color === '#ff0000' || color === 'red') {
+              redData.push(candle);
+            } else if (color === '#000000' || color === 'black') {
+              blackData.push(candle);
+            } else {
+              greenData.push(candle);
+            }
+          });
         }
       });
+
+      if (redData.length > 0) (redSeries as unknown as ISeriesApi<'Candlestick'>).setData(redData);
+      if (blackData.length > 0) (blackSeries as unknown as ISeriesApi<'Candlestick'>).setData(blackData);
+      if (greenData.length > 0) (greenSeries as unknown as ISeriesApi<'Candlestick'>).setData(greenData);
+
+      seriesMap.set('red', redSeries as unknown as ISeriesApi<'Histogram'>);
+      seriesMap.set('black', blackSeries as unknown as ISeriesApi<'Histogram'>);
+      seriesMap.set('green', greenSeries as unknown as ISeriesApi<'Histogram'>);
+
+      const lastTimes: number[] = [];
+      if (redData.length > 0) lastTimes.push(Number(redData[redData.length - 1].time));
+      if (blackData.length > 0) lastTimes.push(Number(blackData[blackData.length - 1].time));
+      if (greenData.length > 0) lastTimes.push(Number(greenData[greenData.length - 1].time));
+      if (lastTimes.length > 0) lastPointTimeRef.current.set('red_black_green', Math.max(...lastTimes));
 
 
       if (yTicks && yTicks.length > 0) {
@@ -691,7 +737,6 @@ const HistogramChart: React.FC<ChartProps> = ({
     };
   }, [height, width, gameType, chartType, onChartReady]);
 
-  // Update data and preserve/decide position without recreating chart
   useEffect(() => {
     if (!chartRef.current) return;
     if (!data || data.length === 0) return;
@@ -706,74 +751,44 @@ const HistogramChart: React.FC<ChartProps> = ({
       if (latestTime === null || maxTime > latestTime) latestTime = maxTime;
     });
 
-    // Rebuild categories depending on gameType
     seriesMap.clear();
 
     if (gameType === 'RedAndBlack') {
+      const red = chart.addSeries(CandlestickSeries, { upColor: '#FF0000', downColor: '#FF0000', borderVisible: true, borderUpColor: '#FFFFFF', borderDownColor: '#FFFFFF', wickUpColor: '#FF0000', wickDownColor: '#FF0000', lastValueVisible: false, priceLineVisible: false });
+      const black = chart.addSeries(CandlestickSeries, { upColor: '#000000', downColor: '#000000', borderVisible: false, wickUpColor: '#000000', wickDownColor: '#000000', lastValueVisible: false, priceLineVisible: false });
+      const green = chart.addSeries(CandlestickSeries, { upColor: '#00FF00', downColor: '#00FF00', borderVisible: false, wickUpColor: '#00FF00', wickDownColor: '#00FF00', lastValueVisible: false, priceLineVisible: false });
+      seriesMap.set('red', red as unknown as ISeriesApi<'Histogram'>);
+      seriesMap.set('black', black as unknown as ISeriesApi<'Histogram'>);
+      seriesMap.set('green', green as unknown as ISeriesApi<'Histogram'>);
+
+      const redData: { time: LwTimestamp; open: number; high: number; low: number; close: number }[] = [];
+      const blackData: { time: LwTimestamp; open: number; high: number; low: number; close: number }[] = [];
+      const greenData: { time: LwTimestamp; open: number; high: number; low: number; close: number }[] = [];
+
       data.forEach((series) => {
         if (!('value' in series.data[0] && 'color' in series.data[0])) return;
-        const s = chart.addSeries(HistogramSeries, { color: 'rgba(32, 178, 108, 1)', lastValueVisible: false, priceLineVisible: false });
-        seriesMap.set(series.id, s);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const validData = series.data.filter(item => item && typeof item.time === 'number' && !isNaN((item as any).value)).sort((a, b) => Number(a.time) - Number(b.time));
-        if (validData.length === 0) return;
-        (function runAnim(key: string, pts: HistogramData[], seriesInst: ISeriesApi<'Histogram'>) {
-          if (pts.length === 0) return;
-          const last = pts[pts.length - 1];
-          const prevTime = lastPointTimeRef.current.get(key);
-          if (prevTime === undefined) {
-            seriesInst.setData(pts);
-            lastPointTimeRef.current.set(key, Number(last.time));
-            return;
-          }
-          const currentTime = Number(last.time);
-          const pre = pts.slice(0, -1);
-          const durationMs = 450;
-          const startTs = performance.now();
-          const ease = (t: number) => 1 - Math.pow(1 - t, 3);
-          if (currentTime > prevTime) {
-            seriesInst.setData(pre);
-            const startValue = pre.length > 0 ? pre[pre.length - 1].value : last.value;
-            const endValue = last.value;
-            const step = (now: number) => {
-              const t = Math.min(1, (now - startTs) / durationMs);
-              const v = startValue + (endValue - startValue) * ease(t);
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              seriesInst.update({ time: currentTime as UTCTimestamp, value: v, color: (last as any).color } as HistogramData);
-              if (t < 1) {
-                const id = requestAnimationFrame(step);
-                animTokenRef.current.set(key, { frameId: id, targetTime: currentTime });
-              } else {
-                lastPointTimeRef.current.set(key, currentTime);
-                seriesInst.setData(pts);
-                animTokenRef.current.delete(key);
-              }
-            };
-            const id = requestAnimationFrame(step);
-            animTokenRef.current.set(key, { frameId: id, targetTime: currentTime });
-          } else {
-            const running = animTokenRef.current.get(key);
-            if (running && running.targetTime === currentTime) return;
-            const startValue = pre.length > 0 ? pre[pre.length - 1].value : last.value;
-            const endValue = last.value;
-            const step = (now: number) => {
-              const t = Math.min(1, (now - startTs) / durationMs);
-              const v = startValue + (endValue - startValue) * ease(t);
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              seriesInst.update({ time: currentTime as UTCTimestamp, value: v, color: (last as any).color } as HistogramData);
-              if (t < 1) {
-                const id = requestAnimationFrame(step);
-                animTokenRef.current.set(key, { frameId: id, targetTime: currentTime });
-              } else {
-                seriesInst.setData(pts);
-                animTokenRef.current.delete(key);
-              }
-            };
-            const id = requestAnimationFrame(step);
-            animTokenRef.current.set(key, { frameId: id, targetTime: currentTime });
-          }
-        })(series.id, validData as HistogramData[], s as unknown as ISeriesApi<'Histogram'>);
+        validData.forEach(item => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const value = (item as any).originalValue !== undefined ? (item as any).originalValue : (item as any).value;
+          const candle = { time: item.time as LwTimestamp, open: 0, high: value, low: 0, close: value };
+          const color = (item as { color?: string }).color?.toLowerCase();
+          if (color === '#ff0000' || color === 'red') redData.push(candle);
+          else if (color === '#000000' || color === 'black') blackData.push(candle);
+          else greenData.push(candle);
+        });
       });
+
+      (red as unknown as ISeriesApi<'Candlestick'>).setData(redData);
+      (black as unknown as ISeriesApi<'Candlestick'>).setData(blackData);
+      (green as unknown as ISeriesApi<'Candlestick'>).setData(greenData);
+
+      const lastTimes: number[] = [];
+      if (redData.length > 0) lastTimes.push(Number(redData[redData.length - 1].time));
+      if (blackData.length > 0) lastTimes.push(Number(blackData[blackData.length - 1].time));
+      if (greenData.length > 0) lastTimes.push(Number(greenData[greenData.length - 1].time));
+      if (lastTimes.length > 0) lastPointTimeRef.current.set('red_black_green', Math.max(...lastTimes));
     } else if (gameType === 'OddAndEven') {
       const even = chart.addSeries(HistogramSeries, { color: '#25A79B', lastValueVisible: false, priceLineVisible: false });
       const odd = chart.addSeries(HistogramSeries, { color: '#EE5351', lastValueVisible: false, priceLineVisible: false });
@@ -847,7 +862,6 @@ const HistogramChart: React.FC<ChartProps> = ({
         });
       });
       high.setData(highData); low.setData(lowData);
-      // animate both series
       const animHigh = highData.length > 0 ? highData : [];
       const animLow = lowData.length > 0 ? lowData : [];
       if (animHigh.length > 0) {
@@ -951,7 +965,6 @@ const HistogramChart: React.FC<ChartProps> = ({
         });
       });
       up.setData(upData); down.setData(downData);
-      // animate both up/down
       const animUp = upData.length > 0 ? upData : [];
       const animDown = downData.length > 0 ? downData : [];
       if (animUp.length > 0) {

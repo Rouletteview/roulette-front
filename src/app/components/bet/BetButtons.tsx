@@ -194,8 +194,8 @@ const RedBlackButtons = ({ redPercentage, blackPercentage, handleToggle }: { red
 const EvenOddButtons = ({ evenPercentage, oddPercentage, handleToggle }: { evenPercentage: number, oddPercentage: number, handleToggle: (tag: string) => void }) => {
     return (
         <div className="flex flex-col gap-6 w-full">
-            <button onClick={() => handleToggle('Even')} className="bg-[#0D7FFC41] hover:bg-[#0D7FFC41]/80 w-full text-white  text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Par ({evenPercentage}%)</button>
-            <button onClick={() => handleToggle('Odd')} className="bg-[#85FFE099] hover:bg-[#85FFE099]/80 w-full text-white text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer">Impar ({oddPercentage}%)</button>
+            <button onClick={() => handleToggle('Even')} className="bg-[#25A69A] hover:bg-[#25A69A]/80 w-full text-white  text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Par ({evenPercentage}%)</button>
+            <button onClick={() => handleToggle('Odd')} className="bg-[#ef5350] hover:bg-[#ef5350]/80 w-full text-white text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer">Impar ({oddPercentage}%)</button>
         </div>
     )
 }

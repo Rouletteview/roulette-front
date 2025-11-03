@@ -10,7 +10,14 @@ import {
 
 } from 'lightweight-charts';
 import { translateRouletteTag, getYAxisTicks, isVoisinDuZero, isOrphelins, isTiersDuCylindre, isPlayZero } from '../../../utils/formatters/rouletterNumbers';
+import SuccessBet from '../bet/SuccessBet';
+import LostBet from '../bet/LostBet';
+import PlacedBet from '../bet/PlacedBet';
 
+interface BetResult {
+  status: string;
+  value?: string;
+}
 
 type ChartProps = {
   data: { time: UTCTimestamp; open: number; high: number; low: number; close: number; openTag?: string; closeTag?: string; isRedAndBlack?: boolean }[];
@@ -19,6 +26,7 @@ type ChartProps = {
   loading?: boolean;
   gameType?: string;
   onChartReady?: (chart: IChartApi) => void;
+  betResult?: BetResult | null;
 };
 
 const CandleChart: React.FC<ChartProps> = ({
@@ -27,21 +35,23 @@ const CandleChart: React.FC<ChartProps> = ({
   width = 0,
   loading = false,
   gameType,
-  onChartReady
+  onChartReady,
+  betResult = null
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
-  // Animation control similar to AreaChart
+
   const defaultSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
   const seriesMapRef = useRef<Map<string, ISeriesApi<'Candlestick'>>>(new Map());
   const lastCandleTimeRef = useRef<Map<string, number>>(new Map());
   const animFrameRef = useRef<number | null>(null);
   const lastRenderedCandleRef = useRef<Map<string, { time: number; open: number; high: number; low: number; close: number }>>(new Map());
-  // keep latest data for tooltip (init effect doesn't depend on data)
+
   const dataRef = useRef<typeof data>(data);
 
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [hasNewData, setHasNewData] = useState(false);
+  const [markerPosition, setMarkerPosition] = useState<{ x: number; y: number } | null>(null);
 
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -140,6 +150,7 @@ const CandleChart: React.FC<ChartProps> = ({
 
     const isRedAndBlack = gameType === 'RedAndBlack';
     const isDozen = gameType === 'Dozen';
+    const isOddAndEven = gameType === 'OddAndEven';
     const isSpecialGame = gameType === 'VoisinsDuZero' || gameType === 'Orphelins' || gameType === 'TiersDuCylindre' || gameType === 'PlayZero';
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -158,7 +169,9 @@ const CandleChart: React.FC<ChartProps> = ({
       redSeries = chart.addSeries(CandlestickSeries, {
         upColor: '#FF0000',
         downColor: '#FF0000',
-        borderVisible: false,
+        borderVisible: true,
+        borderUpColor: '#FFFFFF',
+        borderDownColor: '#FFFFFF',
         wickUpColor: '#FF0000',
         wickDownColor: '#FF0000',
         lastValueVisible: false,
@@ -215,6 +228,37 @@ const CandleChart: React.FC<ChartProps> = ({
         lastValueVisible: false,
         priceLineVisible: false,
       });
+    } else if (isOddAndEven) {
+
+      greenSeries = chart.addSeries(CandlestickSeries, {
+        upColor: '#25A69A',
+        downColor: '#25A69A',
+        borderVisible: false,
+        wickUpColor: '#25A69A',
+        wickDownColor: '#25A69A',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+
+      redSeries = chart.addSeries(CandlestickSeries, {
+        upColor: '#ef5350',
+        downColor: '#ef5350',
+        borderVisible: false,
+        wickUpColor: '#ef5350',
+        wickDownColor: '#ef5350',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+
+      whiteSeries = chart.addSeries(CandlestickSeries, {
+        upColor: '#00FF00',
+        downColor: '#00FF00',
+        borderVisible: false,
+        wickUpColor: '#00FF00',
+        wickDownColor: '#00FF00',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
     } else if (isSpecialGame) {
 
       greenSeries = chart.addSeries(CandlestickSeries, {
@@ -247,10 +291,9 @@ const CandleChart: React.FC<ChartProps> = ({
         lastValueVisible: false,
         priceLineVisible: false,
       });
-      // expose default series for animation updates
+
       defaultSeriesRef.current = defaultSeries;
     }
-    // store all created series
     seriesMapRef.current.clear();
     if (defaultSeries) seriesMapRef.current.set('default', defaultSeries);
     if (redSeries) seriesMapRef.current.set('red', redSeries);
@@ -370,6 +413,44 @@ const CandleChart: React.FC<ChartProps> = ({
             });
           });
         }
+      } else if (isOddAndEven) {
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const greenData: any[] = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const redData: any[] = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const whiteData: any[] = [];
+
+        validData.forEach(candle => {
+          const strippedCandle = stripCandle(candle);
+          if (candle.closeTag === 'Even') {
+            greenData.push(strippedCandle);
+          } else if (candle.closeTag === 'Odd') {
+            redData.push(strippedCandle);
+          } else if (candle.closeTag === 'Zero') {
+            whiteData.push(strippedCandle);
+          }
+        });
+
+        if (greenData.length > 0) greenSeries.setData(greenData);
+        if (redData.length > 0) redSeries.setData(redData);
+        if (whiteData.length > 0) whiteSeries.setData(whiteData);
+
+        const firstSeries = greenSeries || redSeries || whiteSeries;
+
+        if (firstSeries && yTicks && yTicks.length > 0 && chartType !== 'Candlestick') {
+          yTicks.forEach(tick => {
+            firstSeries.createPriceLine({
+              price: tick.value,
+              color: tick.color,
+              lineWidth: 2,
+              lineStyle: 1,
+              axisLabelVisible: true,
+              title: tick.label,
+            });
+          });
+        }
       } else if (isSpecialGame) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const greenData: any[] = [];
@@ -421,7 +502,6 @@ const CandleChart: React.FC<ChartProps> = ({
       } else {
 
         defaultSeries.setData(validData.map(stripCandle));
-        // remember last candle time for animation logic
         lastCandleTimeRef.current.set('default', Number(validData[validData.length - 1].time));
         lastRenderedCandleRef.current.set('default', {
           time: Number(validData[validData.length - 1].time),
@@ -507,7 +587,6 @@ const CandleChart: React.FC<ChartProps> = ({
         }
       }
 
-      // Set a sensible initial time position to show recent candles
       const latestUnix = (() => {
         const arr = dataRef.current || [];
         if (arr.length === 0) return Math.floor(Date.now() / 1000);
@@ -616,13 +695,12 @@ const CandleChart: React.FC<ChartProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [height, width, gameType]);
 
-  // Animate last candle on new data for all modes (per-series)
   useEffect(() => {
     if (!data || data.length === 0) return;
 
-    // build per-series buckets
     const isRedAndBlack = gameType === 'RedAndBlack';
     const isDozen = gameType === 'Dozen';
+    const isOddAndEven = gameType === 'OddAndEven';
     const isSpecialGame = gameType === 'VoisinsDuZero' || gameType === 'Orphelins' || gameType === 'TiersDuCylindre' || gameType === 'PlayZero';
 
     const sorted = [...data].sort((a, b) => Number(a.time) - Number(b.time));
@@ -646,6 +724,14 @@ const CandleChart: React.FC<ChartProps> = ({
         else if (v >= 13 && v <= 24) seriesBuckets.get('white')!.push(s);
         else if (v >= 25 && v <= 36) seriesBuckets.get('green')!.push(s);
       });
+    } else if (isOddAndEven) {
+      seriesBuckets.set('green', []); seriesBuckets.set('red', []); seriesBuckets.set('white', []);
+      sorted.forEach(c => {
+        const s: Candle = { time: Number(c.time), open: c.open, high: c.high, low: c.low, close: c.close };
+        if (c.closeTag === 'Even') seriesBuckets.get('green')!.push(s);
+        else if (c.closeTag === 'Odd') seriesBuckets.get('red')!.push(s);
+        else if (c.closeTag === 'Zero') seriesBuckets.get('white')!.push(s);
+      });
     } else if (isSpecialGame) {
       seriesBuckets.set('green', []); seriesBuckets.set('red', []);
       sorted.forEach(c => {
@@ -668,7 +754,7 @@ const CandleChart: React.FC<ChartProps> = ({
       const last = candles[candles.length - 1];
       const currentTime = last.time;
 
-      // seed if first time
+
       if (prevTime === null) {
         s.setData(candles.map(c => ({ time: c.time as UTCTimestamp, open: c.open, high: c.high, low: c.low, close: c.close })));
         lastCandleTimeRef.current.set(key, currentTime);
@@ -715,10 +801,53 @@ const CandleChart: React.FC<ChartProps> = ({
       animFrameRef.current = requestAnimationFrame(step);
     };
 
-    // run per series with same duration
     seriesBuckets.forEach((candles, key) => animateSeries(key, candles, 1000));
   }, [data]);
 
+
+  useEffect(() => {
+    if (!betResult || !betResult.value || !chartRef.current || !data || data.length === 0) {
+      setMarkerPosition(null);
+      return;
+    }
+
+    const chart = chartRef.current;
+    const betTag = betResult.value;
+
+
+    let lastMatchingCandle: { time: UTCTimestamp; value: number } | null = null;
+
+    for (let i = data.length - 1; i >= 0; i--) {
+      const candle = data[i];
+      if (candle.closeTag === betTag) {
+        lastMatchingCandle = { time: candle.time, value: candle.close };
+        break;
+      }
+    }
+
+    if (lastMatchingCandle && chartContainerRef.current) {
+      try {
+        const timeScale = chart.timeScale();
+
+
+        const series = seriesMapRef.current.values().next().value;
+
+        if (series) {
+          const x = timeScale.timeToCoordinate(lastMatchingCandle.time);
+          const y = series.priceToCoordinate(lastMatchingCandle.value);
+
+          if (x !== null && y !== null) {
+            setMarkerPosition({ x, y: y - 40 });
+          }
+        }
+      } catch (error) {
+        console.error('Error calculating marker position:', error);
+        setMarkerPosition(null);
+      }
+    } else {
+      setMarkerPosition(null);
+    }
+  }, [betResult, data]);
 
   return (
     <div style={{ position: 'relative', width: '100%' }}>
@@ -804,12 +933,31 @@ const CandleChart: React.FC<ChartProps> = ({
           <div style={{ margin: '8px 0', fontSize: '13px' }}>
             <div>Abre: <b>{tooltipData.open}</b> {tooltipData.openTag && `(${translateRouletteTag(tooltipData.openTag)})`}</div>
             <div>Cierra: <b>{tooltipData.close}</b> {tooltipData.closeTag && `(${translateRouletteTag(tooltipData.closeTag)})`}</div>
-            {/* <div>Máximo: <b>{tooltipData.high}</b></div>
-            <div>Mínimo: <b>{tooltipData.low}</b></div> */}
+
           </div>
           <div style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '10px', marginTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.2)', paddingTop: '6px' }}>
             {tooltipData.time}
           </div>
+        </div>
+      )}
+      {markerPosition && betResult && (
+        <div
+          style={{
+            position: 'absolute',
+            left: `${markerPosition.x}px`,
+            top: `${markerPosition.y}px`,
+            transform: 'translate(-50%, -100%)',
+            pointerEvents: 'none',
+            zIndex: 100,
+          }}
+        >
+          {betResult.status === 'Won' ? (
+            <SuccessBet value={betResult.value || ''} />
+          ) : betResult.status === 'Lost' ? (
+            <LostBet value={betResult.value || ''} />
+          ) : betResult.status === 'Placed' ? (
+            <PlacedBet value={betResult.value || ''} />
+          ) : null}
         </div>
       )}
     </div>
