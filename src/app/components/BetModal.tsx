@@ -10,6 +10,7 @@ import { showErrorToast, showPlacedToast } from './Toast';
 import { translateRouletteTag } from '../../utils/formatters/rouletterNumbers';
 import { getGraphQLErrorMessage } from '../../utils/errorMessages';
 import { useBetStatusStore } from '../../stores/betStatusStore';
+import { useBalanceStore } from '../../stores/balanceStore';
 // import chip7 from '../../assets/poker-chips/chip-7.png';
 // import chip8 from '../../assets/poker-chips/chip-8.png';
 
@@ -45,11 +46,15 @@ interface ModalContentProps {
     betValue: string;
     selectedChip: string;
     setSelectedChip: (chip: string) => void;
-    setCounter: (counter: number) => void;
+    handleCounterChange: (counter: number) => void;
     counter: number;
     handleChipClick: (chip: string) => void;
     handleBet: () => void;
     loading: boolean;
+    canPlaceBet: boolean;
+    totalBetAmount: number;
+    availableBalance: number;
+    exceedsBalance: boolean;
 }
 
 const ModalContent: React.FC<ModalContentProps> = (props) => (
@@ -87,14 +92,42 @@ const ModalContent: React.FC<ModalContentProps> = (props) => (
                 </div>
             ))}
         </div>
-        <div className="flex items-center justify-center gap-2 ">
-            <button onClick={() => props.setCounter(props.counter - 1)} disabled={props.counter === 1} className="w-12 h-12 rounded-full bg-gray-200 text-3xl text-black flex items-center justify-center font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300">-</button>
-            <span className="w-16 h-12 flex items-center justify-center rounded-full bg-gray-100 text-3xl font-semibold text-[#D9A425] mx-2 select-none">{props.counter}</span>
-            <button onClick={() => props.setCounter(props.counter + 1)} className="w-12 h-12 rounded-full bg-gray-200 text-3xl text-black flex items-center justify-center font-bold cursor-pointer hover:bg-gray-300">+</button>
+        <div className="flex flex-col items-center gap-2">
+            <div className="flex items-center justify-center gap-2">
+                <button
+                    onClick={() => props.handleCounterChange(props.counter - 1)}
+                    disabled={props.counter === 1}
+                    className="w-12 h-12 rounded-full bg-gray-200 text-3xl text-black flex items-center justify-center font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300"
+                >
+                    -
+                </button>
+                <span className="w-16 h-12 flex items-center justify-center rounded-full bg-gray-100 text-3xl font-semibold text-[#D9A425] mx-2 select-none">
+                    {props.counter}
+                </span>
+                <button
+                    onClick={() => props.handleCounterChange(props.counter + 1)}
+                    disabled={props.exceedsBalance || !props.selectedChip}
+                    className="w-12 h-12 rounded-full bg-gray-200 text-3xl text-black flex items-center justify-center font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300"
+                >
+                    +
+                </button>
+            </div>
+            <div className="text-center">
+                <div className="text-sm text-gray-600">
+                    Monto total: <span className={`font-semibold ${props.exceedsBalance ? 'text-red-600' : 'text-[#D9A425]'}`}>
+                        ${props.totalBetAmount.toFixed(2)}
+                    </span>
+                </div>
+                {props.exceedsBalance && (
+                    <div className="text-xs text-red-500 mt-1">
+                        Disponible: ${props.availableBalance.toFixed(2)}
+                    </div>
+                )}
+            </div>
         </div>
         <button
             onClick={props.handleBet}
-            disabled={props.counter === 0 || props.selectedChip === "" || props.loading}
+            disabled={!props.canPlaceBet || props.loading}
             className="w-full py-4 rounded-xl bg-[#D9A425] text-white text-xl font-semibold shadow-md mt-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#D9A425]/80 cursor-pointer flex items-center justify-center gap-2"
         >
             {props.loading ? (
@@ -117,16 +150,63 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
         value: betValue || ""
     });
 
-
     const { addActiveBet } = useBetStatusStore();
+    const { addBet, getAvailableBalance } = useBalanceStore();
 
     if (!open) return null;
 
+
+    const availableBalance = getAvailableBalance();
+    const chipValue = selectedChip ? parseFloat(selectedChip) : 0;
+    const totalBetAmount = chipValue * counter;
+    const canPlaceBet = !!selectedChip && counter > 0 && totalBetAmount <= availableBalance && totalBetAmount > 0;
+    const exceedsBalance = !!selectedChip && counter > 0 && totalBetAmount > availableBalance;
+
+    const handleCounterChange = (newCounter: number) => {
+        if (newCounter < 1) return;
+
+        const chipValue = selectedChip ? parseFloat(selectedChip) : 0;
+        const newAmount = chipValue * newCounter;
+
+        if (newAmount > availableBalance) {
+            // Limit to maximum possible based on available balance
+            const maxCounter = Math.floor(availableBalance / chipValue);
+            if (maxCounter >= 1) {
+                setCounter(maxCounter);
+                showErrorToast(`Monto máximo disponible: $${availableBalance.toFixed(2)}`);
+            } else {
+                showErrorToast(`Saldo insuficiente. Disponible: $${availableBalance.toFixed(2)}`);
+            }
+            return;
+        }
+
+        setCounter(newCounter);
+    };
+
     const handleBet = async () => {
+        // Validate available balance again before placing bet
+        if (!canPlaceBet) {
+            if (exceedsBalance) {
+                showErrorToast(`Saldo insuficiente. Disponible: $${availableBalance.toFixed(2)}, Intenta apostar: $${totalBetAmount.toFixed(2)}`);
+            } else if (!selectedChip) {
+                showErrorToast('Selecciona una ficha');
+            } else if (counter <= 0) {
+                showErrorToast('La cantidad debe ser mayor a 0');
+            }
+            return;
+        }
+
         try {
             const response = await createBet();
             const betId = response.data.CreateBet.id;
 
+            // Track bet in balance store
+            addBet({
+                id: betId,
+                amount: amount,
+                gameType: gameType,
+                status: 'Placed'
+            });
 
             if (gameType === 'Column' || gameType === 'Dozen') {
                 addActiveBet({
@@ -137,7 +217,6 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
                 });
             }
 
-
             const existingBetIds = localStorage.getItem('betId');
             let betIdsArray: string[] = [];
 
@@ -145,14 +224,13 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
                 try {
                     betIdsArray = JSON.parse(existingBetIds);
 
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 } catch (error) {
                     betIdsArray = [];
                 }
             }
 
-
             betIdsArray.push(betId);
-
 
             localStorage.setItem('betId', JSON.stringify(betIdsArray));
 
@@ -172,7 +250,23 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
         if (selectedChip === chip) {
             setSelectedChip("");
         } else {
-            setSelectedChip(chip);
+            const newChipValue = parseFloat(chip);
+            const newAmount = newChipValue * counter;
+
+            // If the new chip would exceed balance, adjust counter
+            if (newAmount > availableBalance) {
+                const maxCounter = Math.floor(availableBalance / newChipValue);
+                if (maxCounter >= 1) {
+                    setCounter(maxCounter);
+                    setSelectedChip(chip);
+                    showErrorToast(`Ficha seleccionada. Contador ajustado a ${maxCounter} (máximo disponible)`);
+                } else {
+                    showErrorToast(`Saldo insuficiente para esta ficha. Disponible: $${availableBalance.toFixed(2)}`);
+                    return;
+                }
+            } else {
+                setSelectedChip(chip);
+            }
         }
     };
 
@@ -187,11 +281,15 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
                     betValue={betValue}
                     selectedChip={selectedChip}
                     setSelectedChip={setSelectedChip}
-                    setCounter={setCounter}
+                    handleCounterChange={handleCounterChange}
                     counter={counter}
                     handleChipClick={handleChipClick}
                     handleBet={handleBet}
                     loading={createBetLoading}
+                    canPlaceBet={canPlaceBet}
+                    totalBetAmount={totalBetAmount}
+                    availableBalance={availableBalance}
+                    exceedsBalance={exceedsBalance}
                 />
             </div>
 
@@ -202,11 +300,15 @@ const BetModal: React.FC<Props> = ({ open, onClose, selectedChip = "", setSelect
                     betValue={betValue}
                     selectedChip={selectedChip}
                     setSelectedChip={setSelectedChip}
-                    setCounter={setCounter}
+                    handleCounterChange={handleCounterChange}
                     counter={counter}
                     handleChipClick={handleChipClick}
                     handleBet={handleBet}
                     loading={createBetLoading}
+                    canPlaceBet={canPlaceBet}
+                    totalBetAmount={totalBetAmount}
+                    availableBalance={availableBalance}
+                    exceedsBalance={exceedsBalance}
                 />
             </div>
         </>

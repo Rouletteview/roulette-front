@@ -130,7 +130,7 @@ const HistoryPage = () => {
                         {bet.status === 'Won' ? '+' : bet.status === 'Lost' ? '-' : ''}${bet.amount}
                       </td>
                       <td className="px-2 sm:px-4 md:px-8 py-2 sm:py-3 md:py-4">
-                        {new Date(bet.createdAt).toLocaleDateString('es-VE', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                        {new Date(bet.createdAt).toLocaleDateString('es-VE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'  })}
                       </td>
                     </tr>
                   ))

@@ -49,6 +49,7 @@ export const ERROR_MESSAGES = {
     VALIDATION_ERROR: "Error de validación",
     NETWORK_ERROR: "Error de red",
     TIMEOUT_ERROR: "Error de tiempo de espera",
+    ACTIVE_BET_EXISTS: "Ya existe una apuesta activa para este tipo de juego",
 } as const;
 
 export type ErrorCode = keyof typeof ERROR_MESSAGES;

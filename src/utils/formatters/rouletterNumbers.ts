@@ -82,7 +82,7 @@ export const translateRouletteTag = (tag: string): string => {
         'Dozen': 'Docena',
         'Column': 'Columna',
         'StraightUp': 'Pleno',
-        
+
         'default': tag
     };
 
@@ -300,24 +300,23 @@ export const getYAxisTicks = (gameType?: string, chartType?: string): { value: n
     }
     if (gameType === 'Dozen') {
         return [
-
-            { value: 12, label: '', color: '#D9A425', lineWidth: 2, lineStyle: 1 },
-
-            { value: 24, label: '', color: '#D9A425', lineWidth: 2, lineStyle: 1 },
-
+            { value: 12, label: '', color: '#FF0000', lineWidth: 2, lineStyle: 1 },
+            { value: 24, label: '', color: '#FFFFFF', lineWidth: 2, lineStyle: 1 },
+            { value: 36, label: '', color: '#25A69A', lineWidth: 2, lineStyle: 1 },
         ];
     }
     if (gameType === 'Column') {
         if (chartType === 'VerticalColumn') {
             return [
-                { value: 12, label: '', color: '#D9A425', lineWidth: 2, lineStyle: 1 },
-                { value: 24, label: '', color: '#D9A425', lineWidth: 2, lineStyle: 1 },
+                { value: 12, label: '', color: '#FF0000', lineWidth: 2, lineStyle: 1 },
+                { value: 24, label: '', color: '#FFFFFF', lineWidth: 2, lineStyle: 1 },
+                { value: 36, label: '', color: '#25A69A', lineWidth: 2, lineStyle: 1 },
             ];
         }
         return [
-            { value: 1, label: translateRouletteTag('FirstColumn'), color: '#D9A425' },
-            { value: 2, label: translateRouletteTag('SecondColumn'), color: '#D9A425' },
-            { value: 3, label: translateRouletteTag('ThirdColumn'), color: '#D9A425' },
+            { value: 1, label: translateRouletteTag('FirstColumn'), color: '#FF0000' },
+            { value: 2, label: translateRouletteTag('SecondColumn'), color: '#FFFFFF' },
+            { value: 3, label: translateRouletteTag('ThirdColumn'), color: '#25A69A' },
         ];
     }
     if (gameType === 'StraightUp') {

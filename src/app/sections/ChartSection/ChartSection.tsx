@@ -88,8 +88,6 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined }> =
 
     const {
         handleChartReady,
-        handleZoomIn,
-        handleZoomOut,
     } = useChartControls();
 
     const [chartContainerRef, chartContainerWidth] = useContainerWidth();
@@ -157,8 +155,6 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined }> =
         }
     }, [subscriptionData, state.selectedTable, state.selectedType, state.gameType]);
 
-    const onZoomIn = () => handleZoomIn(state.selectedType);
-    const onZoomOut = () => handleZoomOut(state.selectedType);
 
 
 
@@ -237,8 +233,6 @@ const ChartSection: React.FC<{ subscriptionData: Partial<Query> | undefined }> =
                                     >
                                         <Controls
                                             setIsChartFullscreen={setFullscreen}
-                                            onZoomIn={onZoomIn}
-                                            onZoomOut={onZoomOut}
                                         />
                                         <div className='absolute top-28 right-28 z-50'>
                                             {/* {state.selectedType && state.gameType && state.selectedTable && (

@@ -37,6 +37,8 @@ export const useNumbersMemory = (
     const numbersRef = useRef<any[]>([]);
     const processedNumbersRef = useRef<Set<string>>(new Set());
     const isInitializedRef = useRef(false);
+    const lastTableIdRef = useRef<string | null>(null);
+    const lastGameTypeRef = useRef<string | null>(null);
 
     useEffect(() => {
         if (!isInitializedRef.current && httpNumbers.length > 0) {
@@ -59,9 +61,32 @@ export const useNumbersMemory = (
         }
     );
 
+    // Resetear datos cuando cambian tableId o gameType
+    useEffect(() => {
+        const tableChanged = lastTableIdRef.current !== null && lastTableIdRef.current !== tableId;
+        const gameTypeChanged = lastGameTypeRef.current !== null && lastGameTypeRef.current !== gameType;
+
+        if (tableChanged || gameTypeChanged) {
+            setNumbers([]);
+            setProbabilities([]);
+            numbersRef.current = [];
+            processedNumbersRef.current.clear();
+            isInitializedRef.current = false;
+            setLoading(true);
+        }
+
+        lastTableIdRef.current = tableId;
+        lastGameTypeRef.current = gameType;
+    }, [tableId, gameType]);
+
     useEffect(() => {
         if (numbersUpdateData?.OnRouletteNumberUpdate) {
-            const { Result, Probabilities, Timestamp } = numbersUpdateData.OnRouletteNumberUpdate;
+            const { Result, Probabilities, Timestamp, TableId } = numbersUpdateData.OnRouletteNumberUpdate;
+
+            // Verificar que los datos corresponden al tableId actual
+            if (tableId && TableId && TableId !== tableId) {
+                return;
+            }
 
             if (Result) {
                 const numberKey = `${Result.Number}-${Result.Date}`;
@@ -95,7 +120,7 @@ export const useNumbersMemory = (
             setError(null);
             setLoading(false);
         }
-    }, [numbersUpdateData]);
+    }, [numbersUpdateData, tableId]);
 
     useEffect(() => {
         if (subscriptionError) {

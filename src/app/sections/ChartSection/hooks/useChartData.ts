@@ -33,11 +33,10 @@ export const useChartData = (
     const resultsParam = searchParams.get("results");
     const probabilitiesResultLimit = resultsParam ? parseInt(resultsParam) : 250;
 
-    const startDate = new Date();
-    startDate.setHours(0, 0, 0, 0);
-    const endDate = new Date();
-    endDate.setHours(23, 59, 59, 999);
-
+    const startDate = new Date("2025-11-03T00:00:00.000Z");
+    console.log('startDate', startDate);
+    const endDate = new Date("2025-11-03T23:59:59.999Z");
+    console.log('endDate', endDate);
     const {
         data: tablesData,
         loading: marketLoading,
@@ -86,6 +85,8 @@ export const useChartData = (
 
     type ResultEntry = { Date: string; Tag: string; Number: number };
     const [liveResults, setLiveResults] = useState<ResultEntry[]>([]);
+    type ProbabilityEntry = { Tag: string; Value: number; Count: number };
+    const [lastValidProbabilities, setLastValidProbabilities] = useState<ProbabilityEntry[] | undefined>(undefined);
 
 
     useEffect(() => {
@@ -144,11 +145,36 @@ export const useChartData = (
     });
 
     const numeros = chartNumbersData?.GetLastRouletteTableNumbers;
+    console.log('numeros', numeros);
     const httpNumbers = numeros || [];
     const {
         numbers: formattedNumbers,
         probabilities: realTimeProbabilities
     } = useNumbersMemory(selectedTable, gameType, httpNumbers);
+    console.log('formattedNumbers', formattedNumbers);
+
+   
+    const currentProbabilities =
+        realTimeProbabilities.length > 0 ? realTimeProbabilities :
+            chartNumbersDataSubscription?.OnRouletteNumberUpdate?.Probabilities ??
+            rouletteProbData?.GetRouletteTableProbabilities.Probabilities;
+
+  
+    useEffect(() => {
+        if (currentProbabilities && currentProbabilities.length > 0) {
+            setLastValidProbabilities(currentProbabilities);
+        }
+    }, [currentProbabilities]);
+
+    // Resetear las probabilidades preservadas cuando cambia la tabla o gameType
+    useEffect(() => {
+        setLastValidProbabilities(undefined);
+    }, [selectedTable, gameType]);
+
+    // Usar las probabilidades actuales si están disponibles, sino usar las últimas válidas
+    const probabilities = currentProbabilities && currentProbabilities.length > 0
+        ? currentProbabilities
+        : lastValidProbabilities;
 
     const totalCount = tablesData?.GetRouletteTables.Total || 0;
     const marketHasNextPage = totalCount > 0 && marketPage * limit < totalCount;
@@ -157,11 +183,9 @@ export const useChartData = (
     return {
         tableOptions,
         chartFormattedData,
+        chartNumbersData,
         formattedNumbers,
-        probabilities:
-            realTimeProbabilities.length > 0 ? realTimeProbabilities :
-                chartNumbersDataSubscription?.OnRouletteNumberUpdate?.Probabilities ??
-                rouletteProbData?.GetRouletteTableProbabilities.Probabilities,
+        probabilities,
         marketLoading,
         chartLoading,
         errorTables,

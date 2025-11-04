@@ -140,11 +140,11 @@ const HistogramChart: React.FC<ChartProps> = ({
         priceLineVisible: false,
       });
       const greenSeries = chart.addSeries(CandlestickSeries, {
-        upColor: '#00FF00',
-        downColor: '#00FF00',
+        upColor: '#25A69A',
+        downColor: '#25A69A',
         borderVisible: false,
-        wickUpColor: '#00FF00',
-        wickDownColor: '#00FF00',
+        wickUpColor: '#25A69A',
+        wickDownColor: '#25A69A',
         lastValueVisible: false,
         priceLineVisible: false,
       });
@@ -362,7 +362,7 @@ const HistogramChart: React.FC<ChartProps> = ({
       });
 
       const greenSeries = chart.addSeries(HistogramSeries, {
-        color: '#00FF00',
+        color: '#25A69A',
         lastValueVisible: false,
         priceLineVisible: false,
       });
@@ -392,7 +392,7 @@ const HistogramChart: React.FC<ChartProps> = ({
             } else if (numberToUse >= 13 && numberToUse <= 24) {
               color = '#FFFFFF';
             } else if (numberToUse >= 25 && numberToUse <= 36) {
-              color = '#00FF00';
+              color = '#25A69A';
             }
 
             const histogramPoint: HistogramData = {
@@ -655,7 +655,7 @@ const HistogramChart: React.FC<ChartProps> = ({
             } else if (numberToUse >= 13 && numberToUse <= 24) {
               tooltipColor = '#FFFFFF';
             } else if (numberToUse >= 25 && numberToUse <= 36) {
-              tooltipColor = '#00FF00';
+              tooltipColor = '#25A69A';
             }
           } else if (gameType === 'Column') {
             const numberToUse = originalValue !== undefined ? originalValue : value;
@@ -756,7 +756,7 @@ const HistogramChart: React.FC<ChartProps> = ({
     if (gameType === 'RedAndBlack') {
       const red = chart.addSeries(CandlestickSeries, { upColor: '#FF0000', downColor: '#FF0000', borderVisible: true, borderUpColor: '#FFFFFF', borderDownColor: '#FFFFFF', wickUpColor: '#FF0000', wickDownColor: '#FF0000', lastValueVisible: false, priceLineVisible: false });
       const black = chart.addSeries(CandlestickSeries, { upColor: '#000000', downColor: '#000000', borderVisible: false, wickUpColor: '#000000', wickDownColor: '#000000', lastValueVisible: false, priceLineVisible: false });
-      const green = chart.addSeries(CandlestickSeries, { upColor: '#00FF00', downColor: '#00FF00', borderVisible: false, wickUpColor: '#00FF00', wickDownColor: '#00FF00', lastValueVisible: false, priceLineVisible: false });
+      const green = chart.addSeries(CandlestickSeries, { upColor: '#25A69A', downColor: '#25A69A', borderVisible: false, wickUpColor: '#25A69A', wickDownColor: '#25A69A', lastValueVisible: false, priceLineVisible: false });
       seriesMap.set('red', red as unknown as ISeriesApi<'Histogram'>);
       seriesMap.set('black', black as unknown as ISeriesApi<'Histogram'>);
       seriesMap.set('green', green as unknown as ISeriesApi<'Histogram'>);
@@ -789,6 +789,24 @@ const HistogramChart: React.FC<ChartProps> = ({
       if (blackData.length > 0) lastTimes.push(Number(blackData[blackData.length - 1].time));
       if (greenData.length > 0) lastTimes.push(Number(greenData[greenData.length - 1].time));
       if (lastTimes.length > 0) lastPointTimeRef.current.set('red_black_green', Math.max(...lastTimes));
+
+
+      const yTicksRedBlack = getYAxisTicks(gameType, chartType);
+      if (yTicksRedBlack && yTicksRedBlack.length > 0) {
+        const firstSeriesRedBlack = red || black || green;
+        if (firstSeriesRedBlack) {
+          yTicksRedBlack.forEach(tick => {
+            (firstSeriesRedBlack as unknown as ISeriesApi<'Candlestick'>).createPriceLine({
+              price: tick.value,
+              color: tick.color,
+              lineWidth: tick.lineWidth as 1 | 2 | 3 | 4 | undefined,
+              lineStyle: tick.lineStyle as 0 | 1 | 2 | 3 | 4 | undefined,
+              axisLabelVisible: true,
+              title: tick.label || '',
+            });
+          });
+        }
+      }
     } else if (gameType === 'OddAndEven') {
       const even = chart.addSeries(HistogramSeries, { color: '#25A79B', lastValueVisible: false, priceLineVisible: false });
       const odd = chart.addSeries(HistogramSeries, { color: '#EE5351', lastValueVisible: false, priceLineVisible: false });
@@ -844,6 +862,24 @@ const HistogramChart: React.FC<ChartProps> = ({
           };
           if (prev === undefined || Number(last.time) >= prev) requestAnimationFrame(step);
         })('odd', animOdd, odd);
+      }
+
+
+      const yTicksOddEven = getYAxisTicks(gameType, chartType);
+      if (yTicksOddEven && yTicksOddEven.length > 0) {
+        const firstSeriesOddEven = even || odd;
+        if (firstSeriesOddEven) {
+          yTicksOddEven.forEach(tick => {
+            firstSeriesOddEven.createPriceLine({
+              price: tick.value,
+              color: tick.color,
+              lineWidth: tick.lineWidth as 1 | 2 | 3 | 4 | undefined,
+              lineStyle: tick.lineStyle as 0 | 1 | 2 | 3 | 4 | undefined,
+              axisLabelVisible: true,
+              title: tick.label || '',
+            });
+          });
+        }
       }
     } else if (gameType === 'HighAndLow') {
       const high = chart.addSeries(HistogramSeries, { color: '#25A79B', lastValueVisible: false, priceLineVisible: false });
@@ -902,10 +938,28 @@ const HistogramChart: React.FC<ChartProps> = ({
       }
       const lastTime = Math.max(highData[highData.length - 1]?.time as number || 0, lowData[lowData.length - 1]?.time as number || 0);
       if (lastTime) lastPointTimeRef.current.set('high_low_composite', Number(lastTime));
+
+
+      const yTicksHighLow = getYAxisTicks(gameType, chartType);
+      if (yTicksHighLow && yTicksHighLow.length > 0) {
+        const firstSeriesHighLow = high || low;
+        if (firstSeriesHighLow) {
+          yTicksHighLow.forEach(tick => {
+            firstSeriesHighLow.createPriceLine({
+              price: tick.value,
+              color: tick.color,
+              lineWidth: tick.lineWidth as 1 | 2 | 3 | 4 | undefined,
+              lineStyle: tick.lineStyle as 0 | 1 | 2 | 3 | 4 | undefined,
+              axisLabelVisible: true,
+              title: tick.label || '',
+            });
+          });
+        }
+      }
     } else if (gameType === 'Dozen') {
       const red = chart.addSeries(HistogramSeries, { color: '#FF0000', lastValueVisible: false, priceLineVisible: false });
       const white = chart.addSeries(HistogramSeries, { color: '#FFFFFF', lastValueVisible: false, priceLineVisible: false });
-      const green = chart.addSeries(HistogramSeries, { color: '#00FF00', lastValueVisible: false, priceLineVisible: false });
+      const green = chart.addSeries(HistogramSeries, { color: '#25A69A', lastValueVisible: false, priceLineVisible: false });
       seriesMap.set('red', red); seriesMap.set('white', white); seriesMap.set('green', green);
       const redData: HistogramData[] = []; const whiteData: HistogramData[] = []; const greenData: HistogramData[] = [];
       data.forEach(series => {
@@ -914,7 +968,7 @@ const HistogramChart: React.FC<ChartProps> = ({
         validData.forEach((item) => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const value = (item as any).originalValue !== undefined ? (item as any).originalValue : (item as any).value;
-          const point: HistogramData = { time: item.time, value, color: value <= 12 ? '#FF0000' : value <= 24 ? '#FFFFFF' : '#00FF00' };
+          const point: HistogramData = { time: item.time, value, color: value <= 12 ? '#FF0000' : value <= 24 ? '#FFFFFF' : '#25A69A' };
           if (value <= 12) redData.push(point); else if (value <= 24) whiteData.push(point); else greenData.push(point);
         });
       });
@@ -942,6 +996,24 @@ const HistogramChart: React.FC<ChartProps> = ({
       });
       const lastTime = Math.max(redData[redData.length - 1]?.time as number || 0, whiteData[whiteData.length - 1]?.time as number || 0, greenData[greenData.length - 1]?.time as number || 0);
       if (lastTime) lastPointTimeRef.current.set('dozen_composite', Number(lastTime));
+
+
+      const yTicks = getYAxisTicks(gameType, chartType);
+      if (yTicks && yTicks.length > 0) {
+        const firstSeries = red || white || green;
+        if (firstSeries) {
+          yTicks.forEach(tick => {
+            firstSeries.createPriceLine({
+              price: tick.value,
+              color: tick.color,
+              lineWidth: tick.lineWidth as 1 | 2 | 3 | 4 | undefined,
+              lineStyle: tick.lineStyle as 0 | 1 | 2 | 3 | 4 | undefined,
+              axisLabelVisible: true,
+              title: tick.label || '',
+            });
+          });
+        }
+      }
     } else if (gameType === 'Column') {
       const up = chart.addSeries(HistogramSeries, { color: '#25A69A', lastValueVisible: false, priceLineVisible: false });
       const down = chart.addSeries(HistogramSeries, { color: '#ef5350', lastValueVisible: false, priceLineVisible: false });
@@ -1005,6 +1077,24 @@ const HistogramChart: React.FC<ChartProps> = ({
       }
       const lastTime = Math.max(upData[upData.length - 1]?.time as number || 0, downData[downData.length - 1]?.time as number || 0);
       if (lastTime) lastPointTimeRef.current.set('column_composite', Number(lastTime));
+
+
+      const yTicksColumn = getYAxisTicks(gameType, chartType);
+      if (yTicksColumn && yTicksColumn.length > 0) {
+        const firstSeriesColumn = up || down;
+        if (firstSeriesColumn) {
+          yTicksColumn.forEach(tick => {
+            firstSeriesColumn.createPriceLine({
+              price: tick.value,
+              color: tick.color,
+              lineWidth: tick.lineWidth as 1 | 2 | 3 | 4 | undefined,
+              lineStyle: tick.lineStyle as 0 | 1 | 2 | 3 | 4 | undefined,
+              axisLabelVisible: true,
+              title: tick.label || '',
+            });
+          });
+        }
+      }
     } else {
       const up = chart.addSeries(HistogramSeries, { color: '#25A69A', lastValueVisible: false, priceLineVisible: false });
       const down = chart.addSeries(HistogramSeries, { color: '#ef5350', lastValueVisible: false, priceLineVisible: false });

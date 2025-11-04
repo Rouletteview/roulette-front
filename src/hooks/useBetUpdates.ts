@@ -1,6 +1,7 @@
 import { useSubscription } from "@apollo/client";
 import { ON_BET_UPDATE_SUBSCRIPTION } from "../graphql/subscriptions/onBetUpdate";
 import { useBetStatusStore } from "../stores/betStatusStore";
+import { useBalanceStore } from "../stores/balanceStore";
 import { useCountdownStore } from "../stores/countdownStore";
 import { showWinToast, showLoseToast, showInfoToast } from "../app/components/Toast";
 import { useEffect, useRef } from "react";
@@ -28,6 +29,7 @@ interface BetUpdateData {
 
 export const useBetUpdates = (tableId: string) => {
     const { setBetResult, removeActiveBet, realTimeUpdates } = useBetStatusStore();
+    const { updateBetStatus } = useBalanceStore();
     const { countdown } = useCountdownStore();
     const processedBetsRef = useRef<Set<string>>(new Set());
 
@@ -44,23 +46,25 @@ export const useBetUpdates = (tableId: string) => {
             const { Bet } = betUpdateData.OnBetUpdate;
             const { id: betId, status, value } = Bet;
 
-        
+
             if (processedBetsRef.current.has(betId)) {
                 return;
             }
 
-          
+
             processedBetsRef.current.add(betId);
 
-      
+
             switch (status) {
                 case 'Won':
                     setBetResult({ status: 'Won', value });
+                    updateBetStatus(betId, 'Won');
                     showWinToast(value, `win-${betId}`);
                     removeActiveBet(betId);
                     break;
                 case 'Lost':
                     setBetResult({ status: 'Lost', value });
+                    updateBetStatus(betId, 'Lost');
                     showLoseToast(value, `lose-${betId}`);
                     removeActiveBet(betId);
                     break;
@@ -70,6 +74,7 @@ export const useBetUpdates = (tableId: string) => {
                     break;
                 case 'Cancelled':
                     setBetResult({ status: 'Cancelled', value });
+                    updateBetStatus(betId, 'Cancelled');
                     showInfoToast('Apuesta cancelada', `cancelled-${betId}`);
                     removeActiveBet(betId);
                     break;
@@ -77,7 +82,7 @@ export const useBetUpdates = (tableId: string) => {
                     showInfoToast('Resultado pendiente', `pending-${betId}`);
             }
 
-        
+
             if (status === 'Won' || status === 'Lost' || status === 'Cancelled') {
                 const betIdsFromStorage = localStorage.getItem('betId');
                 if (betIdsFromStorage) {
@@ -96,7 +101,7 @@ export const useBetUpdates = (tableId: string) => {
                 }
             }
         }
-    }, [betUpdateData, setBetResult, removeActiveBet]);
+    }, [betUpdateData, setBetResult, removeActiveBet, updateBetStatus]);
 
     useEffect(() => {
         if (countdown === 0) {
