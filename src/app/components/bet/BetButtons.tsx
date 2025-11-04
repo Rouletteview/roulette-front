@@ -176,8 +176,8 @@ const numbers = [
 const HighLowButtons = ({ lowPercentage, highPercentage, handleToggle }: { lowPercentage: number, highPercentage: number, handleToggle: (tag: string) => void }) => {
     return (
         <div className="flex flex-col gap-6 w-full">
-            <button onClick={() => handleToggle('Low')} className="bg-[#0D7FFC41] hover:bg-[#0D7FFC41]/80 w-full text-white  text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Bajo 1-18 ({lowPercentage}%)</button>
-            <button onClick={() => handleToggle('High')} className="bg-[#85FFE099] hover:bg-[#85FFE099]/80 w-full text-white text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer">Alto 19-36 ({highPercentage}%)</button>
+             <button onClick={() => handleToggle('High')} className="bg-[#25A69A] hover:bg-[#25A69A]/80 w-full text-white text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer">Alto 19-36 ({highPercentage}%)</button>
+            <button onClick={() => handleToggle('Low')} className="bg-[#ef5350] hover:bg-[#ef5350]/80 w-full text-white  text-md font-bold px-4 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Bajo 1-18 ({lowPercentage}%)</button>
         </div>
     )
 };
@@ -220,21 +220,21 @@ const DozenButtons = ({ dozen1Percentage, dozen2Percentage, dozen3Percentage, ha
             <button
                 onClick={() => handleToggle('FirstDozen')}
                 disabled={!canPlaceFirstDozen}
-                className={`bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${!canPlaceFirstDozen ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`bg-[#FF0000] hover:bg-[#FF0000]/80 transition-all duration-300 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${!canPlaceFirstDozen ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
                 Docena 1 - 12 ({dozen1Percentage}%)
             </button>
             <button
                 onClick={() => handleToggle('SecondDozen')}
                 disabled={!canPlaceSecondDozen}
-                className={`bg-[#0D7FFC41] hover:bg-[#0D7FFC41]/80 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${!canPlaceSecondDozen ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`bg-[#FFFFFF] hover:bg-[#FFFFFF]/80 transition-all duration-300 w-full text-black text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${!canPlaceSecondDozen ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
                 Docena 13 - 24 ({dozen2Percentage}%)
             </button>
             <button
                 onClick={() => handleToggle('ThirdDozen')}
                 disabled={!canPlaceThirdDozen}
-                className={`bg-[#85FFE099] hover:bg-[#85FFE099]/80 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${!canPlaceThirdDozen ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`bg-[#25A69A] hover:bg-[#25A69A]/80 transition-all duration-300 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${!canPlaceThirdDozen ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
                 Docena 25 - 36 ({dozen3Percentage}%)
             </button>
@@ -262,21 +262,21 @@ const ColumnButtons = ({ column1Percentage, column2Percentage, column3Percentage
             <button
                 onClick={() => handleToggle('FirstColumn')}
                 disabled={!canPlaceFirstColumn}
-                className={`bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${!canPlaceFirstColumn ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`bg-[#FF0000] hover:bg-[#FF0000]/80 transition-all duration-300 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${!canPlaceFirstColumn ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
                 Columna 1 ({column1Percentage}%)
             </button>
             <button
                 onClick={() => handleToggle('SecondColumn')}
                 disabled={!canPlaceSecondColumn}
-                className={`bg-[#0D7FFC41] hover:bg-[#0D7FFC41]/80 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${!canPlaceSecondColumn ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`bg-[#FFFFFF] hover:bg-[#FFFFFF]/80 transition-all duration-300 w-full text-black text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_-6px_8px_0px_#00000040] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${!canPlaceSecondColumn ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
                 Columna 2 ({column2Percentage}%)
             </button>
             <button
                 onClick={() => handleToggle('ThirdColumn')}
                 disabled={!canPlaceThirdColumn}
-                className={`bg-[#85FFE099] hover:bg-[#85FFE099]/80 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${!canPlaceThirdColumn ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`bg-[#25A69A] hover:bg-[#25A69A]/80 transition-all duration-300 w-full text-white text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${!canPlaceThirdColumn ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
                 Columna 3 ({column3Percentage}%)
             </button>
@@ -304,25 +304,25 @@ export const StraightUpButtons = ({ probabilities, handleToggle }: { probabiliti
 
 const VoisinsDuZeroButtons = ({ voisinsDuZeroPercentage, handleToggle }: { voisinsDuZeroPercentage: number, handleToggle: (tag: string) => void }) => {
     return (
-        <button onClick={() => handleToggle('VoisinsDuZero')} className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Vecinos del cero ({voisinsDuZeroPercentage}%)</button>
+        <button onClick={() => handleToggle('VoisinsDuZero')} className="bg-[#D9A425] hover:bg-[#B3831D]/80 transition-all duration-300 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Vecinos del cero ({voisinsDuZeroPercentage}%)</button>
     )
 }
 
 const TiersDuCylindreButtons = ({ tiersDuCylindrePercentage, handleToggle }: { tiersDuCylindrePercentage: number, handleToggle: (tag: string) => void }) => {
     return (
-        <button onClick={() => handleToggle('TiersDuCylindre')} className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Tercio ({tiersDuCylindrePercentage}%)</button>
+        <button onClick={() => handleToggle('TiersDuCylindre')} className="bg-[#D9A425] hover:bg-[#B3831D]/80 transition-all duration-300 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Tercio ({tiersDuCylindrePercentage}%)</button>
     )
 }
 
 const PlayZeroButtons = ({ playZeroPercentage, handleToggle }: { playZeroPercentage: number, handleToggle: (tag: string) => void }) => {
     return (
-        <button onClick={() => handleToggle('PlayZero')} className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Juego del cero ({playZeroPercentage}%)</button>
+        <button onClick={() => handleToggle('PlayZero')} className="bg-[#D9A425] hover:bg-[#B3831D]/80 transition-all duration-300 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Juego del cero ({playZeroPercentage}%)</button>
     )
 }
 
 const OrphelinsButtons = ({ orphelinsPercentage, handleToggle }: { orphelinsPercentage: number, handleToggle: (tag: string) => void }) => {
     return (
-        <button onClick={() => handleToggle('Orphelins')} className="bg-[#8D34F9] hover:bg-[#8D34F9]/80 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Huérfanos ({orphelinsPercentage}%)</button>
+        <button onClick={() => handleToggle('Orphelins')} className="bg-[#D9A425] hover:bg-[#B3831D]/80 transition-all duration-300 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Huérfanos ({orphelinsPercentage}%)</button>
     )
 }
 

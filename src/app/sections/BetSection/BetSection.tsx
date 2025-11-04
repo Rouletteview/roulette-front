@@ -7,6 +7,7 @@ import { useEffect, useRef } from 'react';
 import { useGetBet } from '../../hooks/useGetBet';
 import { useCountdownStore } from '../../../stores/countdownStore';
 import { useBetStatusStore } from '../../../stores/betStatusStore';
+import { useBalanceStore } from '../../../stores/balanceStore';
 import { showWinToast, showLoseToast, showInfoToast } from '../../components/Toast';
 import StraightUpButton from "../../components/bet/StraightUpBetButton";
 import { GameType } from "../../../graphql/generated/types";
@@ -82,6 +83,7 @@ const BetSection: React.FC<Props> = ({ gameType, probabilities, tableId }) => {
 
   const { data: betData } = useGetBet(betIdsArray, { skip: betIdsArray.length === 0 });
   const { setBetResult } = useBetStatusStore();
+  const { updateBetStatus } = useBalanceStore();
   const processedBetsRef = useRef<Set<string>>(new Set());
 
 
@@ -100,11 +102,13 @@ const BetSection: React.FC<Props> = ({ gameType, probabilities, tableId }) => {
 
         if (status === 'Won') {
           setBetResult({ status: 'Won', value });
+          updateBetStatus(betId, 'Won');
           showWinToast(value, `win-${betId}`);
           completedBets.push(betId);
           processedBetsRef.current.add(betId);
         } else if (status === 'Lost') {
           setBetResult({ status: 'Lost', value });
+          updateBetStatus(betId, 'Lost');
           showLoseToast(value, `lose-${betId}`);
           completedBets.push(betId);
           processedBetsRef.current.add(betId);
@@ -127,7 +131,7 @@ const BetSection: React.FC<Props> = ({ gameType, probabilities, tableId }) => {
         }
       }
     }
-  }, [countdown, betData, setBetResult]);
+  }, [countdown, betData, setBetResult, updateBetStatus]);
 
 
   useEffect(() => {
