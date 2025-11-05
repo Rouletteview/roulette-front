@@ -304,7 +304,7 @@ export const StraightUpButtons = ({ probabilities, handleToggle }: { probabiliti
 
 const VoisinsDuZeroButtons = ({ voisinsDuZeroPercentage, handleToggle }: { voisinsDuZeroPercentage: number, handleToggle: (tag: string) => void }) => {
     return (
-        <button onClick={() => handleToggle('VoisinsDuZero')} className="bg-[#D9A425] hover:bg-[#B3831D]/80 transition-all duration-300 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Vecinos del cero ({voisinsDuZeroPercentage}%)</button>
+        <button onClick={() => handleToggle('VoisinsDuZero')} className="bg-[#25A69A] hover:bg-[#25A69A]/80 transition-all duration-300 w-full text-white  text-md font-bold px-2 py-2 rounded-[10px] shadow-[0px_4px_6px_0px_#00000040] cursor-pointer">Vecinos del cero ({voisinsDuZeroPercentage}%)</button>
     )
 }
 

@@ -14,7 +14,7 @@ const colorClasses = {
 const placeholderColors = ['red', 'white', 'green', 'red', 'white', 'green', 'red', 'white', 'green', 'red', 'white', 'green', 'red', 'white'];
 
 const NumbersDisplay = ({ numbers, loading }: Props) => {
-    const lastNumbers = numbers;
+    const lastNumbers = numbers.slice(-14);
 
     return (
         <div className="mb-4">

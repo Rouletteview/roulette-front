@@ -161,7 +161,7 @@ const formatMultipleHistograms = (grouped: GroupedData[], gameType?: GameType): 
         }
       } else if (gameType === 'VoisinsDuZero') {
         value = Number;
-        color = isVoisinDuZero(Number) ? '#25A69A' : '#ef5350';
+        color = (Tag === 'VoisinsDuZero' || Tag === 'VoisinDuZero') ? '#25A69A' : '#ef5350';
       } else {
         value = (gameType === 'StraightUp' || gameType === 'Dozen' || gameType === 'HighAndLow') ? Number : convertTagToNumber(Tag, gameType);
         if (lastValue === null) {

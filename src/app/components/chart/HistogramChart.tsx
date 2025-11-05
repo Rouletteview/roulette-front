@@ -435,6 +435,77 @@ const HistogramChart: React.FC<ChartProps> = ({
           });
         }
       }
+    } else if (gameType === 'VoisinsDuZero') {
+      const greenSeries = chart.addSeries(HistogramSeries, {
+        color: '#25A69A',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+
+      const redSeries = chart.addSeries(HistogramSeries, {
+        color: '#ef5350',
+        lastValueVisible: false,
+        priceLineVisible: false,
+      });
+
+      const greenData: HistogramData[] = [];
+      const redData: HistogramData[] = [];
+
+      data.forEach((series) => {
+        if ('value' in series.data[0] && 'color' in series.data[0]) {
+          const validData = series.data
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .filter(item => item && typeof item.time === 'number' && !isNaN((item as any).value))
+            .sort((a, b) => Number(a.time) - Number(b.time));
+
+          validData.forEach((item) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const value = (item as any).value;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const originalValue = (item as any).originalValue;
+            const numberToUse = originalValue !== undefined ? originalValue : value;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const tag = (item as any).tag;
+
+            const isVoisin = tag === 'VoisinsDuZero' || tag === 'VoisinDuZero';
+            const finalColor = isVoisin ? '#25A69A' : '#ef5350';
+
+            const histogramPoint: HistogramData = {
+              time: item.time,
+              value: numberToUse,
+              color: finalColor,
+            };
+
+            if (isVoisin) {
+              greenData.push(histogramPoint);
+            } else {
+              redData.push(histogramPoint);
+            }
+          });
+        }
+      });
+
+      if (greenData.length > 0) greenSeries.setData(greenData);
+      if (redData.length > 0) redSeries.setData(redData);
+
+      seriesMap.set('green', greenSeries);
+      seriesMap.set('red', redSeries);
+
+      if (yTicks && yTicks.length > 0) {
+        const firstSeries = greenSeries || redSeries;
+        if (firstSeries) {
+          yTicks.forEach(tick => {
+            firstSeries.createPriceLine({
+              price: tick.value,
+              color: tick.color,
+              lineWidth: 2,
+              lineStyle: 1,
+              axisLabelVisible: true,
+              title: tick.label,
+            });
+          });
+        }
+      }
     } else if (gameType === 'Column') {
 
       const upSeries = chart.addSeries(HistogramSeries, {
@@ -584,24 +655,6 @@ const HistogramChart: React.FC<ChartProps> = ({
     }
 
     seriesMapRef.current = seriesMap;
-
-
-
-
-
-    if (seriesMap.size > 0 && yTicks && yTicks.length > 0) {
-      const firstSeries = Array.from(seriesMap.values())[0];
-      yTicks.forEach(tick => {
-        firstSeries.createPriceLine({
-          price: tick.value,
-          color: tick.color,
-          lineWidth: 2,
-          lineStyle: 1,
-          axisLabelVisible: true,
-          title: tick.label,
-        });
-      });
-    }
 
     chart.subscribeCrosshairMove((param: MouseEventParams) => {
       if (
@@ -946,6 +999,66 @@ const HistogramChart: React.FC<ChartProps> = ({
         if (firstSeriesHighLow) {
           yTicksHighLow.forEach(tick => {
             firstSeriesHighLow.createPriceLine({
+              price: tick.value,
+              color: tick.color,
+              lineWidth: tick.lineWidth as 1 | 2 | 3 | 4 | undefined,
+              lineStyle: tick.lineStyle as 0 | 1 | 2 | 3 | 4 | undefined,
+              axisLabelVisible: true,
+              title: tick.label || '',
+            });
+          });
+        }
+      }
+    } else if (gameType === 'VoisinsDuZero') {
+      const green = chart.addSeries(HistogramSeries, { color: '#25A69A', lastValueVisible: false, priceLineVisible: false });
+      const red = chart.addSeries(HistogramSeries, { color: '#ef5350', lastValueVisible: false, priceLineVisible: false });
+      seriesMap.set('green', green); seriesMap.set('red', red);
+      const greenData: HistogramData[] = []; const redData: HistogramData[] = [];
+      data.forEach(series => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const validData = series.data.filter(item => item && typeof item.time === 'number' && !isNaN((item as any).value)).sort((a, b) => Number(a.time) - Number(b.time));
+        validData.forEach((item) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const value = (item as any).originalValue !== undefined ? (item as any).originalValue : (item as any).value;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const tag = (item as any).tag;
+          // Determinar el color basado en el tag: verde para VoisinsDuZero, rojo para Other
+          const isVoisin = tag === 'VoisinsDuZero' || tag === 'VoisinDuZero';
+          const point: HistogramData = { time: item.time, value, color: isVoisin ? '#25A69A' : '#ef5350' };
+          if (isVoisin) greenData.push(point); else redData.push(point);
+        });
+      });
+      green.setData(greenData); red.setData(redData);
+      // animate both series
+      const anim = [['green', greenData, green], ['red', redData, red]] as const;
+      anim.forEach(([key, pts, s]) => {
+        if (pts.length === 0) return;
+        (function run(k: string, arr: HistogramData[], seriesInst: ISeriesApi<'Histogram'>) {
+          const last = arr[arr.length - 1]; const pre = arr.slice(0, -1);
+          const prev = lastPointTimeRef.current.get(k);
+          seriesInst.setData(pre);
+          const start = pre.length > 0 ? pre[pre.length - 1].value : last.value;
+          const end = last.value; const startTs = performance.now(); const dur = 450;
+          const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+          const step = (now: number) => {
+            const t = Math.min(1, (now - startTs) / dur);
+            const v = start + (end - start) * ease(t);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            seriesInst.update({ time: Number(last.time) as UTCTimestamp, value: v, color: (last as any).color } as HistogramData);
+            if (t < 1) requestAnimationFrame(step); else { lastPointTimeRef.current.set(k, Number(last.time)); seriesInst.setData(arr); }
+          };
+          if (prev === undefined || Number(last.time) >= prev) requestAnimationFrame(step);
+        })(key as string, pts as HistogramData[], s as ISeriesApi<'Histogram'>);
+      });
+      const lastTime = Math.max(greenData[greenData.length - 1]?.time as number || 0, redData[redData.length - 1]?.time as number || 0);
+      if (lastTime) lastPointTimeRef.current.set('voisins_composite', Number(lastTime));
+
+      const yTicksVoisins = getYAxisTicks(gameType, chartType);
+      if (yTicksVoisins && yTicksVoisins.length > 0) {
+        const firstSeriesVoisins = green || red;
+        if (firstSeriesVoisins) {
+          yTicksVoisins.forEach(tick => {
+            firstSeriesVoisins.createPriceLine({
               price: tick.value,
               color: tick.color,
               lineWidth: tick.lineWidth as 1 | 2 | 3 | 4 | undefined,

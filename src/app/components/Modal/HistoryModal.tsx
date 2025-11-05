@@ -143,13 +143,15 @@ const HistoryModal: React.FC<HistoryModalProps> = ({ open, onClose }) => {
                                         <img src={ColumnIcon} alt="" />
                                     </th>
                                     <th className="px-4 sm:px-4 md:px-8 py-3">Mercado Operado</th>
+                                    <th className="px-2 sm:px-4 md:px-8 py-3 hidden lg:table-cell">Tipo de apuesta</th>
                                     <th className="px-2 sm:px-4 md:px-8 py-3">Ganancia</th>
+                                    <th className="px-2 sm:px-4 md:px-8 py-3">Fecha</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {userBets.length === 0 ? (
                                     <tr>
-                                        <td colSpan={3} className="px-4 sm:px-4 md:px-8 py-8 text-center text-gray-500">
+                                        <td colSpan={5} className="px-4 sm:px-4 md:px-8 py-8 text-center text-gray-500">
                                             No hay apuestas en el historial
                                         </td>
                                     </tr>
@@ -164,10 +166,16 @@ const HistoryModal: React.FC<HistoryModalProps> = ({ open, onClose }) => {
                                             </td>
                                             <td className="px-4 sm:px-4 md:px-8 py-2 sm:py-3 md:py-4">
                                                 <div className="font-medium">{bet.table.Name}</div>
-                                                <div className="text-xs text-gray-400">{translateRouletteTag(bet.gameType)}</div>
+                                                <div className="text-xs text-gray-400 md:hidden table-cell">{bet.gameType}</div>
+                                            </td>
+                                            <td className="px-2 sm:px-4 md:px-8 py-2 sm:py-3 md:py-4 hidden lg:table-cell">
+                                                <div className="font-medium">{translateRouletteTag(bet.gameType)}</div>
                                             </td>
                                             <td className={`px-2 sm:px-4 md:px-8 py-2 sm:py-3 md:py-4 ${bet.status === 'Won' ? 'text-green-600' : bet.status === 'Lost' ? 'text-red-600' : 'text-gray-600'} font-light`}>
                                                 {bet.status === 'Won' ? '+' : bet.status === 'Lost' ? '-' : ''}${bet.amount}
+                                            </td>
+                                            <td className="px-2 sm:px-4 md:px-8 py-2 sm:py-3 md:py-4">
+                                                {new Date(bet.createdAt).toLocaleDateString('es-VE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                             </td>
                                         </tr>
                                     ))

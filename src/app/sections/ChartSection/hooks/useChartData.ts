@@ -34,9 +34,8 @@ export const useChartData = (
     const probabilitiesResultLimit = resultsParam ? parseInt(resultsParam) : 250;
 
     const startDate = new Date("2025-11-03T00:00:00.000Z");
-    console.log('startDate', startDate);
     const endDate = new Date("2025-11-03T23:59:59.999Z");
-    console.log('endDate', endDate);
+
     const {
         data: tablesData,
         loading: marketLoading,
@@ -166,12 +165,11 @@ export const useChartData = (
         }
     }, [currentProbabilities]);
 
-    // Resetear las probabilidades preservadas cuando cambia la tabla o gameType
+  
     useEffect(() => {
         setLastValidProbabilities(undefined);
     }, [selectedTable, gameType]);
 
-    // Usar las probabilidades actuales si están disponibles, sino usar las últimas válidas
     const probabilities = currentProbabilities && currentProbabilities.length > 0
         ? currentProbabilities
         : lastValidProbabilities;
