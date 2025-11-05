@@ -9,7 +9,7 @@ import {
   ISeriesApi,
 
 } from 'lightweight-charts';
-import { translateRouletteTag, getYAxisTicks, isVoisinDuZero, isOrphelins, isTiersDuCylindre, isPlayZero } from '../../../utils/formatters/rouletterNumbers';
+import { translateRouletteTag, getYAxisTicks, isOrphelins, isTiersDuCylindre, isPlayZero } from '../../../utils/formatters/rouletterNumbers';
 
 
 type ChartProps = {
@@ -380,12 +380,13 @@ const CandleChart: React.FC<ChartProps> = ({
         validData.forEach(candle => {
           const strippedCandle = stripCandle(candle);
           const closeValue = candle.close;
+          const closeTag = candle.closeTag;
 
 
           let belongsToGameType = false;
 
           if (gameType === 'VoisinsDuZero') {
-            belongsToGameType = isVoisinDuZero(closeValue);
+            belongsToGameType = closeTag === 'VoisinsDuZero' || closeTag === 'VoisinDuZero';
           } else if (gameType === 'Orphelins') {
             belongsToGameType = isOrphelins(closeValue);
           } else if (gameType === 'TiersDuCylindre') {
@@ -684,8 +685,8 @@ const CandleChart: React.FC<ChartProps> = ({
     } else if (isSpecialGame) {
       seriesBuckets.set('green', []); seriesBuckets.set('red', []);
       sorted.forEach(c => {
-        const v = c.close; const s: Candle = { time: Number(c.time), open: c.open, high: c.high, low: c.low, close: c.close };
-        const belongs = (gameType === 'VoisinsDuZero' && isVoisinDuZero(v)) ||
+        const v = c.close; const tag = c.closeTag; const s: Candle = { time: Number(c.time), open: c.open, high: c.high, low: c.low, close: c.close };
+        const belongs = (gameType === 'VoisinsDuZero' && (tag === 'VoisinsDuZero' || tag === 'VoisinDuZero')) ||
           (gameType === 'Orphelins' && isOrphelins(v)) ||
           (gameType === 'TiersDuCylindre' && isTiersDuCylindre(v)) ||
           (gameType === 'PlayZero' && isPlayZero(v));
