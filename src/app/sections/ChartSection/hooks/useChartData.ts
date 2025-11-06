@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { GET_ROULETTE_TABLES } from "../../../../graphql/query/getRouletteTables";
 import { GET_ROULETTE_TABLES_PROBABILITIES } from "../../../../graphql/query/getRouletteTableProbabilities";
-import { GET_LAST_ROULETTE_TABLE_NUMBERS } from "../../../../graphql/query/getLastRouletteTableNumbers";
 import {
     useFormattedChartData,
     GameType,
@@ -11,7 +10,7 @@ import {
 import { chartTypes } from "../../../../types/types";
 import { ChartType } from "../../../../types/chart/types";
 import { ON_ROULETTE_NUMBER_UPDATE_SUBSCRIPTION } from "../../../../graphql/subscriptions/onRouletteNumberUpdate";
-import { useNumbersMemory } from "../../../../hooks/useNumbersMemory";
+import { useRouletteNumbers } from "../../../../utils/formatters/rouletterNumbers";
 
 
 interface RouletteTable {
@@ -70,6 +69,8 @@ export const useChartData = (
         fetchPolicy: 'cache-and-network',
     });
 
+    console.log('rouletteProbData', rouletteProbData);
+
     const { data: chartNumbersDataSubscription } =
         useSubscription(ON_ROULETTE_NUMBER_UPDATE_SUBSCRIPTION, {
             variables: {
@@ -116,13 +117,7 @@ export const useChartData = (
         });
     }, [chartNumbersDataSubscription, selectedTable, probabilitiesResultLimit]);
 
-    const { data: chartNumbersData } = useQuery(GET_LAST_ROULETTE_TABLE_NUMBERS, {
-        variables: {
-            TableId: selectedTable,
-            Limit: 14,
-        },
-        skip: !selectedTable,
-    });
+ 
 
     const tableOptions =
         tablesData?.GetRouletteTables?.Tables?.map((table: RouletteTable) => ({
@@ -143,29 +138,32 @@ export const useChartData = (
         gameType: gameType || 'RedAndBlack',
     });
 
-    const numeros = chartNumbersData?.GetLastRouletteTableNumbers;
-    console.log('numeros', numeros);
-    const httpNumbers = numeros || [];
-    const {
-        numbers: formattedNumbers,
-        probabilities: realTimeProbabilities
-    } = useNumbersMemory(selectedTable, gameType, httpNumbers);
-    console.log('formattedNumbers', formattedNumbers);
-
-   
-    const currentProbabilities =
-        realTimeProbabilities.length > 0 ? realTimeProbabilities :
-            chartNumbersDataSubscription?.OnRouletteNumberUpdate?.Probabilities ??
-            rouletteProbData?.GetRouletteTableProbabilities.Probabilities;
-
   
+    const selectedChartType = selectedType
+        ? chartTypes[selectedType as keyof typeof chartTypes]
+        : chartTypes.Candlestick;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const candleData = Array.isArray(chartFormattedData) && chartFormattedData[0]?.data ? (chartFormattedData[0].data as any[]) : [];
+    const numbersFromCandles = candleData.map(c => ({ Number: typeof c.closeOriginal === 'number' ? c.closeOriginal : c.close }));
+
+    const rouletteFromCandles = useRouletteNumbers(numbersFromCandles);
+    const rouletteFromResults = useRouletteNumbers(sourceResults);
+    const formattedNumbers = selectedChartType === chartTypes.Candlestick ? rouletteFromCandles : rouletteFromResults;
+
+
+    const currentProbabilities =
+        chartNumbersDataSubscription?.OnRouletteNumberUpdate?.Probabilities ??
+        rouletteProbData?.GetRouletteTableProbabilities.Probabilities;
+
+
     useEffect(() => {
         if (currentProbabilities && currentProbabilities.length > 0) {
             setLastValidProbabilities(currentProbabilities);
         }
     }, [currentProbabilities]);
 
-  
+
     useEffect(() => {
         setLastValidProbabilities(undefined);
     }, [selectedTable, gameType]);
@@ -181,7 +179,6 @@ export const useChartData = (
     return {
         tableOptions,
         chartFormattedData,
-        chartNumbersData,
         formattedNumbers,
         probabilities,
         marketLoading,

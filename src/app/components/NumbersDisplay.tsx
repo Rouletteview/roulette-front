@@ -14,7 +14,8 @@ const colorClasses = {
 const placeholderColors = ['red', 'white', 'green', 'red', 'white', 'green', 'red', 'white', 'green', 'red', 'white', 'green', 'red', 'white'];
 
 const NumbersDisplay = ({ numbers, loading }: Props) => {
-    const lastNumbers = numbers.slice(-14);
+    console.log('numbers', numbers);
+    const lastNumbers = numbers.slice(-14).reverse();
 
     return (
         <div className="mb-4">
